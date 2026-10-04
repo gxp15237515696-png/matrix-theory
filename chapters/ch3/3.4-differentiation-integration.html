@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§3.4 矩阵的微分和积分 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §3.4：函数矩阵 A(t) 对 t 的导数与积分、四则运算法则、e^{tA} 的导数、多元函数对矩阵/向量的导数（梯度、Hessian、Jacobi 矩阵）、复合函数链式法则">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§3.4 矩阵的微分和积分</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="3.4" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 3 章 矩阵分析及其应用</a><span class="sep" aria-hidden="true">/</span>
+            <span>§3.4 矩阵的微分和积分</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 3 章 · 矩阵分析及其应用</div>
+            <h1>§3.4 矩阵的微分和积分</h1>
+            <p class="lede">当矩阵元素是变量 <strong>\(t\) 的函数</strong>时，就有<strong>函数矩阵</strong> \(A(t)=(a_{ij}(t))\)。它的微积分完全<strong>逐元素</strong>定义，却满足矩阵形式的四则法则；特别地 \(\dfrac{d}{dt}e^{tA}=Ae^{tA}\) 是下一节解线性微分方程组的钥匙。后半节进入自动控制与优化常用的多元微分：纯量对向量（<strong>梯度</strong>）、纯量对矩阵、向量对向量（<strong>Jacobi 矩阵</strong>）的导数与链式法则，核心公式 \(\dfrac{\mathrm d}{\mathrm dx}(x^{\mathrm T}Ax)=(A+A^{\mathrm T})x\) 是最小二乘与梯度法的基石。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.163–171</strong></span>
+              <span class="chip">建议 <strong>3 学时</strong></span>
+              <span class="chip">定义 <strong>3 个</strong></span>
+              <span class="chip">定理 <strong>1 个</strong></span>
+              <span class="chip">例题 <strong>4 道</strong></span>
+            </div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>逐元素定义函数矩阵的导数与积分，并运用四则法则；</li>
+                  <li>证明并使用 \(\dfrac{d}{dt}e^{tA}=Ae^{tA}=e^{tA}A\) 及 \(\sin,\cos\) 的导数；</li>
+                  <li>区分四类导数：函数矩阵对 t、纯量对向量、纯量对矩阵、向量对向量；</li>
+                  <li>计算二次型的梯度 \((A+A^{\mathrm T})x\)，对称时为 \(2Ax\)；</li>
+                  <li>写出 Hessian 与 Jacobi 矩阵，使用矩阵链式法则。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>导数的逐元素定义；</li>
+                      <li>乘积法则顺序；</li>
+                      <li>\(e^{tA}\) 求导；</li>
+                      <li>\(x^{\mathrm T}Ax\) 的梯度。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>\(A(t)\) 与 \(A'(t)\) 一般不可交换；</li>
+                      <li>梯度列向量 vs 行向量的布局；</li>
+                      <li>积分中常矩阵提出的方向。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 3 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>函数矩阵导数、四则法则、定理 3.9</td><td class="num">p.163–165</td></tr>
+                    <tr><td class="num">2</td><td>积分及 Newton–Leibniz 公式</td><td class="num">p.165–166</td></tr>
+                    <tr><td class="num">3</td><td>其他微分概念（梯度/Hessian/Jacobi）</td><td class="num">p.166–171</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 210" role="img" aria-label="矩阵微分脉络图">
+                    <defs><marker id="m34" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="30" y="28" width="180" height="48"/><rect x="250" y="28" width="180" height="48"/><rect x="470" y="28" width="170" height="48"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="120" y="50">函数矩阵 A(t)</text><text x="120" y="67" font-size="11" fill="#666">逐元素求导/积分</text>
+                      <text x="340" y="50">d/dt e^{tA} = A e^{tA}</text><text x="340" y="67" font-size="11" fill="#666">乘积法则（注意顺序）</text>
+                      <text x="555" y="50">积分 + N-L 公式</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m34)"><line x1="210" y1="52" x2="248" y2="52"/><line x1="430" y1="52" x2="468" y2="52"/></g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="180" y="130" width="480" height="50"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13.5" text-anchor="middle">
+                      <text x="420" y="152">多元微分：梯度 df/dx · Hessian · Jacobi 矩阵 · 链式法则</text>
+                      <text x="420" y="171" font-size="12" fill="#666">核心：d(xᵀAx)/dx = (A+Aᵀ)x（对称时 2Ax）</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m34)"><path d="M120 78 C200 110 300 118 330 128" stroke-dasharray="4 4"/></g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、函数矩阵的导数 ================= -->
+          <section class="section" id="sec-derivative">
+            <h2 class="sec-title"><span class="cn">一</span>函数矩阵对 t 的导数</h2>
+            <section class="card def" id="def-3-9">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 3.9</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">若函数矩阵 \(A(t)=(a_{ij}(t))_{m\times n}\) 的每一个元素 \(a_{ij}(t)\) 都是变量 \(t\) 的可微函数，则称 \(A(t)\) 可微，其<strong>导数（微商）</strong>定义为
+                  <div class="eq-scroll">\[ A'(t)=\frac{\mathrm d}{\mathrm dt}A(t)=\left(\frac{\mathrm d}{\mathrm dt}a_{ij}(t)\right)_{m\times n}. \tag{3.4.1} \]</div>
+                  即对每个元素分别求导，再按原位置排成矩阵。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="four-rules">四则运算法则</h3>
+            <p>设 \(A(t),B(t)\) 是可进行运算的两个可微矩阵，则
+              <div class="eq-scroll">\[ \frac{\mathrm d}{\mathrm dt}\big(A(t)+B(t)\big)=\frac{\mathrm dA}{\mathrm dt}+\frac{\mathrm dB}{\mathrm dt}, \tag{3.4.2} \]</div>
+              <div class="eq-scroll">\[ \frac{\mathrm d}{\mathrm dt}\big(A(t)B(t)\big)=\frac{\mathrm dA}{\mathrm dt}B(t)+A(t)\frac{\mathrm dB}{\mathrm dt}, \tag{3.4.3} \]</div>
+              <div class="eq-scroll">\[ \frac{\mathrm d}{\mathrm dt}\big(a(t)A(t)\big)=\frac{\mathrm da}{\mathrm dt}A(t)+a(t)\frac{\mathrm dA}{\mathrm dt}. \tag{3.4.4} \]</div>
+            </p>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意：乘积法则中顺序不能换</span>
+              </header>
+              <div class="card-body"><p>式 (3.4.3) 右边两项必须保持 \(\frac{dA}{dt}B + A\frac{dB}{dt}\) 的次序，因为一般 \(A(t)A'(t)\ne A'(t)A(t)\)。证明就是对元素 \(p_{ij}=\sum_k a_{ik}b_{kj}\) 用数的乘积法则再按矩阵拼回。</p></div>
+            </aside>
+
+            <section class="card thm" id="thm-3-9">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 3.9（最常用：e^{tA} 的导数）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(n\) 阶矩阵 \(A\) 与 \(t\) 无关，则
+                  <div class="eq-scroll">\[ \frac{\mathrm d}{\mathrm dt}e^{tA}=Ae^{tA}=e^{tA}A, \tag{3.4.5} \]</div>
+                  <div class="eq-scroll">\[ \frac{\mathrm d}{\mathrm dt}\cos(tA)=-A\sin(tA)=-\sin(tA)A, \tag{3.4.6} \]</div>
+                  <div class="eq-scroll">\[ \frac{\mathrm d}{\mathrm dt}\sin(tA)=A\cos(tA)=\cos(tA)A. \tag{3.4.7} \]</div></p>
+                <details class="proof">
+                  <summary><span>式 (3.4.5) 证明（幂级数逐项求导，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>\(e^{tA}=\sum_{k=0}^{\infty}\frac{t^kA^k}{k!}\) 对任意 \(t\) 绝对收敛，可逐项求导：
+                      \[ \frac{\mathrm d}{\mathrm dt}e^{tA}=\sum_{k=1}^{\infty}\frac{t^{k-1}A^k}{(k-1)!}
+                         =A\sum_{k=1}^{\infty}\frac{t^{k-1}A^{k-1}}{(k-1)!}=Ae^{tA}. \]
+                      把常数 \(A\) 提到右侧提时同理得 \(e^{tA}A\)（\(A\) 与其自身的幂当然可交换）。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0">这是下一节解 \(x'=Ax\) 的直接依据：\(x(t)=e^{tA}c\) 满足 \(x'=Ae^{tA}c=Ax\) 且 \(x(0)=c\)。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 二、积分 ================= -->
+          <section class="section" id="sec-integral">
+            <h2 class="sec-title"><span class="cn">二</span>函数矩阵的积分</h2>
+            <section class="card def" id="def-3-10">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 3.10</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">若每个元素 \(a_{ij}(t)\) 在 \([t_0,t_1]\) 上可积，则定义
+                  <div class="eq-scroll">\[ \int_{t_0}^{t_1}A(t)\,\mathrm dt=\left(\int_{t_0}^{t_1}a_{ij}(t)\,\mathrm dt\right)_{m\times n}. \tag{3.4.8} \]</div>
+                  同样逐元素积分。</p>
+              </div>
+            </section>
+            <p>线性与常矩阵提出法则：
+              <div class="eq-scroll">\[ \int_{t_0}^{t_1}(A(t)+B(t))\,\mathrm dt=\int_{t_0}^{t_1}A(t)\,\mathrm dt+\int_{t_0}^{t_1}B(t)\,\mathrm dt, \tag{3.4.9} \]</div>
+              <div class="eq-scroll">\[ \int_{t_0}^{t_1}A(t)B\,\mathrm dt=\left(\int_{t_0}^{t_1}A(t)\,\mathrm dt\right)B,\quad
+                 \int_{t_0}^{t_1}AB(t)\,\mathrm dt=A\int_{t_0}^{t_1}B(t)\,\mathrm dt, \tag{3.4.10–11} \]</div>
+              其中 \(A,B\) 与 \(t\) 无关。<strong>Newton–Leibniz 公式</strong>依然成立：
+              <div class="eq-scroll">\[ \frac{\mathrm d}{\mathrm dt}\int_a^{t}A(s)\,\mathrm ds=A(t),\qquad
+                 \int_a^{b}A'(t)\,\mathrm dt=A(b)-A(a). \tag{3.4.12–13} \]</div>
+            </p>
+          </section>
+          <!-- ================= 三、其他微分概念 ================= -->
+          <section class="section" id="sec-other-derivatives">
+            <h2 class="sec-title"><span class="cn">三</span>多元函数对向量与矩阵的导数</h2>
+            <p>在自动控制、最优化中还要讨论：纯量对向量、纯量对矩阵、向量对向量的微商。约定：以下 \(\boldsymbol x\) 多写为 \(x\)。</p>
+
+            <h3 class="sub-title" id="scalar-matrix">1. 纯量对矩阵的导数（定义 3.11）</h3>
+            <section class="card def" id="def-3-11">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 3.11</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(X=(\xi_{ij})_{m\times n}\)，\(mn\) 元函数 \(f(X)=f(\xi_{11},\ldots,\xi_{mn})\)，定义
+                  <div class="eq-scroll">\[
+                  \frac{\mathrm df}{\mathrm dX}
+                  =\left(\frac{\partial f}{\partial \xi_{ij}}\right)_{m\times n}
+                  =\begin{pmatrix}
+                  \frac{\partial f}{\partial \xi_{11}}&\cdots&\frac{\partial f}{\partial \xi_{1n}}\\
+                  \vdots&&\vdots\\
+                  \frac{\partial f}{\partial \xi_{m1}}&\cdots&\frac{\partial f}{\partial \xi_{mn}}
+                  \end{pmatrix}. \tag{3.4.14}
+                  \]</div>
+                  即把每个偏导数放回对应位置，形状与 \(X\) 相同。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="scalar-vector">2. 纯量对向量的导数（梯度）</h3>
+            <section class="card ex" id="exm-3-10">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 3.10（梯度的列/行两种布局）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(x=(\xi_1,\ldots,\xi_n)^{\mathrm T}\)，\(n\) 元函数 \(f(x)=f(\xi_1,\ldots,\xi_n)\)，则
+                  <div class="eq-scroll">\[
+                  \frac{\mathrm df}{\mathrm dx}
+                  =\left(\frac{\partial f}{\partial \xi_1},\frac{\partial f}{\partial \xi_2},\ldots,\frac{\partial f}{\partial \xi_n}\right)^{\mathrm T}
+                  \quad\text{（列向量，梯度）},
+                  \]</div>
+                  <div class="eq-scroll">\[
+                  \frac{\mathrm df}{\mathrm dx^{\mathrm T}}
+                  =\left(\frac{\partial f}{\partial \xi_1},\ldots,\frac{\partial f}{\partial \xi_n}\right)
+                  \quad\text{（行向量）}.
+                  \]</div></p>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-3-11">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 3.11（二次型的梯度，最常用）</span><span class="card-tag">优化基石</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(x=(\xi_i)^{\mathrm T}\)，\(A=(a_{ij})_{n\times n}\)，\(f(x)=x^{\mathrm T}Ax=\sum_{i,j}a_{ij}\xi_i\xi_j\)。对第 \(k\) 个变量求偏导：
+                  \[ \frac{\partial f}{\partial \xi_k}=\sum_j a_{kj}\xi_j+\sum_i a_{ik}\xi_i, \]
+                  把所有分量拼成列向量：
+                  <div class="eq-scroll">\[
+                  \boxed{\ \frac{\mathrm d}{\mathrm dx}(x^{\mathrm T}Ax)=(A+A^{\mathrm T})x\ } \tag{一般}
+                  \]</div>
+                  特别地，<strong>当 \(A\) 为对称矩阵时</strong>
+                  <div class="eq-scroll">\[
+                  \boxed{\ \frac{\mathrm d}{\mathrm dx}(x^{\mathrm T}Ax)=2Ax.\ } \tag{3.4.15}
+                  \]</div></p>
+              </div>
+            </section>
+            <div class="grid2">
+              <div class="mini-card"><div class="mc-title">常用推论</div><p style="margin:0">
+                \(\dfrac{\mathrm d}{\mathrm dx}(b^{\mathrm T}x)=\dfrac{\mathrm d}{\mathrm dx}(x^{\mathrm T}b)=b\)；\(\dfrac{\mathrm d}{\mathrm dx}(c)=0\)；\(\dfrac{\mathrm d}{\mathrm dx}\|x\|_2^2=2x\)。这些是最小二乘正规方程 \(A^{\mathrm T}Ax=A^{\mathrm T}b\) 的求导来源。</p></div>
+              <div class="mini-card"><div class="mc-title">Hessian 矩阵（例 3.13）</div><p style="margin:0">梯度再对行向量 \(x^{\mathrm T}\) 求导：
+                \[ \frac{\mathrm d}{\mathrm dx^{\mathrm T}}\!\left(\frac{\mathrm df}{\mathrm dx}\right)
+                   =\left(\frac{\partial^2 f}{\partial \xi_i\partial \xi_j}\right)_{n\times n}, \tag{3.4.18} \]
+                即 Hessian，二阶连续可微时对称。</p></div>
+            </div>
+
+            <h3 class="sub-title" id="vector-vector">3. 向量对向量的导数（Jacobi 矩阵）</h3>
+            <section class="card ex" id="exm-3-14">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">例 3.14（向量函数的 Jacobi 矩阵）</span><span class="card-tag">Jacobi</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(f_j(x)=f_j(\xi_1,\ldots,\xi_n)\)（\(j=1,\ldots,n\)），令 \(\boldsymbol F(x)=(f_1(x),\ldots,f_n(x))^{\mathrm T}\)，定义函数矩阵
+                  <div class="eq-scroll">\[
+                  \frac{\mathrm d\boldsymbol F}{\mathrm dx}
+                  =\left(\frac{\partial \boldsymbol F}{\partial \xi_1},\ldots,\frac{\partial \boldsymbol F}{\partial \xi_n}\right)
+                  =\begin{pmatrix}
+                  \frac{\partial f_1}{\partial \xi_1}&\cdots&\frac{\partial f_1}{\partial \xi_n}\\
+                  \vdots&&\vdots\\
+                  \frac{\partial f_n}{\partial \xi_1}&\cdots&\frac{\partial f_n}{\partial \xi_n}
+                  \end{pmatrix}, \tag{3.4.19}
+                  \]</div>
+                  其第 \(j\) 行是 \(f_j\) 的梯度转置。称矩阵 (3.4.19) 为 \(f_1,\ldots,f_n\) 的 <strong>Jacobi 矩阵</strong>，在求解非线性方程组的 <strong>Newton 法</strong>中有重要应用。</p>
+              </div>
+            </section>
+            <section class="card note" id="note-ex314-cor">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">注：例 3.14 的直接推论（习题 3.4 第 8 题）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">若 \(f_j(x)=\sum_{i=1}^n a_{ji}\xi_i+\delta_j\)，即 \(\boldsymbol F(x)=Ax+\delta\)，则其 Jacobi 矩阵恰为 \(A\) 本身：\(\dfrac{\mathrm d\boldsymbol F}{\mathrm dx}=A\)。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="chain-rule">4. 复合函数链式法则（例 3.15）</h3>
+            <section class="card thm" id="chain-rule-card">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">例 3.15（矩阵形式链式法则）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(f(x)\) 是向量 \(x=(\xi_i)^{\mathrm T}\) 的函数，而 \(\xi_i=\xi_i(u)\)，\(u=(\zeta_1,\ldots,\zeta_m)^{\mathrm T}\)，则
+                  <div class="eq-scroll">\[
+                  \frac{\mathrm df}{\mathrm du}=\frac{\mathrm dx^{\mathrm T}}{\mathrm du}\frac{\mathrm df}{\mathrm dx}.
+                  \]</div>
+                  这正是多元链式法则 \(\dfrac{\partial f}{\partial \zeta_j}=\sum_i\dfrac{\partial f}{\partial \xi_i}\dfrac{\partial \xi_i}{\partial \zeta_j}\) 的矩阵写法：Jacobi 矩阵按复合顺序相乘。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="grad-lab-title">动手实验：二次型梯度计算器</h3>
+            <p>改 \(A\)（2×2）与 \(b\)，实时看 \(f=x^{\mathrm T}Ax-b^{\mathrm T}x\) 的偏导与梯度；把 \(A\) 改成不对称（如 \(a_{12}\ne a_{21}\)），观察公式自动退回 \((A+A^{\mathrm T})x-b\)。</p>
+            <section class="card lab" data-gradient-lab></section>
+          </section>
+
+          <!-- ================= 习题 3.4 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 3.4（共 9 题）</h2>
+            <div class="ex-toolbar">
+              <span data-fold-tools="details.solution">
+                <button type="button" data-fold="open">全部展开解答</button>
+                <button type="button" data-fold="close">全部收起</button>
+              </span>
+            </div>
+
+            <article class="card task" id="ex34-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">求导线性法则</span></header>
+              <div class="card-body"><p>证明式 (3.4.4)：\(\dfrac{\mathrm d}{\mathrm dt}(a(t)A(t))=a'(t)A(t)+a(t)A'(t)\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>对任意位置 \((i,j)\)，元素为 \(a(t)a_{ij}(t)\)，由数的乘积法则其导数为 \(a'(t)a_{ij}(t)+a(t)a'_{ij}(t)\)，正是矩阵 \(a'(t)A(t)+a(t)A'(t)\) 的第 \((i,j)\) 元；对所有 \(i,j\) 成立即得。式 (3.4.2)（加法）同理逐元素证明。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex34-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag">sin/cos 求导</span></header>
+              <div class="card-body"><p>证明式 (3.4.6)：\(\dfrac{\mathrm d}{\mathrm dt}\cos(tA)=-A\sin(tA)\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(\cos(tA)=\sum_{k=0}^{\infty}\dfrac{(-1)^k t^{2k}A^{2k}}{(2k)!}\)，逐项求导（与 \(t\) 无关的 \(A\) 作为常数）：
+                    \[ \frac{\mathrm d}{\mathrm dt}\cos(tA)=\sum_{k=1}^{\infty}\frac{(-1)^k t^{2k-1}A^{2k}}{(2k-1)!}
+                       =-A\sum_{k=1}^{\infty}\frac{(-1)^{k-1}t^{2k-1}A^{2k-1}}{(2k-1)!}=-A\sin(tA). \]</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex34-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag">积分提出法则</span></header>
+              <div class="card-body"><p>证明式 (3.4.11)：设 \(A\) 与 \(t\) 无关，证明
+                \[ \int_{t_0}^{t_1}A\,B(t)\,\mathrm dt=A\int_{t_0}^{t_1}B(t)\,\mathrm dt. \]</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>逐元素展开：左端第 \((i,j)\) 元为
+                    \[ \sum_k a_{ik}\int_{t_0}^{t_1}b_{kj}(t)\,\mathrm dt, \]
+                    这正是 \(A\int_{t_0}^{t_1}B(t)\,\mathrm dt\) 的第 \((i,j)\) 元（常数因子可提出积分号）。另一种写法用 (3.4.10) 的转置即得。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex34-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag tag-mid">二次型+线性项</span></header>
+              <div class="card-body"><p>设 \(x=(\xi_i)^{\mathrm T}\)，\(A=(a_{ij})\) 是 \(n\) 阶对称矩阵，\(b=(\beta_i)^{\mathrm T}\)，\(c\) 为常数，试求
+                \[ f(x)=x^{\mathrm T}Ax-b^{\mathrm T}x+c \]
+                对 \(x\) 的导数。</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由线性性与式 (3.4.15)、\(\dfrac{\mathrm d}{\mathrm dx}(b^{\mathrm T}x)=b\)、常数导数为 0：
+                    \[ \boxed{\frac{\mathrm df}{\mathrm dx}=2Ax-b}. \]
+                    令其为零即得线性方程组 \(2Ax=b\)——这正是二次目标函数的驻点（\(A\) 正定时为最小二乘/二次规划的解）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex34-5">
+              <header class="card-head"><span class="card-label">第 5 题</span><span class="tag">逆矩阵求导</span></header>
+              <div class="card-body"><p>若 \(A=A(t)=(a_{ij}(t))_{n\times n}\) 非奇异，证明
+                \[ \frac{\mathrm d}{\mathrm dt}A^{-1}=-A^{-1}\frac{\mathrm dA}{\mathrm dt}A^{-1}. \]</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>对恒等式 \(A(t)A^{-1}(t)=I\) 两边关于 \(t\) 求导，用乘积法则：
+                    \[ A'(t)A^{-1}(t)+A(t)(A^{-1})'(t)=O. \]
+                    左乘 \(A^{-1}\) 整理：\((A^{-1})'=-A^{-1}A'A^{-1}\)。关键是负号与两侧 \(A^{-1}\) 的顺序不可交换；这是参数估计、卡尔曼滤波中灵敏度分析的常用公式。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex34-6">
+              <header class="card-head"><span class="card-label">第 6 题</span><span class="tag tag-mid">迹的导数</span></header>
+              <div class="card-body"><p>设 \(X\) 为 \(n\times m\) 矩阵，\(A,B\) 依次为 \(n\times n\) 与 \(m\times n\) 的常数矩阵，证明
+                \[ (1)\ \frac{\mathrm d}{\mathrm dX}\big(\tr(BX)\big)=B^{\mathrm T};\qquad
+                   (2)\ \frac{\mathrm d}{\mathrm dX}\big(\tr(X^{\mathrm T}AX)\big)=(A+A^{\mathrm T})X. \]</p>
+                <details class="solution"><summary><span>证明思路（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>逐元素用定义 (3.4.14)：(1) \(\tr(BX)=\sum_{i,j}b_{ij}x_{ji}\)，对 \(x_{pq}\) 求偏导恰得 \(b_{qp}\)，拼成矩阵即 \(B^{\mathrm T}\)。(2) 与例 3.11 同样的双求和展开，对每个 \(x_{pq}\) 出现两次（分别来自含 \(A\) 与含 \(A^{\mathrm T}\) 的项），汇总为 \((A+A^{\mathrm T})X\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex34-7">
+              <header class="card-head"><span class="card-label">第 7 题</span><span class="tag">二次型（列向量）</span></header>
+              <div class="card-body"><p>设 \(x\) 为 \(n\) 维列向量，\(u\) 为 \(n\) 维常数列向量，\(A\) 为 \(n\) 阶常数对称矩阵，证明
+                \[ \frac{\mathrm d}{\mathrm dx}\big((x-u)^{\mathrm T}A(x-u)\big)=2A(x-u). \]</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>令 \(y=x-u\)，由链式法则 \(\dfrac{\mathrm dy}{\mathrm dx}=I\)，再用式 (3.4.15)：
+                    \[ \frac{\mathrm d}{\mathrm dx}(y^{\mathrm T}Ay)=\frac{\mathrm dy^{\mathrm T}}{\mathrm dx}(A+A^{\mathrm T})y=2A(x-u) \]
+                    （\(A\) 对称）。这是高斯分布负对数似然、加权最小二乘的核心二次型。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex34-8">
+              <header class="card-head"><span class="card-label">第 8 题</span><span class="tag tag-mid">线性函数的 Jacobi</span></header>
+              <div class="card-body"><p>设 \(x=(\xi_1,\ldots,\xi_n)^{\mathrm T}\)，\(\boldsymbol F(x)=(f_1(x),\ldots,f_n(x))^{\mathrm T}\)，其中
+                \[ f_i(x)=\sum_{j=1}^n a_{ij}\xi_j+\delta_i\quad(i=1,\ldots,n), \]
+                求 \(\boldsymbol F'(x)\)。</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(\dfrac{\partial f_i}{\partial \xi_j}=a_{ij}\)（常数项导数为 0），故 Jacobi 矩阵 \(\boldsymbol F'(x)=(a_{ij})=A\)，与 \(x\) 无关。这正是例 3.14 的直接计算。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex34-9">
+              <header class="card-head"><span class="card-label">第 9 题</span><span class="tag tag-hard">矩阵值函数的幂</span></header>
+              <div class="card-body"><p>举例说明
+                \[ \frac{\mathrm d}{\mathrm dt}\big(A(t)\big)^m=m\big(A(t)\big)^{m-1}\frac{\mathrm dA(t)}{\mathrm dt} \]
+                一般不成立；又在什么条件下它能够成立？</p>
+                <details class="solution"><summary><span>查看解答（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由乘积法则，\(\dfrac{\mathrm d}{\mathrm dt}A^2=A'A+AA'\)，只有当 <strong>\(A(t)\) 与 \(A'(t)\) 可交换</strong>时才等于 \(2AA'\)。一般情形 \(m\) 个因子每个位置都可能被求导，得到 \(m\) 项之和：
+                    \[ \frac{\mathrm d}{\mathrm dt}A^m=\sum_{k=0}^{m-1}A^kA'A^{m-1-k}, \]
+                    各项顺序不同。</p>
+                  <p><strong>反例：</strong>取 \(A(t)=\begin{pmatrix}t&1\\0&0\end{pmatrix}\)，\(A'(t)=\begin{pmatrix}1&0\\0&0\end{pmatrix}\)。直接算 \(A^2=\begin{pmatrix}t^2&t\\0&0\end{pmatrix}\)，\((A^2)'=\begin{pmatrix}2t&1\\0&0\end{pmatrix}\)；而 \(2AA'=\begin{pmatrix}2t&0\\0&0\end{pmatrix}\)，二者不等（右上角 1≠0）。</p>
+                  <p><strong>成立条件：</strong>\(A(t)A'(t)=A'(t)A(t)\) 对所有 \(t\) 成立。重要特例是 \(A(t)=tB+C\)（\(B,C\) 为常数且可交换），以及 \(A(t)=e^{tB}\)（此时 \(A'=BA=AB\)）。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 本节小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结与自检</h2>
+            <div class="summary-block">
+              <p>矩阵微积分的核心是"<strong>逐元素求导、按位拼回</strong>"，外加几条矩阵形式的链式/乘积法则：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>对象</th><th>定义 / 公式</th></tr>
+                  <tr><td>函数矩阵对 t</td><td>\(A'(t)=(a'_{ij}(t))\)；乘积 \((AB)'=A'B+AB'\)（顺序不变）</td></tr>
+                  <tr><td>指数函数</td><td>\(\dfrac{\mathrm d}{\mathrm dt}e^{tA}=Ae^{tA}=e^{tA}A\)（定理 3.9）；\(\sin,\cos\) 类似</td></tr>
+                  <tr><td>积分</td><td>逐元素积分；常矩阵可提出；\(\int_a^b A'(t)\mathrm dt=A(b)-A(a)\)</td></tr>
+                  <tr><td>逆矩阵</td><td>\((A^{-1})'=-A^{-1}A'A^{-1}\)</td></tr>
+                  <tr><td>梯度</td><td>\(\dfrac{\mathrm d}{\mathrm dx}(x^{\mathrm T}Ax)=(A+A^{\mathrm T})x\)，对称时 \(2Ax\)；\(\dfrac{\mathrm d}{\mathrm dx}(b^{\mathrm T}x)=b\)</td></tr>
+                  <tr><td>Hessian / Jacobi</td><td>梯度再对 \(x^{\mathrm T}\) 求导；向量函数 \(\boldsymbol F(x)=Ax+\delta\) 的 Jacobi 为 \(A\)</td></tr>
+                  <tr><td>链式法则</td><td>\(\dfrac{\mathrm df}{\mathrm du}=\dfrac{\mathrm dx^{\mathrm T}}{\mathrm du}\dfrac{\mathrm df}{\mathrm dx}\)（例 3.15）</td></tr>
+                </table>
+              </div>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>为什么 \(\dfrac{\mathrm d}{\mathrm dt}(A(t)B(t))\) 不能写成 \(A'B'+B'A'\) 之类？正确的两项是什么，顺序为何重要？</li>
+                  <li>不用死记，从 \(f=x^{\mathrm T}Ax=\sum a_{ij}\xi_i\xi_j\) 出发，自己推出梯度为什么是 \((A+A^{\mathrm T})x\) 而不是 \(2Ax\)；后者要加什么条件？</li>
+                  <li>\(\dfrac{\mathrm d}{\mathrm dt}(A(t))^m\) 一般有几项？举一个 \(A\) 与 \(A'\) 不可交换的反例，并说明 \(e^{tA}\) 为什么不受此限制。</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="3.3-matrix-functions.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§3.3 矩阵函数</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="3.5-matrix-function-applications.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§3.5 矩阵函数的一些应用</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

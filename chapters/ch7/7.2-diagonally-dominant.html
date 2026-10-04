@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§7.2 对角占优矩阵（选学） · 矩阵论</title>
+  <meta name="description" content="矩阵论 §7.2（选学）：行强/弱对角占优、不可约矩阵与不可约对角占优、具非零元素链对角占优、拟对角占优（正对角阵缩放）、半强对角占优、各类包含关系、与 Jacobi/Seidel/SOR 迭代收敛性（L-矩阵、Stein-Rosenberg、Ostrowski-Reich）、块对角占优">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§7.2 对角占优矩阵（选学）</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="7.2" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 7 章 若干特殊矩阵类介绍</a><span class="sep" aria-hidden="true">/</span>
+            <span>§7.2 对角占优矩阵（选学）</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 7 章 · 迭代法的矩阵类</div>
+            <h1>§7.2 对角占优矩阵</h1>
+            <p class="lede">对角占优是"对角线管住非对角线"的性质，它<strong>不做任何变换就保证非奇异、特征值位置与迭代收敛</strong>：Gerschgorin 圆盘（§5.1）直接给出非奇异性，Jacobi/Seidel/SOR 迭代（§3.3、数值代数）的收敛性由它判定，三对角方程组的追赶法必可进行到底。本节介绍五个层层放宽的占优类：<strong>强占优 → 不可约占优 → 非零元素链占优 → 拟占优</strong>，以及半强占优与块占优。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.377–387</strong></span>
+              <span class="chip">建议 <strong>2 学时</strong></span>
+              <span class="chip">占优类 <strong>5 个</strong></span>
+              <span class="chip">核心结论 <strong>非奇异 / 正稳定 / 迭代收敛</strong></span>
+              <span class="chip">习题 <strong>7 题</strong></span>
+            </div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>准确区分强、弱、不可约、非零元素链、拟、半强六类对角占优；</li>
+                  <li>会用定义逐行验证占优，会判定矩阵不可约（有向图强连通）；</li>
+                  <li>掌握"强或不可约占优 ⇒ 非奇异、\(\rho(I-D^{-1}A)&lt;1\)、对角正时正稳定"；</li>
+                  <li>理解拟对角占优的正对角阵缩放刻画与向量形式；</li>
+                  <li>知道各类占优与 Jacobi/Seidel/SOR 收敛的关系及块占优概念。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>强/不可约占优的性质；</li>
+                      <li>拟占优的缩放定义；</li>
+                      <li>非奇异性与谱半径。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>不可约与非零元素链；</li>
+                      <li>五类包含关系的反例；</li>
+                      <li>Stein-Rosenberg 四情形。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 2 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>强/不可约占优、非零元素链占优、拟占优（含缩放例）</td><td class="num">p.377–383</td></tr>
+                    <tr><td class="num">2</td><td>半强占优与包含关系、迭代收敛性、块占优、实验与习题</td><td class="num">p.383–387</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 200" role="img" aria-label="对角占优矩阵脉络图">
+                    <defs><marker id="m72" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b"><rect x="30" y="24" width="150" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="105" y="46">强对角占优</text><text x="105" y="64" font-size="11" fill="#666">|aᵢᵢ|&gt;Σ|aᵢⱼ| 逐行</text>
+                    </g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="215" y="24" width="170" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="300" y="46">不可约对角占优</text><text x="300" y="64" font-size="11" fill="#666">弱占优 + 有向图强连通</text>
+                    </g>
+                    <g class="fm-node" fill="#f4f0e2" stroke="#a06a17"><rect x="420" y="24" width="180" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="510" y="46">非零元素链占优</text><text x="510" y="64" font-size="11" fill="#666">弱占优+链连通到严行</text>
+                    </g>
+                    <g class="fm-node" fill="#eef7f0" stroke="#3d7a4e"><rect x="635" y="24" width="175" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="722" y="46">拟对角占优</text><text x="722" y="64" font-size="11" fill="#666">∃D&gt;0 使 AD 强占优</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m72)"><line x1="180" y1="50" x2="213" y2="50"/><line x1="385" y1="50" x2="418" y2="50"/><line x1="600" y1="50" x2="633" y2="50"/></g>
+                    <g class="fm-node" fill="#f3eef7" stroke="#6b4e9e"><rect x="250" y="126" width="340" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="420" y="148">共同结论：非奇异、对角元非零、ρ(I−D⁻¹A)&lt;1</text><text x="420" y="166" font-size="11" fill="#666">对角元为正时 Reλᵢ&gt;0（正稳定）；基本迭代收敛</text>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、强与不可约 ================= -->
+          <section class="section" id="sec-strong">
+            <h2 class="sec-title"><span class="cn">一</span>强对角占优与不可约对角占优</h2>
+            <p>设 \(n\) 阶矩阵 \(A=(a_{ij})_{n\times n}\) 满足</p>
+            <div class="eq-scroll">\[ |a_{ii}|\ge\sum_{j\ne i}|a_{ij}|\qquad(i=1,\cdots,n), \tag{7.2.1} \]</div>
+            <p>则称 \(A\) 为<strong>行对角占优矩阵</strong>（类似可定义列对角占优，统称对角占优）。若</p>
+            <div class="eq-scroll">\[ |a_{ii}|>\sum_{j\ne i}|a_{ij}|\qquad(i=1,\cdots,n), \tag{7.2.2} \]</div>
+            <p>则称 \(A\) 为<strong>强（严格）对角占优矩阵</strong>。</p>
+            <div class="card note">
+              <header class="card-head"><span class="card-label">两个直接推论</span></header>
+              <div class="card-body">
+                <p style="margin-bottom:0">① <strong>强对角占优阵必非奇异</strong>（Levy–Desplanques 定理，见例 5.8：由 Gerschgorin 圆盘全部不含原点）。② 三对角阵 \(J_n\) 强对角占优时，追赶法（§4.1 Thomas 算法）必可进行到底。</p>
+              </div>
+            </div>
+
+            <h3 class="sub-title" id="irreducible">不可约矩阵</h3>
+            <p>\(n=1\) 时唯一元素非零即为不可约；\(n\ge2\) 时，若<strong>不存在</strong>置换阵 \(P\) 使</p>
+            <div class="eq-scroll">\[ PAP^{\mathrm T}=\begin{pmatrix}A_{11}&A_{12}\\O&A_{22}\end{pmatrix}\quad(A_{11},A_{22}\text{ 为真子方阵}), \tag{7.2.3} \]</div>
+            <p>则称 \(A\) 为<strong>不可约矩阵</strong>。等价的图论刻画（习题 3）：任取两个不同下标 \(i,j\)，都存在连接它们的<strong>非零元素链</strong> \(a_{ii_1},a_{i_1i_2},\cdots,a_{i_kj}\)，链中每个元素非零——即矩阵有向图（\(i\to j\Leftrightarrow a_{ij}\ne0\)）强连通。不可约时线性方程组 \(Ax=b\) 可经同步置换化为两个低阶独立方程组，特征多项式也分解为两块之积。</p>
+
+            <section class="card thm" id="thm-strong-irred">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">强或不可约对角占优的性质</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A\) 为强对角占优或不可约对角占优，且 \(a_{ii}\ne0\)，令</p>
+                <div class="eq-scroll">\[ B=I-D^{-1}A,\qquad D=\operatorname{diag}(a_{11},\cdots,a_{nn}), \]</div>
+                <p>则 <strong>\(\rho(B)&lt;1\) 且 \(\det A\ne0\)</strong>。若再有 \(a_{ii}&gt;0\)，则 <strong>\(\mathrm{Re}\,\lambda_i(A)&gt;0\)</strong> 且 \(\det A&gt;0\)——即<strong>具有正对角元的强（不可约）对角占优阵是正稳定矩阵</strong>（与 §7.1 习题 10 呼应）。</p>
+                <details class="proof"><summary><span>证明要点</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">Gerschgorin 圆盘 \(|z-a_{ii}|\le\sum_{j\ne i}|a_{ij}|\) 在强占优时全部不含原点；不可约时由 Taussky（Gerschgorin 定理的等号情形，§5.1 习题路线）：特征值若落在圆盘并集边界上必落在每个圆盘边界上，弱占优 + 强连通排除了这种可能，故原点仍不在谱中——非奇异。\(B=I-D^{-1}A\) 的 Gerschgorin 圆盘为 \(|z|\le|a_{ii}|^{-1}\sum_{j\ne i}|a_{ij}|\le1\)，同理论证 \(\rho(B)&lt;1\)。正对角元时圆盘全在右半平面，故 \(\mathrm{Re}\lambda_i&gt;0\)。</p>
+                </details>
+                <p style="margin-bottom:0"><strong>例。</strong>\(A=\begin{pmatrix}-2&1\\1&2\end{pmatrix}\) 强对角占优（行 1：\(2&gt;1\)；行 2：\(2&gt;1\)），而 \(B=I-D^{-1}A=\begin{pmatrix}0&\tfrac12\\-\tfrac12&0\end{pmatrix}\)，特征值为 \(\pm\tfrac12\mathrm j\)，故 \(\rho(B)=\tfrac12&lt;1\)。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 二、非零元素链 ================= -->
+          <section class="section" id="sec-chain">
+            <h2 class="sec-title"><span class="cn">二</span>具非零元素链对角占优矩阵</h2>
+            <p>称 \(A=(a_{ij})\) 为<strong>具非零元素链对角占优矩阵</strong>，是指同时满足：</p>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>条件</th><th>内容</th></tr>
+                <tr><td class="num">(1)</td><td>\(|a_{ii}|\ge\sum_{j\ne i}|a_{ij}|\)（每行弱占优）</td></tr>
+                <tr><td class="num">(2)</td><td>至少有一行严格：集合 \(K=\{i:|a_{ii}|>\sum_{j\ne i}|a_{ij}|\}\) 非空</td></tr>
+                <tr><td class="num">(3)</td><td>对每个 \(i\notin K\)，都存在非零元素链 \(a_{ii_1},a_{i_1i_2},\cdots,a_{i_k k'}\) 连到某个 \(k'\in K\)</td></tr>
+              </table>
+            </div>
+            <p>强占优与不可约占优都必是链占优，但反之不然。教材反例：</p>
+            <div class="eq-scroll">\[ A=\begin{pmatrix}1&1&0\\0&1&1\\0&-\tfrac12&1\end{pmatrix}, \]</div>
+            <p style="margin-bottom:0">逐行检验：行 1 \(1=1\)（弱占优）、行 2 \(1=1\)（弱占优）、行 3 \(1&gt;\tfrac12\)（严格），且有非零链 \(a_{12}\to a_{23}\) 把行 1、行 2 连通到严行 3——故是链占优；但行 1、2 不严格所以不是强占优，又因 \(a_{21}=a_{31}=0\)（从下标 2、3 走不到 1）矩阵可约，所以也不是不可约占优。</p>
+            <section class="card thm" id="thm-chain">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">链占优的同样结论</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">令 \(B=I-D^{-1}A\)（\(D=\operatorname{diag}(a_{ii}),\ a_{ii}\ne0\)），则 ① \(\rho(B)&lt;1\)；② 当 \(a_{ii}&gt;0\) 时 \(\mathrm{Re}\lambda_i(A)&gt;0\)。即对角元为正的链占优阵同样<strong>非奇异且正稳定</strong>。证明沿非零元素链逐行传播 Gerschgorin 边界排除论证。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 三、拟对角占优 ================= -->
+          <section class="section" id="sec-h">
+            <h2 class="sec-title"><span class="cn">三</span>拟对角占优矩阵</h2>
+            <p>若存在<strong>正对角矩阵</strong> \(D\)，使 \(AD\) 为强对角占优矩阵，则称 \(A\) 为<strong>拟对角占优矩阵</strong>。</p>
+            <section class="card ex" id="exm-scale">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">缩放例：上三角全 1 矩阵</span>
+              </header>
+              <div class="card-body">
+                <p>\(A=\begin{pmatrix}1&1&1&1\\0&1&1&1\\0&0&1&1\\0&0&0&1\end{pmatrix}\) 本身不是强占优（各行非对角和分别为 \(3,2,1,0\)）。取 \(D=\operatorname{diag}(1,\tfrac12,\tfrac14,\tfrac18)\)：</p>
+                <div class="eq-scroll">\[ AD=\begin{pmatrix}1&\tfrac12&\tfrac14&\tfrac18\\0&\tfrac12&\tfrac14&\tfrac18\\0&0&\tfrac14&\tfrac18\\0&0&0&\tfrac18\end{pmatrix}, \]</div>
+                <p style="margin-bottom:0">逐行有 \(1&gt;\tfrac78,\ \tfrac12&gt;\tfrac38,\ \tfrac14&gt;\tfrac18,\ \tfrac18&gt;0\)，故 \(AD\) 强占优，\(A\) 拟对角占优。</p>
+              </div>
+            </section>
+            <p>该定义的<strong>等价向量形式</strong>：存在正向量 \(x=(\xi_1,\cdots,\xi_n)^{\mathrm T}&gt;0\) 使</p>
+            <div class="eq-scroll">\[ |a_{ii}|\,\xi_i>\sum_{j\ne i}|a_{ij}|\,\xi_j\qquad(i=1,\cdots,n). \tag{7.2.5} \]</div>
+            <p>按列拟占优与按行拟占优等价（双侧判别）：\(A\) 拟对角占优 \(\Leftrightarrow\) 存在正对角阵 \(D_1,D_2\) 使 \(D_1AD_2\) 强对角占优。</p>
+            <p><strong>性质：</strong>拟对角占优阵的主对角元全不为零、\(\det A\ne0\)；若更有 \(a_{ii}&gt;0\)，则 \(\mathrm{Re}\lambda_i(A)&gt;0\) 且 \(\det A&gt;0\)（正稳定）。强、不可约、链占优都是拟占优（取 \(D=I\) 即可）。</p>
+          </section>
+
+          <!-- ================= 四、半强占优与关系、迭代法 ================= -->
+          <section class="section" id="sec-semistrong">
+            <h2 class="sec-title"><span class="cn">四</span>半强对角占优及各类关系</h2>
+            <p>若 \(A\) 对角占优且除一行外各行严格：</p>
+            <div class="eq-scroll">\[ |a_{ii}|>\sum_{j=1}^{i-1}|a_{ij}|\qquad(i=2,3,\cdots,n), \tag{7.2.6} \]</div>
+            <p>则称 \(A\) 为<strong>下半强对角占优矩阵</strong>（第一行允许取等号）；若存在置换阵 \(P\) 使 \(PAP^{\mathrm T}\) 下半强，则称<strong>半强对角占优</strong>。</p>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>等价关系</th></tr>
+                <tr><td>\(A\) 半强对角占优 \(\Leftrightarrow\) \(A\) 具非零元素链对角占优</td></tr>
+                <tr><td>\(A\) 不可约对角占优 \(\Leftrightarrow\) \(A\) 半强对角占优且不可约</td></tr>
+              </table>
+            </div>
+            <p><strong>五类包含关系</strong>（箭头表示"必是"）：</p>
+            <div class="eq-scroll">\[
+            \underbrace{\text{强对角占优}\ \searrow}_{\text{都蕴含}}\quad
+            \text{具非零元素链对角占优（= 半强）}\quad
+            \underbrace{\nearrow\ \text{不可约对角占优}}_{\text{都蕴含}}
+            \]</div>
+            <p style="margin-bottom:0">而链占优（半强）又蕴含<strong>对角占优</strong>与<strong>拟对角占优</strong>；反向一般不成立（前述 3 阶反例）。拟占优是这五类中最大的类——它是用正对角相似（缩放）扩张而来，并且是"饱和"的：若 \(AD\) 拟占优则 \(A\) 已拟占优，再扩张需用比拟似变换更广的变换。</p>
+
+            <h3 class="sub-title" id="iterations">与基本迭代法收敛性的关系</h3>
+            <p>写分裂 \(A=D-L-U\)（\(D\) 对角、\(-L,-U\) 严格下/上三角），Jacobi 迭代阵 \(B=\widetilde L+\widetilde U=D^{-1}(L+U)\)，Seidel 迭代阵 \(B_1=(I-\omega\widetilde L)^{-1}(\omega\widetilde U+(1-\omega)I)\)（\(\omega=1\) 时）。主要结论：</p>
+            <ul>
+              <li><strong>L-矩阵</strong>：具有正对角元、主对角线外元素非负（注意符号约定：非对角 \(a_{ij}\le0\) 时 \(B\) 元素非负）的不可约矩阵。若 \(A\) 为不可约 L-矩阵，其 Jacobi、Seidel 迭代收敛的必要条件是 \(A\) 拟对角占优；</li>
+              <li>\(0&lt;\omega\le1\) 时 SOR 收敛的必要条件也是拟对角占优；</li>
+              <li><strong>Stein–Rosenberg 定理</strong>：Jacobi 阵 \(B\ge O\) 与 Seidel 阵 \(B_1\) 的谱半径有且仅有下列四种互斥关系之一：① \(\rho(B)=\rho(B_1)=0\)；② \(0&lt;\rho(B_1)&lt;\rho(B)&lt;1\)（都收敛，Seidel 快）；③ \(1=\rho(B)=\rho(B_1)\)（都不收敛）；④ \(1&lt;\rho(B)&lt;\rho(B_1)\)（都发散，Seidel 更慢）；</li>
+              <li><strong>Ostrowski–Reich 定理</strong>（SOR 收敛性）；高益明 1981 年推广：广义不可约 L-矩阵（存在非奇异对角阵 \(P,Q\) 使 \(PAQ\) 为 L-矩阵）的 Jacobi 与 Seidel 迭代收敛的充要条件是拟对角占优。</li>
+            </ul>
+          </section>
+
+          <!-- ================= 五、块对角占优 ================= -->
+          <section class="section" id="sec-block">
+            <h2 class="sec-title"><span class="cn">五</span>块对角占优矩阵</h2>
+            <p>把对角占优推广到分块阵（Feingold，1962，Gerschgorin 圆盘定理的分块推广）。将 \(A=(a_{ij})\) 划分为分块矩阵 \(A=(A_{ij})_{N\times N}\)，其中各对角块 \(A_{ii}\) 可逆，若</p>
+            <div class="eq-scroll">\[ \|A_{ii}^{-1}\|^{-1}\ge\sum_{j\ne i}\|A_{ij}\|\qquad(i=1,\cdots,N), \tag{7.2.7} \]</div>
+            <p>称 \(A\) 为<strong>按行分块对角占优</strong>；(7.2.7) 全部严格成立时为<strong>块强对角占优</strong>。若 \(B=(\|A_{ij}\|)_{N\times N}\) 不可约则称 \(A\) <strong>块不可约</strong>。下列两条件任一成立时 \(A\) 非奇异：① 块强占优；② 块不可约占优且 (7.2.7) 至少一个不等号严格。</p>
+            <section class="card note">
+              <header class="card-head"><span class="card-label">块占优不一定元素占优</span></header>
+              <div class="card-body">
+                <p style="margin-bottom:0">教材例：4 阶分块（\(\infty\)-范数）\(A=\begin{pmatrix}0&1&0&0\\\tfrac23&0&\tfrac13&0\\0&\tfrac13&0&\tfrac23\\0&0&1&0\end{pmatrix}\)，\(\|A_{11}^{-1}\|_\infty^{-1}=\|A_{22}^{-1}\|_\infty^{-1}=\tfrac23\)，\(\|A_{21}\|_\infty=\|A_{12}\|_\infty=\tfrac13\)，满足块占优 \(\tfrac23\ge\tfrac13\)，但按元素逐行（第 1 行 \(|0|=0&lt;1\)）并不对角占优。链/半强/拟占优同样可推广到分块，块强占优条件还可减弱为 \(\sum_{j\ne i}\|A_{ii}^{-1}A_{ij}\|&lt;1\)（7.2.8）。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="dd-lab-title">动手实验：对角占优判定台</h3>
+            <p>输入 3×3 矩阵：工具逐行画 \(|a_{ii}|\) 与 \(\sum_{j\ne i}|a_{ij}|\) 的对比条，判定强/弱占优；由有向图强连通搜索判定不可约；由非零链连通判定链占优；再用正向量网格搜索判定拟对角占优；最后报告 \(\rho(I-D^{-1}A)\) 与 Gerschgorin 圆盘是否避开原点和虚轴。</p>
+            <section class="card lab" data-dd-lab></section>
+          </section>
+
+          <!-- ================= 习题 7.2 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 7.2（教材 p.387）</h2>
+            <div class="fold-bar no-print" data-fold-tools=".card.task">
+              <button type="button" data-fold="open">全部展开</button>
+              <button type="button" data-fold="close">全部收起</button>
+            </div>
+
+            <article class="card task" id="ex72-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">齐次只有零解</span></header>
+              <div class="card-body">
+                <p>设 \(A\) 强对角占优或不可约对角占优，直接证明 \(Ax=0\) 只有零解。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p><strong>强占优：</strong>反设 \(x\ne0\) 是解，取 \(|x_k|=\max_i|x_i|&gt;0\)。第 \(k\) 个方程给出 \(|a_{kk}||x_k|=|\sum_{j\ne k}a_{kj}x_j|\le\sum_{j\ne k}|a_{kj}||x_k|\)，即 \(|a_{kk}|\le\sum_{j\ne k}|a_{kj}|\)，与严格矛盾。</p>
+                  <p><strong>不可约占优：</strong>同上取最大分量集合 \(I=\{i:|x_i|=\|x\|_\infty\}\)。若 \(I\ne\{1,\cdots,n\}\)，由不可约性存在 \(i\in I,\ j\notin I\) 使 \(a_{ij}\ne0\)；第 \(i\) 方程取严格不等号（因 \(|x_j|&lt;|x_i|\)），得 \(|a_{ii}|&lt;\sum|a_{ij}|\) 或破坏弱占优，矛盾。故所有分量同模；此时各行方程迫使 \(|a_{ii}|=\sum_{j\ne i}|a_{ij}|\)（每行取等号），与不可约对角占优"至少一行严格"的条件 (3) 直接矛盾（把该严行 \(k\) 代入方程即得 \(|a_{kk}||x_k|\le\sum_{j\ne k}|a_{kj}||x_k|&lt;|a_{kk}||x_k|\)）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex72-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag">主子矩阵正稳定</span></header>
+              <div class="card-body">
+                <p>强或不可约对角占优且主对角元为正的 \(A\)，其各主子矩阵的特征值实部是否都为正？</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p><strong>强占优时是。</strong>任意主子矩阵 \(A_k\) 继承对角正与严格行占优（删去列只使右端和变小）：\(|a_{ii}|&gt;\sum_{j\ne i}|a_{ij}|\ge\sum_{j\ne i,\,j\in I}|a_{ij}|\)，故 \(A_k\) 仍是正对角元强占优阵，Gerschgorin 圆盘全在右半平面，\(\mathrm{Re}\lambda(A_k)&gt;0\)。</p>
+                  <p><strong>不可约占优：是。</strong>设 \(B\) 为 \(A\) 的任一主子矩阵：\(B\) 继承弱占优与正对角元。对 \(B\) 的每个强连通分支 \(S\)，若 \(S\) 内无严行，则 \(\forall i\in S\) 有 \(|a_{ii}|=\sum_{j\in S,\,j\ne i}|a_{ij}|\)，结合 \(A\) 的弱占优得 \(a_{ij}=0\ (j\notin S)\)，即 \(S\) 在 \(A\) 中无出边，与 \(A\) 不可约矛盾——故每个分支必含严行；分支内强连通又保证等号行经非零链连到该严行。于是 \(B\) 满足链占优三条件，由教材结果 (2) 得 \(\operatorname{Re}\lambda(B)&gt;0\)，即任意主子矩阵都正稳定（这正是 V.L.稳定"主子矩阵遗传"的对照，见 §7.1 条件 (6)）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex72-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag">不可约的链刻画</span></header>
+              <div class="card-body">
+                <p>证明阶数大于 1 的 \(A\) 不可约的充要条件是：对任意 \(i\ne j\) 都存在连接 \(i\) 与 \(j\) 的非零元素链。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>定义有向图 \(G(A)\)：顶点 \(1,\cdots,n\)，\(a_{ij}\ne0\) 时有边 \(i\to j\)。非零元素链恰是有向路径，"任意两顶点连通"即强连通。若 \(A\) 可约，存在真子集 \(K\) 使 \(a_{ij}=0\ (i\in K,\ j\notin K)\)，则从 \(K\) 中顶点走不到 \(K\) 外，链不存在。反之若有 \(i\) 到不了 \(j\)，令 \(K\) 为从 \(i\) 能到达的顶点集，则 \(K\) 是非空真子集且 \(a_{pq}=0\ (p\in K,q\notin K)\)，对应分块上三角，\(A\) 可约。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex72-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag">拟半强 vs 拟占优</span></header>
+              <div class="card-body">
+                <p>若存在正对角阵 \(D\) 使矩阵 \(AD\) 为半强对角占优，则称 \(A\) 为<strong>拟半强对角占优</strong>。试比较拟半强对角占优与拟对角占优。</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>拟半强 \(\Rightarrow\) 拟占优：\(AD\) 半强（= 链占优）蕴含 \(AD\) 拟占优，即存在正对角 \(E\) 使 \(ADE\) 强占优，而 \(DE\) 仍是正对角阵，故 \(A\) 拟占优。反之，拟占优时 \(AD\) 已强占优，强占优自然半强（严行集合含全部行，链条件空虚满足），故二者<strong>实际等价</strong>：拟占优的 \(A\) 取使 \(AD\) 强占优的 \(D\) 即可。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex72-5">
+              <header class="card-head"><span class="card-label">第 5 题</span><span class="tag tag-mid">和的封闭性</span></header>
+              <div class="card-body">
+                <p>设 \(A\) 拟对角占优、\(D\) 为正对角阵，问 \(AD+DA^{\mathrm T}\) 是否仍为拟对角占优？</p>
+                <details class="solution"><summary><span>查看提示</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>一般<strong>不一定</strong>。拟占优是"存在某个正权重 \(x\)"的性质，而 \(AD+DA^{\mathrm T}\) 改变了非对角结构（注意 \(AD+DA^{\mathrm T}\) 恒为对称阵，但对称并不保证拟占优）。反例：\(A=\begin{pmatrix}1/2&2\\0&1/2\end{pmatrix}\) 拟占优（取 \(D=\diag(5,1)\) 使 \(AD\) 强占优），但取 \(D=I\) 时 \(AD+DA^{\mathrm T}=\begin{pmatrix}1&2\\2&1\end{pmatrix}\) 有特征值 \(-1\)，非拟占优。建议用实验台构造更多反例。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex72-6">
+              <header class="card-head"><span class="card-label">第 6 题</span><span class="tag">正定即拟占优</span></header>
+              <div class="card-body">
+                <p>对称正定矩阵是否为拟对角占优矩阵？</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p><strong>是。</strong>对称正定阵 \(A\) 的比较矩阵 \(M(A)\)（\(m_{ii}=a_{ii}\)，\(m_{ij}=-|a_{ij}|\ (i\ne j)\)）是 M-矩阵：正定 ⇒ 各阶主子式全正 ⇒ \(M(A)\) 为非奇异 M-矩阵，故存在正向量 \(x&gt;0\) 使 \(M(A)x&gt;0\)，即 \(|a_{ii}|x_i&gt;\sum_{j\ne i}|a_{ij}|x_j\)；而 (7.2.5) 只含绝对值，故 \(A\) 与 \(M(A)\) 的拟占优等价，\(A\) 拟占优。注意正定阵本身不一定逐行对角占优（如 \(\begin{pmatrix}2&1&1\\1&2&1\\1&1&1\end{pmatrix}\) 第 3 行 \(1&lt;2\) 不占优），但一定<strong>拟</strong>占优。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex72-7">
+              <header class="card-head"><span class="card-label">第 7 题</span><span class="tag tag-mid">双重占优</span></header>
+              <div class="card-body">
+                <p>设 \(A\) 对角占优且为拟对角占优，问 \(A\) 是否为具非零元素链对角占优？</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p><strong>是。</strong>已知 \(A\) 拟占优，存在正权重 \(x\) 使 (7.2.5) 成立。若 \(A\) 本身还逐行弱占优但不是链占优，则存在某个等号行 \(i\)（\(|a_{ii}|=\sum_{j\ne i}|a_{ij}|\)）其非零链走不到任何严行；沿该闭链上的行对 (7.2.5) 求和，等号行的弱占优迫使权重在闭链上全部相等，最终推出矛盾（与该闭链外严格不等式的权重流入不相容）。故每个等号行必链通到严行，即链占优成立。这也可由"半强 \(\Leftrightarrow\) 链占优"与拟半强 = 拟占优（第 4 题）直接得到。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结</h2>
+            <div class="summary-block">
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>类别</th><th>定义要点</th><th>关键结论</th></tr>
+                  <tr><td>强对角占优</td><td>每行 \(|a_{ii}|&gt;\sum_{j\ne i}|a_{ij}|\)</td><td>非奇异；\(\rho(I-D^{-1}A)&lt;1\)</td></tr>
+                  <tr><td>不可约占优</td><td>弱占优 + 有向图强连通 + 至少一严行</td><td>同强占优</td></tr>
+                  <tr><td>非零元素链占优</td><td>弱占优 + 每行由非零链连通到严行</td><td>同强占优；= 半强</td></tr>
+                  <tr><td>拟对角占优</td><td>\(\exists D&gt;0\) 使 \(AD\) 强占优；正向量形式 (7.2.5)</td><td>对角元非零、非奇异；对角正时正稳定；最大类</td></tr>
+                  <tr><td>块对角占优</td><td>\(\|A_{ii}^{-1}\|^{-1}\ge\sum_{j\ne i}\|A_{ij}\|\)</td><td>块强/块不可约占优非奇异；不蕴含元素占优</td></tr>
+                </table>
+              </div>
+              <p style="margin-top:12px">对角占优把三件事一次给出：<strong>Gerschgorin 定位</strong>（§5.1，非奇异/谱位置）、<strong>迭代收敛</strong>（Jacobi/Seidel/SOR，Stein–Rosenberg 与 Ostrowski–Reich）、<strong>算法可执行</strong>（追赶法、选主元消元）。下一节 §7.3 转向元素全非负的<strong>非负矩阵</strong>——Perron–Frobenius 理论与单调矩阵，它们是 §7.4 M 矩阵（\(a_{ij}\le0\ (i\ne j)\) 且逆非负）的直接准备。</p>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>强、不可约、链、拟四类占优的严格包含关系各用什么反例分隔？为什么"拟"是饱和的最大类？</li>
+                  <li>为什么 \(B=I-D^{-1}A\) 的谱半径小于 1 能同时推出 \(A\) 非奇异和 Jacobi 迭代收敛？</li>
+                  <li>正定阵为什么不一定逐行占优却一定拟占优？权重 \(x\) 可由什么矩阵的 Neumann 级数构造？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="7.1-positive-definite-stable.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§7.1 正定矩阵与正稳定矩阵（选学）</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="7.3-nonnegative-matrices.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§7.3 非负矩阵（选学）</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

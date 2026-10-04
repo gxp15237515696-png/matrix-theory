@@ -1,0 +1,1810 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§1.2 线性变换及其矩阵 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §1.2：线性变换及其运算、线性变换的矩阵表示、特征值与特征向量、对角矩阵、不变子空间、Jordan 标准形介绍">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§1.2 线性变换及其矩阵</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="1.2" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 1 章 线性空间与线性变换</a><span class="sep" aria-hidden="true">/</span>
+            <span>§1.2 线性变换及其矩阵</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 1 章 · 线性空间与线性变换</div>
+            <h1>§1.2 线性变换及其矩阵</h1>
+            <p class="lede">线性空间是某类客观事物从"量"的方面的抽象，而<strong>线性变换</strong>研究线性空间中元素之间的最基本联系。本节先把线性变换本身作为运算对象（加法、数乘、乘法、逆、多项式），再给它装上"矩阵坐标"，进而引出贯穿全书的特征值理论、对角化与 Jordan 标准形——本节是全章篇幅最大、定理最密集的一节。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.26–79</strong></span>
+              <span class="chip">建议 <strong>10 学时</strong></span>
+              <span class="chip">定义 <strong>12 个</strong></span>
+              <span class="chip">定理 <strong>23 个</strong></span>
+              <span class="chip">例题 <strong>21 道</strong></span>
+
+              <span class="chip">推论 <strong>2 个</strong></span></div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标（学完本节你将能够）</h3>
+                <ul>
+                  <li>用 \(T(kx+ly)=k(Tx)+l(Ty)\) 判别一个变换是否线性；</li>
+                  <li>求线性变换在给定基下的<strong>矩阵</strong>，用 \(\eta=A\xi\) 计算象的坐标，处理换基下的相似矩阵 \(B=C^{-1}AC\)；</li>
+                  <li>熟练求矩阵的<strong>特征多项式、特征值、特征向量</strong>、迹与特征子空间；</li>
+                  <li>陈述并运用 Hamilton–Cayley 定理，会用<strong>最小多项式</strong>化简矩阵多项式与高次幂；</li>
+                  <li>判别矩阵可否<strong>对角化</strong>，理解不变子空间与准对角形的关系；</li>
+                  <li>由特征矩阵的初等因子组求 <strong>Jordan 标准形</strong>及相似变换矩阵 \(P\)，了解其在解线性微分方程组中的应用。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>本节重点</h4>
+                    <ul>
+                      <li>线性变换的矩阵 \(A\)（第 \(i\) 列是 \(Tx_i\) 的坐标）；</li>
+                      <li>特征值/特征向量的计算；</li>
+                      <li>相似关系 \(B=C^{-1}AC\)；</li>
+                      <li>Hamilton–Cayley 与最小多项式；</li>
+                      <li>对角化条件与 Jordan 标准形。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>学习难点</h4>
+                    <ul>
+                      <li>线性变换乘法次序 \(T_1T_2\)（先 \(T_2\) 后 \(T_1\)），一般不可交换；</li>
+                      <li>代数重数 ≠ 几何重数（亏损矩阵）；</li>
+                      <li>最小多项式与特征多项式的关系；</li>
+                      <li>Jordan 块的个数与大小、广义特征向量链。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 10 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1–2</td><td>线性变换定义、值域与核、五种运算</td><td class="num">p.27–34</td></tr>
+                    <tr><td class="num">3–4</td><td>矩阵表示、运算对应、坐标公式、相似</td><td class="num">p.34–43</td></tr>
+                    <tr><td class="num">5–6</td><td>特征值特征向量、迹、Schur、Sylvester</td><td class="num">p.43–51</td></tr>
+                    <tr><td class="num">7</td><td>Hamilton–Cayley、最小多项式</td><td class="num">p.52–57</td></tr>
+                    <tr><td class="num">8</td><td>对角化、不变子空间</td><td class="num">p.57–62</td></tr>
+                    <tr><td class="num">9–10</td><td>Jordan 标准形、λ-矩阵、求 P、应用与习题</td><td class="num">p.62–79</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 302" role="img" aria-label="线性变换知识脉络图">
+                    <defs><marker id="marrow2" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="0" y="24" width="140" height="44"/><rect x="164" y="24" width="150" height="44"/>
+                      <rect x="338" y="24" width="120" height="44"/><rect x="482" y="24" width="150" height="44"/>
+                      <rect x="656" y="24" width="184" height="44"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="70" y="52">线性变换 T</text>
+                      <text x="239" y="52">值域 R(T)·核 N(T)</text>
+                      <text x="398" y="52">五种运算</text>
+                      <text x="557" y="52">基下的矩阵 A</text>
+                      <text x="748" y="52">坐标公式 η=Aξ</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#marrow2)">
+                      <line x1="140" y1="46" x2="162" y2="46"/><line x1="314" y1="46" x2="336" y2="46"/>
+                      <line x1="458" y1="46" x2="480" y2="46"/><line x1="632" y1="46" x2="654" y2="46"/>
+                    </g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46">
+                      <rect x="40" y="128" width="150" height="44"/><rect x="214" y="128" width="150" height="44"/>
+                      <rect x="388" y="128" width="170" height="44"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="115" y="156">特征值·特征向量</text>
+                      <text x="289" y="156">相似 B=C⁻¹AC</text>
+                      <text x="473" y="156">H–C 定理·最小多项式</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#marrow2)">
+                      <line x1="190" y1="150" x2="212" y2="150"/><line x1="364" y1="150" x2="386" y2="150"/>
+                      <path d="M700 70 C700 100 473 100 473 126" stroke-dasharray="4 4"/>
+                      <path d="M557 68 C400 100 115 100 115 126" stroke-dasharray="4 4"/>
+                    </g>
+                    <g class="fm-node" fill="#f3f0fa" stroke="#6b4e9e">
+                      <rect x="150" y="232" width="160" height="44"/><rect x="334" y="232" width="160" height="44"/>
+                      <rect x="518" y="232" width="190" height="44"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="230" y="260">可对角化（几何重数=代数重数）</text>
+                      <text x="414" y="260">不变子空间·准对角形</text>
+                      <text x="613" y="260">Jordan 标准形 J</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#marrow2)">
+                      <line x1="310" y1="254" x2="332" y2="254"/><line x1="494" y1="254" x2="516" y2="254"/>
+                      <path d="M115 174 C115 205 230 205 230 230" stroke-dasharray="4 4"/>
+                      <path d="M473 174 C450 205 414 205 414 230" stroke-dasharray="4 4"/>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、线性变换及其运算 ================= -->
+          <section class="section" id="sec-transform">
+            <h2 class="sec-title"><span class="cn">一</span>线性变换及其运算</h2>
+            <p>根据 §1.1，线性空间 \(V\) 到自身的一种映射就是 \(V\) 的一个<strong>变换</strong>。下面只研究其中性质最好的一类——线性变换。</p>
+
+            <h3 class="sub-title" id="def-linear-transform">1. 定义 1.10、1.11：什么是线性变换</h3>
+            <section class="card def" id="def-1-10">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.10</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(V\) 是数域 \(K\) 上的线性空间，\(T\) 是 \(V\) 到自身的一个映射，使对任意向量 \(x\in V\)，\(V\) 中都有唯一的向量 \(y\) 与之对应，则称 \(T\) 是 \(V\) 的一个<strong>变换</strong>或<strong>算子</strong>，记为
+                  \[ Tx=y, \]
+                  称 \(y\) 为 \(x\) 在 \(T\) 下的<strong>象</strong>，\(x\) 为 \(y\) 的<strong>原象</strong>（象源）。</p>
+                <p style="margin-bottom:0">变换记号 \(T\) 类似数学分析中的函数记号，不同之处在于那里是数（纯量）函数，这里是<strong>向量函数</strong>。若 \(x\) 是一维向量，线性函数 \(y=F(x)=kx\) 就是 \(\R\) 的一个变换，按本记号可写成 \(y=Fx=kx\)。</p>
+              </div>
+            </section>
+            <section class="card def" id="def-1-11">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.11</span>
+              </header>
+              <div class="card-body">
+                <p>如果数域 \(K\) 上线性空间 \(V\) 的变换 \(T\) 满足
+                  <div class="eq-scroll">\[ T(kx+ly)=k(Tx)+l(Ty)\qquad(x,y\in V,\ k,l\in K), \tag{1.2.1} \]</div>
+                  则称 \(T\) 为 \(V\) 的一个<strong>线性变换</strong>（或<strong>线性算子</strong>）。</p>
+                <p style="margin-bottom:0">式 (1.2.1) 的实质是：变换 \(T\) 对向量的线性运算是<strong>封闭（保持）</strong>的。在其中分别取 \(k=l=1\) 与 \(l=0\)，便得到两条最常用的等价判据：
+                  \[ T(x+y)=Tx+Ty,\qquad T(kx)=k(Tx). \]
+                  因此也有作者直接用这两式作为线性变换的定义。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="lt-examples">2. 三个经典例子：旋转、微分、积分</h3>
+            <section class="card ex" id="exm-1-10">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.10</span><span class="card-tag">平面旋转</span>
+              </header>
+              <div class="card-body">
+                <p>把线性空间 \(\R^2\) 的所有向量绕原点依顺（或逆）时针方向旋转 \(\theta\) 角的变换，是一个线性变换。象 \((\eta_1,\eta_2)\) 与原象 \((\xi_1,\xi_2)\) 的关系为
+                  <div class="eq-scroll">\[
+                  \begin{pmatrix}\eta_1\\ \eta_2\end{pmatrix}
+                  =\begin{pmatrix}\cos\theta &amp; \sin\theta\\ -\sin\theta &amp; \cos\theta\end{pmatrix}
+                  \begin{pmatrix}\xi_1\\ \xi_2\end{pmatrix}.
+                  \]</div>
+                  平面上所有起点在原点的向量的集合形成二维线性空间 \(\R^2\)。旋转矩阵的两列就是两个基向量旋转后的象。</p>
+              </div>
+            </section>
+            <section class="card ex" id="exm-1-11">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.11</span><span class="card-tag">求导是线性变换</span>
+              </header>
+              <div class="card-body">
+                <p>在多项式空间 \(P_n\) 中，求微分是一个线性变换（§1.1 映射例中曾记作 \(\sigma\)，这里改用 \(D\)）：
+                  \[ Df(t)=f'(t)\qquad(\forall f(t)\in P_n). \]
+                  事实上对任意 \(f(t),g(t)\in P_n\) 及 \(k,l\in\R\)，由求导法则
+                  <div class="eq-scroll">\[
+                  D(kf(t)+lg(t))=(kf(t)+lg(t))'=kf'(t)+lg'(t)=k(Df(t))+l(Dg(t)).
+                  \]</div></p>
+              </div>
+            </section>
+            <section class="card ex" id="exm-1-12">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.12</span><span class="card-tag">积分是线性变换（无限维空间）</span>
+              </header>
+              <div class="card-body">
+                <p>闭区间 \([a,b]\) 上所有实连续函数的集合 \(C(a,b)\) 构成 \(\R\) 上的线性空间。在 \(C(a,b)\) 上定义
+                  \[ J(f(t))=\int_a^t f(u)\,\mathrm du\qquad(\forall f(t)\in C(a,b)), \]
+                  则 \(J\) 是 \(C(a,b)\) 的一个线性变换，因为由积分的线性性质
+                  <div class="eq-scroll">\[
+                  J(kf+lg)=\int_a^t(kf(u)+lg(u))\,\mathrm du
+                  =k\!\int_a^t\!f(u)\,\mathrm du+l\!\int_a^t\!g(u)\,\mathrm du
+                  =k(Jf)+l(Jg).
+                  \]</div>
+                  例 1.11、1.12 表明：数学分析中的微分与积分，从变换（算子）角度看都是线性变换——线性变换在理论与应用中无处不在。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="lt-basic-props">3. 线性变换的简单性质</h3>
+            <p>由定义 1.11 立得（取系数 \(0\) 与 \(-1\)）：
+              \[ T\mathbf 0=T(0x)=0(Tx)=\mathbf 0,\qquad T(-x)=T((-1)x)=-Tx. \]
+              即线性变换把<strong>零向量变为零向量</strong>，把 \(x\) 的负向量 \(-x\) 变为 \(Tx\) 的负向量 \(-Tx\)。</p>
+            <p>线性变换把线性相关的向量组仍变为线性相关的向量组：若
+              \[ k_1x_1+k_2x_2+\cdots+k_sx_s=\mathbf 0 \]
+              且 \(k_i\) 不全为零，则作用 \(T\) 后
+              \[ k_1(Tx_1)+k_2(Tx_2)+\cdots+k_s(Tx_s)=T\mathbf 0=\mathbf 0. \]</p>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意：反过来不成立</span>
+              </header>
+              <div class="card-body">
+                <p>线性变换<strong>可能把线性无关的向量组变成线性相关</strong>的向量组。最极端的例子是马上要定义的<strong>零变换</strong> \(T_0\)（把一切向量都映为 \(\mathbf 0\)）：再无关的向量组，经它一映全成了 \(\mathbf 0\)。能否保持无关，取决于变换是否"可逆"。</p>
+              </div>
+            </aside>
+            <h3 class="sub-title" id="range-kernel-t">4. 线性变换的值域与核（定义 1.12、1.13）</h3>
+            <p>这两个概念与 §1.1 中矩阵 \(A\) 的值域 \(R(A)\)、核空间 \(N(A)\) 完全对应。</p>
+            <section class="card def" id="def-1-12">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.12</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(T\) 是线性空间 \(V\) 的线性变换。\(V\) 中所有向量的象形成的集合称为 \(T\) 的<strong>值域</strong>，记 \(R(T)\)：
+                  \[ R(T)=\{\,Tx\mid x\in V\,\}; \]
+                  \(V\) 中所有被 \(T\) 变为零向量的原象构成的集合称为 \(T\) 的<strong>核</strong>，记 \(N(T)\)：
+                  \[ N(T)=\{\,x\mid Tx=\mathbf 0,\ x\in V\,\}. \]</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-1-8">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.8</span>
+              </header>
+              <div class="card-body">
+                <p>线性变换 \(T\) 的值域与核都是 \(V\) 的线性子空间。</p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>因 \(V\) 非空，\(R(T)\) 非空；且
+                      \[ Tx+Ty=T(x+y),\qquad k(Tx)=T(kx), \]
+                      即 \(R(T)\) 对线性运算封闭，故 \(R(T)\) 是子空间（也称 <strong>象子空间</strong>）。</p>
+                    <p>由 \(Tx=\mathbf 0,\ Ty=\mathbf 0\) 得 \(T(x+y)=\mathbf 0,\ T(kx)=\mathbf 0\)，故 \(N(T)\) 对线性运算封闭；又 \(T\mathbf 0=\mathbf 0\)，所以 \(\mathbf 0\in N(T)\)，核非空。故 \(N(T)\) 也是子空间（<strong>核子空间</strong>）。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <p>例如在 \(P_n\) 中令 \(D(f)=f'\)，则值域是 \(P_{n-1}\)，核是子空间 \(\R\)（常数的导数为 0）。</p>
+            <section class="card def" id="def-1-13">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.13</span>
+              </header>
+              <div class="card-body">
+                <p>象子空间的维数 \(\dim R(T)\) 称为 \(T\) 的<strong>秩</strong>；核子空间的维数 \(\dim N(T)\) 称为 \(T\) 的<strong>亏</strong>（或零度）。</p>
+                <p style="margin-bottom:0">后面会看到，线性变换的秩与亏和矩阵 \(A\) 的秩与零度，在一定条件（取定基）下有相同的数量关系：\(\dim R(T)+\dim N(T)=n\)。</p>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-1-13">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.13</span><span class="card-tag">值域的生成式</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(x_1,\ldots,x_n\) 是 \(V^n\) 的一个基，\(T\) 是 \(V^n\) 中的线性变换，则
+                  \[ R(T)=L(Tx_1,Tx_2,\ldots,Tx_n). \]</p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>任取 \(y\in R(T)\)，存在 \(x\in V^n\) 使 \(y=Tx\)。写 \(x=c_1x_1+\cdots+c_nx_n\)，则
+                      \[ y=c_1(Tx_1)+\cdots+c_n(Tx_n)\in L(Tx_1,\ldots,Tx_n), \]
+                      故 \(R(T)\subset L(Tx_1,\ldots,Tx_n)\)。</p>
+                    <p>反之 \(Tx_i\in R(T)\)，故 \(L(Tx_1,\ldots,Tx_n)\subset R(T)\)。两者相等。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-1-14">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.14</span><span class="card-tag">求秩与亏</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(x=(\xi_1,\xi_2,\xi_3,\xi_4)\in\R^4\)，定义
+                  \[ T(\xi_1,\xi_2,\xi_3,\xi_4)=\big(\xi_1+\xi_2-3\xi_3-\xi_4,\ 3\xi_1-\xi_2-3\xi_3+4\xi_4,\ 0,\ 0\big), \]
+                  证明 \(T\) 是 \(\R^4\) 的线性变换并求 \(T\) 的秩与亏。</p>
+                <details class="proof">
+                  <summary><span>解（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>\(T\) 是线性变换容易验证（分量都是 \(\xi_i\) 的齐次线性式），留给读者。取标准基 \(e_1,e_2,e_3,e_4\)，计算
+                      \[ Te_1=(1,3,0,0),\quad Te_2=(1,-1,0,0),\quad Te_3=(-3,-3,0,0),\quad Te_4=(-1,4,0,0). \]
+                      向量组 \(Te_1,\ldots,Te_4\) 的秩为 2，故
+                      \[ \dim L(Te_1,\ldots,Te_4)=2, \]
+                      由例 1.13，\(T\) 的秩 \(\dim R(T)=2\)。</p>
+                    <p>设 \(x\in N(T)\)，即
+                      \[ \begin{cases}\xi_1+\xi_2-3\xi_3-\xi_4=0,\\ 3\xi_1-\xi_2-3\xi_3+4\xi_4=0,\end{cases} \]
+                      核空间就是该齐次方程组的解空间；系数矩阵秩为 2，基础解系含 \(4-2=2\) 个解向量，故 \(T\) 的亏 \(\dim N(T)=2\)。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="special-transforms">5. 单位变换与零变换</h3>
+            <p>把 \(V\) 中任一向量都变为其自身的变换是线性变换（读者自证），称<strong>单位变换</strong>或<strong>恒等变换</strong>，记 \(T_e\)：
+              <div class="eq-scroll">\[ T_ex=x\qquad(\forall x\in V). \tag{1.2.2} \]</div>
+              把任一向量都变为零向量的变换也是线性变换，称<strong>零变换</strong>，记 \(T_0\)：
+              <div class="eq-scroll">\[ T_0x=\mathbf 0\qquad(\forall x\in V). \tag{1.2.3} \]</div>
+              若 \(T_1,T_2\) 对任意 \(x\) 都有 \(T_1x=T_2x\)，则称两变换<strong>相等</strong>：
+              <div class="eq-scroll">\[ T_1=T_2. \tag{1.2.4} \]</div></p>
+
+            <h3 class="sub-title" id="transform-operations">6. 线性变换的五种运算</h3>
+            <p>线性空间 \(V\) 的全体线性变换，自身也能做加减、数乘、乘法、取逆、求多项式——它们构成一个"线性变换的代数系统"。</p>
+
+            <h4 class="minor-title">（1）加法</h4>
+            <p>定义和 \(T_1+T_2\)：
+              \[ (T_1+T_2)x=T_1x+T_2x\qquad(\forall x\in V). \]
+              两个线性变换的和仍是线性变换，因为
+              <div class="eq-scroll">\[
+              (T_1+T_2)(kx+ly)=T_1(kx+ly)+T_2(kx+ly)
+              =k(T_1x+T_2x)+l(T_1y+T_2y)
+              =k(T_1+T_2)x+l(T_1+T_2)y.
+              \]</div>
+              <strong>负变换</strong> \(-T\) 定义为
+              \[ (-T)x=-(Tx), \]
+              它也是线性变换。加法满足：
+              \[ T_1+T_2=T_2+T_1;\quad (T_1+T_2)+T_3=T_1+(T_2+T_3);\quad T+T_0=T;\quad T+(-T)=T_0. \]</p>
+
+            <h4 class="minor-title">（2）数乘</h4>
+            <p>\(k\in K\) 与线性变换 \(T\) 的乘积 \(kT\)：
+              \[ (kT)x=k(Tx)\qquad(\forall x\in V). \]
+              \(kT\) 也是线性变换，且
+              \[ k(T_1+T_2)=kT_1+kT_2;\quad (k+l)T=kT+lT;\quad (kl)T=k(lT);\quad 1\,T=T. \]</p>
+            <p>由加法与数乘（合称线性变换的线性运算）可见：<strong>\(V\) 的所有线性变换的集合，在这两种运算下形成一个新的线性空间</strong>，常记作
+              \[ \mathrm{Hom}(V,V). \]</p>
+
+            <h4 class="minor-title">（3）乘法（复合）</h4>
+            <p>定义乘积 \(T_1T_2\)：
+              \[ (T_1T_2)x=T_1(T_2x)\qquad(\forall x\in V), \]
+              即<strong>先施行 \(T_2\)，然后施行 \(T_1\)</strong>。\(T_1T_2\) 也是线性变换：
+              <div class="eq-scroll">\[
+              (T_1T_2)(kx+ly)=T_1(kT_2x+lT_2y)=k(T_1T_2)x+l(T_1T_2)y.
+              \]</div>
+              乘法满足结合律、对加法的左右分配律：
+              \[ (T_1T_2)T_3=T_1(T_2T_3), \]
+              \[ T_1(T_2+T_3)=T_1T_2+T_1T_3,\qquad (T_1+T_2)T_3=T_1T_3+T_2T_3, \]
+              且单位变换扮演数 1 的角色：
+              \[ TT_e=T_eT=T. \tag{1.2.5} \]</p>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意：变换乘法一般不满足交换律</span>
+              </header>
+              <div class="card-body">
+                <p>与矩阵乘法一样，一般 \(T_1T_2\ne T_2T_1\)。例：在 \(\R^2\) 中 \(T_1\) 表示绕原点逆时针转 \(\pi/2\)，\(T_2\) 表示向横轴投影。对标准基 \(e_1,e_2\)：
+                  \[ (T_1T_2)e_1=e_2,\qquad (T_2T_1)e_1=\mathbf 0; \]
+                  \[ (T_1T_2)e_2=\mathbf 0,\qquad (T_2T_1)e_2=-e_1, \]
+                  故 \(T_1T_2\ne T_2T_1\)。做复合务必认准先后次序。</p>
+              </div>
+            </aside>
+
+            <h4 class="minor-title">（4）逆变换</h4>
+            <p>类似逆矩阵，若存在线性变换 \(S\) 使
+              \[ (ST)x=(TS)x=x\qquad(\forall x\in V), \]
+              则称 \(S\) 为 \(T\) 的<strong>逆变换</strong>，记 \(S=T^{-1}\)，且
+              \[ T^{-1}T=TT^{-1}=T_e. \tag{1.2.6} \]</p>
+            <p>意义：\(T\) 把 \(x\) 变为 \(Tx\)，\(T^{-1}\) 再把 \(Tx\) 还原为 \(x\)。<strong>线性变换存在逆变换的充要条件是它是一对一（双射）的变换</strong>；有逆变换的线性变换称<strong>可逆的线性变换</strong>。可以证明逆变换也是线性变换。</p>
+
+            <h4 class="minor-title">（5）幂与线性变换的多项式</h4>
+            <p>定义非负整数次幂
+              \[ T^n=T^{n-1}T\quad(n=2,3,\ldots),\qquad T^0=T_e, \tag{1.2.7} \]</p>
+            <p>于是有指数法则
+              \[ T^{m+n}=T^mT^n,\qquad (T^m)^n=T^{mn}\qquad(m,n\in\N_0). \tag{1.2.8} \]</p>
+            <p>当 \(T\) 可逆时定义负整数次幂
+              \[ T^{-n}=(T^{-1})^n\qquad(n\in\N_0), \tag{1.2.9} \]</p>
+            <p>指数法则推广到负整数次幂。设纯量多项式
+              \[ f(t)=a_0t^m+a_1t^{m-1}+\cdots+a_{m-1}t+a_m, \]
+              则
+              <div class="eq-scroll">\[ f(T)=a_0T^m+a_1T^{m-1}+\cdots+a_{m-1}T+a_mT_e \tag{1.2.10} \]</div>
+              也是线性变换，称为线性变换 \(T\) 的<strong>多项式</strong>。若 \(h(t)=f(t)g(t)\)、\(p(t)=f(t)+g(t)\)，则
+              \[ h(T)=f(T)g(T),\qquad p(T)=f(T)+g(T), \]
+              特别地
+              \[ f(T)g(T)=g(T)f(T). \]</p>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意</span>
+              </header>
+              <div class="card-body">
+                <p>虽然不同变换一般不可交换，但<strong>同一变换的多项式彼此恒可交换</strong>（都只是 \(T\) 的幂的线性组合）。这一性质在 Hamilton–Cayley 定理中极为关键。</p>
+              </div>
+            </aside>
+          </section>
+          <!-- ================= 二、线性变换的矩阵表示 ================= -->
+          <section class="section" id="sec-matrix-repr">
+            <h2 class="sec-title"><span class="cn">二</span>线性变换的矩阵表示</h2>
+            <p>有限维线性空间的向量可以用坐标表示。更进一步，这里通过坐标把<strong>抽象的线性变换转化为具体的矩阵</strong>来处理。</p>
+            <p>要确定一个线性变换 \(T\)，乍看似乎要把 \(V\) 中所有向量在 \(T\) 下的象全部找出来。其实不必：因为任一向量都由基向量唯一线性表示，<strong>只要确定了基向量的象，任一向量的象就完全确定了</strong>。</p>
+
+            <h3 class="sub-title" id="def-matrix-of-t">1. 定义 1.14：T 在基下的矩阵</h3>
+            <p>设 \(T\) 是 \(V^n\) 的线性变换，\(x_1,\ldots,x_n\) 是 \(V^n\) 的一个基，\(x\in V^n\)：
+              \[ x=a_1x_1+a_2x_2+\cdots+a_nx_n, \]
+              则
+              \[ Tx=a_1(Tx_1)+a_2(Tx_2)+\cdots+a_n(Tx_n). \]
+              这说明任一向量 \(x\) 的象由<strong>基象组</strong> \(Tx_1,\ldots,Tx_n\) 唯一确定。基象组仍在 \(V^n\) 中，故可令
+              <div class="eq-scroll">
+              \[
+              \left.\begin{aligned}
+              Tx_1&amp;=a_{11}x_1+a_{21}x_2+\cdots+a_{n1}x_n,\\
+              Tx_2&amp;=a_{12}x_1+a_{22}x_2+\cdots+a_{n2}x_n,\\
+              &amp;\vdots\\
+              Tx_n&amp;=a_{1n}x_1+a_{2n}x_2+\cdots+a_{nn}x_n,
+              \end{aligned}\right\}
+              \tag{1.2.11}
+              \]</div>
+              即 \(Tx_i=\displaystyle\sum_{j=1}^n a_{ji}x_j\)。写成形式矩阵运算：
+              <div class="eq-scroll">\[
+              T(x_1,x_2,\ldots,x_n)=(Tx_1,Tx_2,\ldots,Tx_n)=(x_1,x_2,\ldots,x_n)\,A,
+              \tag{1.2.12}
+              \]</div>
+              其中
+              \[
+              A=\begin{pmatrix}
+              a_{11}&a_{12}&\cdots&a_{1n}\\
+              a_{21}&a_{22}&\cdots&a_{2n}\\
+              \vdots&\vdots&&\vdots\\
+              a_{n1}&a_{n2}&\cdots&a_{nn}
+              \end{pmatrix}.
+              \]</p>
+            <section class="card def" id="def-1-14">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.14</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">式 (1.2.12) 中的矩阵 \(A\) 称为 <strong>\(T\) 在基 \(x_1,\ldots,x_n\) 下的矩阵</strong>，简称 <strong>\(T\) 的矩阵</strong>。<strong>\(A\) 的第 \(i\) 列恰是 \(Tx_i\) 在该基下的坐标</strong>（\(i=1,\ldots,n\)）。由式 (1.2.11)(1.2.12)，线性变换与 \(n\) 阶矩阵一一对应。</p>
+              </div>
+            </section>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意：又是"第 i 列"</span>
+              </header>
+              <div class="card-body">
+                <p>与过渡矩阵一样，列方向最容易写反。记忆法：式 (1.2.12) 右边按矩阵乘法，\(A\) 的<strong>第 \(i\) 列与左边一行基向量配对，正好展开成 \(Tx_i\)</strong>。</p>
+              </div>
+            </aside>
+
+            <h3 class="sub-title" id="special-matrices">2. 三个特殊变换的矩阵</h3>
+            <p>因为 \(T_0x_i=\mathbf 0=0x_1+\cdots+0x_n\)，所以<strong>零变换的矩阵是零矩阵 \(O\)</strong>；\(T_ex_i=x_i\)，故<strong>单位变换的矩阵是单位矩阵 \(I\)</strong>。</p>
+            <p>使任一向量 \(x\) 变为 \(mx\)（\(m\) 固定）的<strong>数乘变换</strong> \(T_m\) 是线性变换，其矩阵为
+              \[
+              \begin{pmatrix}
+              m&0&\cdots&0\\
+              0&m&\cdots&0\\
+              \vdots&\vdots&\ddots&\vdots\\
+              0&0&\cdots&m
+              \end{pmatrix}=mI,
+              \tag{1.2.13}
+              \]
+              称为<strong>数量矩阵</strong>。当 \(m\) 分别取 \(0,1\) 时就得到零矩阵与单位矩阵，即二者都是数量矩阵的特例。</p>
+
+            <h3 class="sub-title" id="exm-1-15">3. 例 1.15：求导变换在两个基下的矩阵</h3>
+            <section class="card ex" id="exm-1-15-card">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.15</span><span class="card-tag">同一变换、不同基、不同矩阵</span>
+              </header>
+              <div class="card-body">
+                <p>在 \(P_n\)（\(n+1\) 维）中分别取两组基（此处是多项式）：
+                  \[ f_0(t)=1,\ f_1(t)=t,\ f_2(t)=\frac{t^2}{2!},\ \ldots,\ f_n(t)=\frac{t^n}{n!}, \]
+                  \[ \widetilde f_0(t)=1,\ \widetilde f_1(t)=t,\ \widetilde f_2(t)=t^2,\ \ldots,\ \widetilde f_n(t)=t^n. \]
+                  令 \(T\) 为求导变换，求 \(T\) 分别在这两个基下的矩阵。</p>
+                <details class="proof">
+                  <summary><span>解（点击展开两个矩阵的来历）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>第一基：\(Tf_0=0\)，\(Tf_1=1=f_0\)，\(Tf_2=t=f_1\)，……，\(Tf_n=\dfrac{t^{n-1}}{(n-1)!}=f_{n-1}\)。把每个象的坐标排成列，得
+                      <div class="eq-scroll">\[
+                      A=\begin{pmatrix}
+                      0&1&0&\cdots&0\\
+                      0&0&1&\cdots&0\\
+                      \vdots&\vdots&\vdots&&\vdots\\
+                      0&0&0&\cdots&1\\
+                      0&0&0&\cdots&0
+                      \end{pmatrix}.
+                      \]</div>
+                      第二基：\(T\widetilde f_k=k\,t^{k-1}=k\,\widetilde f_{k-1}\)，故
+                      <div class="eq-scroll">\[
+                      B=\begin{pmatrix}
+                      0&1&0&\cdots&0\\
+                      0&0&2&\cdots&0\\
+                      \vdots&\vdots&\vdots&&\vdots\\
+                      0&0&0&\cdots&n\\
+                      0&0&0&\cdots&0
+                      \end{pmatrix}.
+                      \]</div>
+                      两基间的过渡矩阵为 \(C=\diag(1,1,2!,\ldots,n!)\)，直接计算确有 \(C^{-1}AC=B\)（见后文定理 1.11）。</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0">本例说明：<strong>同一个线性变换在不同基下的矩阵一般不同</strong>。向量的坐标随基改变，线性变换的矩阵也随基改变——后者正是"相似"理论要解决的问题。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="exm-1-16">4. 例 1.16：变换的秩 = 矩阵的秩</h3>
+            <section class="card ex" id="exm-1-16-card">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.16</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A\) 是线性变换 \(T\) 的矩阵，则
+                  \[ \dim R(T)=\dim R(A),\qquad \dim N(T)=\dim N(A). \]</p>
+                <details class="proof">
+                  <summary><span>证明思路（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>若 \(\dim R(A)=r\)，则 \(A\) 的列向量组的最大无关组由 \(r\) 个列构成。由 (1.2.12)，\(Tx_1,\ldots,Tx_n\) 的最大无关组也由对应的 \(r\) 个向量构成，再由例 1.13：
+                      \[ \dim R(T)=\dim L(Tx_1,\ldots,Tx_n)=r. \]
+                      反向推理同样成立，故 \(\dim R(T)=\dim R(A)\)。核维数的等式通过"核的基对应 \(N(A)\) 的基"双向论证（详见教材 p.38）。</p>
+                  </div>
+                </details>
+                <p>结合式 (1.1.15) 立即得到线性变换版的秩—零度公式：
+                  <div class="eq-scroll">\[ \dim R(T)+\dim N(T)=n. \tag{1.2.14} \]</div></p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="thm-1-9">5. 定理 1.9：变换运算 ↔ 矩阵运算</h3>
+            <p>取定基后，变换的和、数乘、乘积、取逆分别对应矩阵的和、数乘、乘积、求逆：</p>
+            <section class="card thm" id="thm-1-9-card">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.9</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(T_1,T_2\) 在基 \(x_1,\ldots,x_n\) 下的 \(n\) 阶矩阵依次为 \(A,B\)，则</p>
+                <ol class="axiom-list" style="list-style:none">
+                  <li><span class="n">1</span>\((T_1+T_2)(x_1,\ldots,x_n)=(x_1,\ldots,x_n)(A+B)\)；</li>
+                  <li><span class="n">2</span>\((kT_1)(x_1,\ldots,x_n)=(x_1,\ldots,x_n)(kA)\)；</li>
+                  <li><span class="n">3</span>\((T_1T_2)(x_1,\ldots,x_n)=(x_1,\ldots,x_n)(AB)\)；</li>
+                  <li><span class="n">4</span>\(T_1^{-1}(x_1,\ldots,x_n)=(x_1,\ldots,x_n)A^{-1}\)。</li>
+                </ol>
+                <details class="proof">
+                  <summary><span>证明（点击展开核心推导）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>由 \(T_1(x_1,\ldots,x_n)=(x_1,\ldots,x_n)A\)、\(T_2(x_1,\ldots,x_n)=(x_1,\ldots,x_n)B\)，有
+                      \[ (T_1+T_2)(x_1,\ldots,x_n)=(x_1,\ldots,x_n)A+(x_1,\ldots,x_n)B=(x_1,\ldots,x_n)(A+B), \]
+                      \[ (kT_1)(x_1,\ldots,x_n)=k(x_1,\ldots,x_n)A=(x_1,\ldots,x_n)(kA), \]
+                      \[ (T_1T_2)(x_1,\ldots,x_n)=T_1((x_1,\ldots,x_n)B)=T_1(x_1,\ldots,x_n)\,B=(x_1,\ldots,x_n)AB. \]</p>
+                    <p>为证 (4)，设 \(T_1\) 可逆，其逆为 \(T_2\)，则 \(T_1T_2=T_2T_1=T_e\)，由 (3) 有 \(AB=BA=I\)，故逆变换的矩阵为 \(B=A^{-1}\)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <section class="card thm cor" id="cor-poly">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">推论：变换多项式的矩阵 = 矩阵多项式</span>
+              </header>
+              <div class="card-body">
+                <p>若 \(f(t)=a_0t^m+\cdots+a_{m-1}t+a_m\)，且 \(T(x_1,\ldots,x_n)=(x_1,\ldots,x_n)A\)，则 \(f(T)\) 在该基下的矩阵是
+                  <div class="eq-scroll">\[ f(A)=a_0A^m+a_1A^{m-1}+\cdots+a_{m-1}A+a_mI. \tag{1.2.15} \]</div>
+                  矩阵 (1.2.15) 称为<strong>方阵 \(A\) 的多项式</strong>，在以后的理论中占有重要地位。</p>
+              </div>
+            </section>
+          </section>
+            <h3 class="sub-title" id="thm-1-10">6. 定理 1.10：象的坐标怎么算</h3>
+            <section class="card thm" id="thm-1-10-card">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.10</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(T\) 在基 \(x_1,\ldots,x_n\) 下的矩阵是 \(A=(a_{ij})\)，向量 \(x\) 在该基下坐标为 \((\xi_1,\ldots,\xi_n)^{\mathrm T}\)，则 \(Tx\) 的坐标 \((\eta_1,\ldots,\eta_n)^{\mathrm T}\) 为
+                  <div class="eq-scroll">\[
+                  \begin{pmatrix}\eta_1\\ \eta_2\\ \vdots\\ \eta_n\end{pmatrix}
+                  =A\begin{pmatrix}\xi_1\\ \xi_2\\ \vdots\\ \xi_n\end{pmatrix}.
+                  \tag{1.2.16}
+                  \]</div></p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>由
+                      \[ x=(x_1,\ldots,x_n)(\xi_1,\ldots,\xi_n)^{\mathrm T}, \]
+                      作用 \(T\) 并代入 (1.2.12)：
+                      <div class="eq-scroll">\[
+                      Tx=T(x_1,\ldots,x_n)(\xi_1,\ldots,\xi_n)^{\mathrm T}
+                      =(x_1,\ldots,x_n)A(\xi_1,\ldots,\xi_n)^{\mathrm T}.
+                      \]</div>
+                      另一方面 \(Tx=(x_1,\ldots,x_n)(\eta_1,\ldots,\eta_n)^{\mathrm T}\)。基向量线性无关，由坐标唯一即得 (1.2.16)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0">利用 (1.2.16)，可以直接由矩阵 \(A\) 计算任一向量的象的坐标，不必再写基向量的线性组合。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="thm-1-11">7. 定理 1.11：换基 → 相似矩阵</h3>
+            <section class="card thm" id="thm-1-11-card">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.11</span><span class="card-tag">全节枢纽</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(T\) 对 \(V^n\) 的两个基 \(x_1,\ldots,x_n\) 和 \(y_1,\ldots,y_n\) 的矩阵依次是 \(A\) 和 \(B\)，且
+                  \[ (y_1,\ldots,y_n)=(x_1,\ldots,x_n)C, \]
+                  其中 \(C\) 是旧基到新基的过渡矩阵，那么
+                  <div class="eq-scroll">\[ B=C^{-1}AC. \tag{1.2.17} \]</div></p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>根据假设有
+                      \[ T(x_1,\ldots,x_n)=(x_1,\ldots,x_n)A,\qquad T(y_1,\ldots,y_n)=(y_1,\ldots,y_n)B. \]
+                      由于
+                      \[ T(y_1,\ldots,y_n)=T((x_1,\ldots,x_n)C)=(x_1,\ldots,x_n)AC, \]
+                      同时
+                      \[ (x_1,\ldots,x_n)AC=(y_1,\ldots,y_n)C^{-1}AC, \]
+                      与 \(T(y_1,\ldots,y_n)=(y_1,\ldots,y_n)B\) 比较，基向量线性无关，故 \(B=C^{-1}AC\)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="similarity">8. 定义 1.15：相似矩阵</h3>
+            <section class="card def" id="def-1-15">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.15</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A,B\) 为数域 \(K\) 上的两个 \(n\) 阶矩阵，如果存在 \(K\) 上的 <strong>\(n\) 阶非奇异矩阵 \(P\)</strong>，使得
+                  \[ B=P^{-1}AP, \]
+                  则称 <strong>\(A\) 相似于 \(B\)</strong>，记为 \(A\sim B\)。</p>
+              </div>
+            </section>
+            <p>按此定义：<strong>线性变换在不同基下的矩阵是相似的</strong>；反之，两个相似矩阵可以看成同一个线性变换在两个不同基下的矩阵。</p>
+            <p>相似关系有三个基本性质，因而是<strong>等价关系</strong>：</p>
+            <div class="grid3">
+              <div class="mini-card"><div class="mc-title">反身性</div><p style="margin:0">\(A\sim A\)，因为 \(A=I^{-1}AI\)。</p></div>
+              <div class="mini-card"><div class="mc-title">对称性</div><p style="margin:0">\(A\sim B\Rightarrow B\sim A\)：由 \(B=P^{-1}AP\)，令 \(Q=P^{-1}\)，则 \(A=PBP^{-1}=Q^{-1}BQ\)。</p></div>
+              <div class="mini-card"><div class="mc-title">传递性</div><p style="margin:0">\(A\sim B,\ B\sim C\Rightarrow A\sim C\)（请读者完成）。</p></div>
+            </div>
+            <p>于是 \(K\) 上一切 \(n\) 阶矩阵可按相似关系分成许多类：<strong>同一类中任意两个矩阵相似，不同类中任意两个不相似</strong>。这样的类称为<strong>相似类</strong>。问题自然变成：每个相似类中能否找到一个形式最简单的代表？这就是后面"对角矩阵"与"Jordan 标准形"要回答的。</p>
+
+            <section class="card ex" id="exm-1-17">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.17</span>
+              </header>
+              <div class="card-body">
+                <p>如果 \(B=P^{-1}AP\)，且 \(f(t)\) 是数域 \(K\) 上的多项式，则矩阵多项式满足
+                  \[ f(B)=P^{-1}f(A)P. \]</p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>对正整数 \(k\)，易知
+                      \[ B^k=(P^{-1}AP)^k=P^{-1}A^kP. \]
+                      令 \(f(t)=a_0t^m+\cdots+a_{m-1}t+a_m\)，则
+                      <div class="eq-scroll">\[
+                      f(B)=a_0B^m+\cdots+a_mI
+                      =a_0(P^{-1}A^mP)+\cdots+P^{-1}a_mIP
+                      =P^{-1}(a_0A^m+\cdots+a_mI)P
+                      =P^{-1}f(A)P.
+                      \]</div></p>
+                  </div>
+                </details>
+              </div>
+            </section>
+          <!-- ================= 三、特征值与特征向量 ================= -->
+          <section class="section" id="sec-eigen">
+            <h2 class="sec-title"><span class="cn">三</span>特征值与特征向量</h2>
+            <p>现在讨论如何选择线性空间的基，使线性变换在该基下的矩阵形状最简单。为此先论述线性变换的特征值与特征向量——它们对线性变换的研究起着十分重要的作用。</p>
+
+            <h3 class="sub-title" id="def-eigen-t">1. 定义 1.16（变换角度）</h3>
+            <section class="card def" id="def-1-16">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.16</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(T\) 是数域 \(K\) 上线性空间 \(V^n\) 的线性变换，且对 \(K\) 中某一数 \(\lambda_0\)，存在<strong>非零</strong>向量 \(x\in V^n\)，使得
+                  <div class="eq-scroll">\[ Tx=\lambda_0 x, \tag{1.2.18} \]</div>
+                  则称 \(\lambda_0\) 为 \(T\) 的<strong>特征值</strong>，\(x\) 为 \(T\) 的属于 \(\lambda_0\) 的<strong>特征向量</strong>。</p>
+                <p style="margin-bottom:0">几何意义：特征向量 \(x\) 的<strong>方位</strong>经过线性变换后保持不变（只是被伸缩了 \(\lambda_0\) 倍；\(\lambda_0&lt;0\) 时反向，\(\lambda_0=0\) 时被压扁）。</p>
+              </div>
+            </section>
+            <p>若 \(x\) 是属于 \(\lambda_0\) 的特征向量，则 \(T(kx)=\lambda_0(kx)\)，所以任意 \(k\ne0\) 时 \(kx\) 也是属于 \(\lambda_0\) 的特征向量。因此：<strong>特征向量不被特征值唯一确定；但一个特征向量只能属于一个特征值</strong>（若 \(Tx=\lambda_1x=\lambda_2x\) 且 \(x\ne\mathbf 0\)，则 \((\lambda_1-\lambda_2)x=\mathbf 0\)，故 \(\lambda_1=\lambda_2\)）。</p>
+
+            <h3 class="sub-title" id="char-poly">2. 坐标化：特征方程与特征多项式（定义 1.17）</h3>
+            <p>设 \(T\) 在基 \(x_1,\ldots,x_n\) 下的矩阵为 \(A=(a_{ij})\)，属于 \(\lambda_0\) 的特征向量 \(x=\xi_1x_1+\cdots+\xi_nx_n\)。由定理 1.10，\(Tx\) 与 \(\lambda_0x\) 的坐标分别是
+              \[ A(\xi_1,\ldots,\xi_n)^{\mathrm T},\qquad \lambda_0(\xi_1,\ldots,\xi_n)^{\mathrm T}, \]
+              坐标相等，得
+              <div class="eq-scroll">\[
+              A\begin{pmatrix}\xi_1\\ \vdots\\ \xi_n\end{pmatrix}
+              =\lambda_0\begin{pmatrix}\xi_1\\ \vdots\\ \xi_n\end{pmatrix},
+              \tag{1.2.19}
+              \]</div>
+              即特征向量的坐标满足齐次方程组
+              <div class="eq-scroll">\[
+              (\lambda_0 I-A)\begin{pmatrix}\xi_1\\ \vdots\\ \xi_n\end{pmatrix}=\mathbf 0.
+              \tag{1.2.20}
+              \]</div>
+              由于 \(x\ne\mathbf 0\)，坐标 \(\xi_1,\ldots,\xi_n\) 不全为零，即 (1.2.20) 有非零解，故
+              <div class="eq-scroll">\[
+              \det(\lambda_0 I-A)=
+              \begin{vmatrix}
+              \lambda_0-a_{11}&-a_{12}&\cdots&-a_{1n}\\
+              -a_{21}&\lambda_0-a_{22}&\cdots&-a_{2n}\\
+              \vdots&\vdots&&\vdots\\
+              -a_{n1}&-a_{n2}&\cdots&\lambda_0-a_{nn}
+              \end{vmatrix}=0.
+              \tag{1.2.21}
+              \]</div></p>
+            <section class="card def" id="def-1-17">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.17</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A=(a_{ij})_{n\times n}\) 是数域 \(K\) 上的 \(n\) 阶矩阵，\(\lambda\) 是参数，称
+                  \[ \varphi(\lambda)=\det(\lambda I-A) \]
+                  为矩阵 \(A\) 的<strong>特征矩阵</strong> \(\lambda I-A\) 的行列式，即 \(A\) 的<strong>特征多项式</strong>，它是 \(K\) 上的 \(n\) 次多项式。\(\varphi(\lambda)\) 的根 \(\lambda_0\) 称为 \(A\) 的<strong>特征值（根）</strong>；方程组 (1.2.20) 的非零解向量称为 \(A\) 的属于 \(\lambda_0\) 的<strong>特征向量</strong>。</p>
+                <p style="margin-bottom:0">所以求变换 \(T\) 的特征值与特征向量，只需求其矩阵 \(A\) 的特征值与特征向量：<strong>\(T\) 的特征值与 \(A\) 的特征值一致</strong>，\(T\) 的特征向量在基下的坐标（列向量）与 \(A\) 的特征向量一致。</p>
+              </div>
+            </section>
+            <p><strong>计算步骤（四步法）：</strong></p>
+            <ol>
+              <li>取定 \(V^n\) 的一个基，写出 \(T\) 的矩阵 \(A\)；</li>
+              <li>求特征多项式 \(\varphi(\lambda)=\det(\lambda I-A)\) 在 \(K\) 中的全部根，即全部特征值；</li>
+              <li>把各特征值逐个代入 \((\lambda I-A)\mathbf x=\mathbf 0\)，解出属于每个特征值的全部线性无关特征向量；</li>
+              <li>以这些特征向量为 \(V^n\) 中取定基下的坐标，即得 \(T\) 的相应特征向量。</li>
+            </ol>
+
+            <section class="card ex" id="exm-1-18">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.18</span><span class="card-tag">二重根的几何重数</span>
+              </header>
+              <div class="card-body">
+                <p>设线性变换 \(T\) 在 \(V^3\) 的基 \(x_1,x_2,x_3\) 下的矩阵是
+                  \[ A=\begin{pmatrix}1&2&2\\2&1&2\\2&2&1\end{pmatrix}, \]
+                  求 \(T\) 的特征值与特征向量。</p>
+                <details class="proof">
+                  <summary><span>解（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p><strong>特征多项式：</strong>
+                      <div class="eq-scroll">\[
+                      \varphi(\lambda)=\det(\lambda I-A)
+                      =\begin{vmatrix}
+                      \lambda-1&-2&-2\\-2&\lambda-1&-2\\-2&-2&\lambda-1
+                      \end{vmatrix}
+                      =(\lambda+1)^2(\lambda-5).
+                      \]</div>
+                      特征值为 \(\lambda_1=-1\)（二重）与 \(\lambda_2=5\)。</p>
+                    <p><strong>属于 \(\lambda_1=-1\)：</strong>解 \((-I-A)\mathbf x=\mathbf 0\)，基础解系
+                      \[ (1,0,-1)^{\mathrm T},\quad (0,1,-1)^{\mathrm T}, \]
+                      即两个线性无关的特征向量
+                      \[ y_1=x_1-x_3,\qquad y_2=x_2-x_3, \]
+                      全体特征向量为 \(k_1y_1+k_2y_2\)（\(k_1,k_2\) 不同时为零）。</p>
+                    <p><strong>属于 \(\lambda_2=5\)：</strong>基础解系 \((1,1,1)^{\mathrm T}\)，记 \(y_3=x_1+x_2+x_3\)，全体特征向量为 \(k_3y_3\)（\(k_3\ne0\)）。</p>
+                    <p><strong>要点：</strong>代数重数为 2 的特征值 \(-1\) 恰好有 2 个线性无关特征向量（几何重数也是 2），所以后面会看到 \(A\) 可以对角化。</p>
+                  </div>
+                </details>
+                <h3 class="sub-title" id="eigen-lab-title" style="margin-top:18px">动手实验：2×2 特征值实验室</h3>
+                <p>改一改数字，观察迹、行列式、判别式如何决定特征值；特别试试只有<strong>一个无关特征向量的重根矩阵</strong>（如 \(\begin{pmatrix}2&1\\0&2\end{pmatrix}\)），它就是后面 Jordan 块的雏形。</p>
+                <section class="card lab" data-eigen-lab style="margin-top:8px"></section>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="eigenspace">3. 特征子空间（定义 1.18）</h3>
+            <p>对任一特征值 \(\lambda_0\)，属于它的全部特征向量再添上零向量构成的集合
+              <div class="eq-scroll">\[ V_{\lambda_0}=\{\,x\mid Tx=\lambda_0x,\ x\in V^n\,\} \tag{1.2.23} \]</div>
+              是 \(V^n\) 的线性子空间：若 \(Tx=\lambda_0x,\ Ty=\lambda_0y\)，则
+              \[ T(x+y)=\lambda_0(x+y),\qquad T(kx)=\lambda_0(kx). \]</p>
+            <section class="card def" id="def-1-18">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.18</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">称 \(V_{\lambda_0}\) 为 \(T\) 的属于 \(\lambda_0\) 的<strong>特征子空间</strong>。\(\dim V_{\lambda_0}\) 就是属于 \(\lambda_0\) 的线性无关特征向量的最大数目（也叫特征值的<strong>几何重数</strong>）。例 1.18 中 \(\dim V_{-1}=2,\ \dim V_5=1\)。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="trace">4. 特征多项式的系数：迹与行列式</h3>
+            <p>由行列式展开法则，\(n\) 阶矩阵 \(A=(a_{ij})\) 的特征多项式为
+              \[ \varphi(\lambda)=\det(\lambda I-A)=\lambda^n-(a_{11}+a_{22}+\cdots+a_{nn})\lambda^{n-1}+\cdots+(-1)^n\det A. \]
+              若 \(A\) 有 \(n\) 个特征值 \(\lambda_1,\ldots,\lambda_n\)（计重数），由韦达定理
+              <div class="eq-scroll">\[
+              \sum_{i=1}^n\lambda_i=\sum_{i=1}^n a_{ii},\qquad
+              \lambda_1\lambda_2\cdots\lambda_n=\det A.
+              \tag{1.2.24}
+              \]</div>
+              引入记号
+              <div class="eq-scroll">\[ \tr A=\sum_{i=1}^n a_{ii}, \tag{1.2.25} \]</div>
+              称为矩阵 \(A\) 的<strong>迹</strong>（追迹）。即：<strong>所有特征值之和等于迹，所有特征值之积等于行列式</strong>。</p>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>定理</th><th>结论</th></tr>
+                <tr><td><strong>定理 1.12</strong></td><td>\(A=(a_{ij})_{m\times n},\ B=(b_{ij})_{n\times m}\) 时 \(\tr(AB)=\tr(BA)\)。<details class="proof" style="margin-top:4px"><summary><span>证明（点击）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="proof-body"><p>\(\tr(AB)=\sum_{i=1}^m\sum_{k=1}^n a_{ik}b_{ki}=\sum_{k=1}^n\sum_{i=1}^m b_{ki}a_{ik}=\tr(BA)\)。</p></div></details></td></tr>
+                <tr><td><strong>定理 1.13</strong></td><td>相似矩阵有相同的迹：\(B=P^{-1}AP\Rightarrow\tr B=\tr(P^{-1}AP)=\tr(APP^{-1})=\tr A\)（连用两次定理 1.12）。</td></tr>
+                <tr><td><strong>定理 1.14</strong></td><td>相似矩阵有相同的特征多项式，因而有相同的特征值：<div class="eq-scroll" style="margin-top:4px">\(\det(\lambda I-B)=\det(\lambda I-P^{-1}AP)=\det P^{-1}\det(\lambda I-A)\det P=\det(\lambda I-A)\)。</div>这表明特征多项式与基的选择无关，直接由线性变换决定。</td></tr>
+                <tr><td><strong>定理 1.15</strong></td><td>准对角矩阵 \(A=\diag(A_1,\ldots,A_m)\) 有 \(\det(\lambda I-A)=\prod_{i=1}^m\det(\lambda I_i-A_i)\)（按分块行列式展开即得）。</td></tr>
+                <tr><td><strong>定理 1.16（Sylvester）</strong></td><td>设 \(A\in\R^{m\times n},B\in\R^{n\times m}\)，\(AB\) 与 \(BA\) 的特征多项式分别为 \(\varphi_{AB}(\lambda),\varphi_{BA}(\lambda)\)，则
+                  <div class="eq-scroll">\[ \lambda^n\varphi_{AB}(\lambda)=\lambda^m\varphi_{BA}(\lambda). \tag{1.2.26} \]</div>
+                  即 \(AB\) 与 \(BA\) 的非零特征值完全相同（差别只在零特征值的个数）。证明由两个分块矩阵取行列式得到。</td></tr>
+              </table>
+            </div>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意</span>
+              </header>
+              <div class="card-body">
+                <p>定理 1.14 反过来不成立：特征多项式相同（甚至迹、行列式都相同）的两个矩阵未必相似。例如 \(\begin{pmatrix}1&0\\0&1\end{pmatrix}\) 与 \(\begin{pmatrix}1&1\\0&1\end{pmatrix}\) 特征多项式都是 \((\lambda-1)^2\)，但前者只与自身相似。真正决定相似类的信息要靠 Jordan 标准形补齐。</p>
+              </div>
+            </aside>
+          </section>
+            <h3 class="sub-title" id="schur">5. 定理 1.17：任意矩阵都能相似于三角矩阵（Schur）</h3>
+            <section class="card thm" id="thm-1-17">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.17（Schur 三角化）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">在复数域 \(\C\) 上，任意 \(n\) 阶矩阵都与一个<strong>三角矩阵</strong>相似：存在非奇异矩阵 \(P\) 使
+                  \[ P^{-1}AP=\begin{pmatrix}\lambda_1&*&\cdots&*\\&\lambda_2&\ddots&\vdots\\&&\ddots&*\\&&&\lambda_n\end{pmatrix}, \]
+                  且对角元 \(\lambda_1,\ldots,\lambda_n\) 就是 \(A\) 的全部特征值。</p>
+                <details class="proof">
+                  <summary><span>证明梗概（对阶数 n 归纳，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>\(n=1\) 显然。设对 \(n-1\) 阶成立。取 \(A\) 的一个特征值 \(\lambda_1\) 与特征向量 \(x_1\)，把它扩充为 \(\C^n\) 的基 \(x_1,x_2,\ldots,x_n\)，令 \(P_1=(x_1,\ldots,x_n)\)，则
+                      \[ P_1^{-1}AP_1=\begin{pmatrix}\lambda_1&b_{12}&\cdots&b_{1n}\\0&&&\\\vdots&&A_1&\\0&&&\end{pmatrix}. \]
+                      由归纳假设存在可逆 \(Q\) 使 \(Q^{-1}A_1Q\) 为上三角阵。取 \(P_2=\diag(1,Q)\)、\(P=P_1P_2\)，则 \(P^{-1}AP\) 为上三角阵，对角元为全部特征值。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <section class="card ex" id="exm-1-19">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.19</span><span class="card-tag">亏损矩阵的三角化</span>
+              </header>
+              <div class="card-body">
+                <p>求与矩阵 \(A=\begin{pmatrix}2&1&1\\-2&5&1\\-3&2&5\end{pmatrix}\) 相似的三角矩阵。</p>
+                <details class="proof">
+                  <summary><span>解（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>\(A\) 有三重特征值 \(4\)，属于 \(4\) 的特征向量只有 \((1,1,1)^{\mathrm T}\)（几何重数 1），故不能对角化，但定理 1.17 保证可三角化。取
+                      \[ P_1=(x_1,x_2,x_3)=\begin{pmatrix}1&0&0\\1&1&0\\1&1&1\end{pmatrix},\quad P_1^{-1}AP_1=\begin{pmatrix}4&2&1\\0&4&0\\0&1&4\end{pmatrix}. \]
+                      对右下 \(A_1=\begin{pmatrix}4&0\\1&4\end{pmatrix}\) 取 \(Q=\begin{pmatrix}0&1\\1&0\end{pmatrix}\) 得 \(Q^{-1}A_1Q=\begin{pmatrix}4&1\\0&4\end{pmatrix}\)。最终
+                      \[ P^{-1}AP=\begin{pmatrix}4&1&2\\0&4&1\\0&0&4\end{pmatrix},\quad P=\begin{pmatrix}1&0&0\\1&0&1\\1&1&1\end{pmatrix}. \]</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="hc">6. 定理 1.18：Hamilton–Cayley 定理</h3>
+            <section class="card thm" id="thm-1-18">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.18（Hamilton–Cayley）</span><span class="card-tag">矩阵满足自己的特征方程</span>
+              </header>
+              <div class="card-body">
+                <p>若 \(n\) 阶矩阵 \(A\) 的特征多项式为
+                  \[ \varphi(\lambda)=\det(\lambda I-A)=\lambda^n+a_1\lambda^{n-1}+\cdots+a_{n-1}\lambda+a_n, \]
+                  则
+                  <div class="eq-scroll">\[ \varphi(A)=A^n+a_1A^{n-1}+\cdots+a_{n-1}A+a_nI=O. \tag{1.2.27} \]</div></p>
+                <details class="proof">
+                  <summary><span>证明思路（借助 Schur 定理，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>由定理 1.17 设 \(P^{-1}AP\) 为对角元 \(\lambda_1,\ldots,\lambda_n\) 的上三角阵。因为 \(\varphi(\lambda)=\prod_{i=1}^n(\lambda-\lambda_i)\)，所以
+                      \[ \varphi(P^{-1}AP)=(P^{-1}AP-\lambda_1I)\cdots(P^{-1}AP-\lambda_nI)=O, \]
+                      相邻的上三角因子逐列把向量"逐层归零"（每乘一个因子至少多消灭一个对角位置），乘积为零矩阵。于是
+                      \[ \varphi(P^{-1}AP)=P^{-1}\varphi(A)P=O\ \Longrightarrow\ \varphi(A)=O. \]</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0">用途极大：\(A^n\) 及更高次幂都能用 \(I,A,\ldots,A^{n-1}\) 线性表示，从而<strong>把矩阵高次幂与矩阵多项式的计算降阶</strong>（例 1.20），也保证下面的"最小多项式"一定存在。</p>
+              </div>
+            </section>
+            <section class="card ex" id="exm-1-20">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.20</span><span class="card-tag">用 H–C 算高次幂</span>
+              </header>
+              <div class="card-body">
+                <p>已知 \(A=\begin{pmatrix}1&1&-1\\1&1&1\\0&-1&2\end{pmatrix}\)，求 \(A^{100}+2A^{50}\)。</p>
+                <details class="proof">
+                  <summary><span>解（待定系数法，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>特征多项式 \(\varphi(\lambda)=(\lambda-1)^2(\lambda-2)\)。令 \(\psi(\lambda)=\lambda^{100}+2\lambda^{50}\)，多项式带余除法给出
+                      \[ \psi(\lambda)=\varphi(\lambda)q(\lambda)+b_0+b_1\lambda+b_2\lambda^2. \]
+                      因为 \(\varphi(A)=O\)，所以 \(\psi(A)=b_0I+b_1A+b_2A^2\)。以 \(\lambda=1,2\) 代入并对 \(\lambda=1\)（二重根）再用导数式 \(\psi'(1)=b_1+2b_2\)：
+                      \[ b_0+b_1+b_2=3,\quad b_0+2b_1+4b_2=2^{100}+2^{51},\quad b_1+2b_2=200, \]
+                      解出 \(b_0,b_1,b_2\)（教材 p.54 给出具体值），即得所求矩阵。</p>
+                    <p class="muted" style="font-size:.9em">重根必须补充导数条件才能凑够方程数——这是待定系数法的关键。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="minimal-poly">7. 最小多项式（定义 1.19、定理 1.19–1.21）</h3>
+            <section class="card def" id="def-1-19">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.19</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">首项系数为 1（首一）、次数最小、且以矩阵 \(A\) 为根的多项式，称为 \(A\) 的<strong>最小多项式</strong>，用 \(m(\lambda)\) 表示。由 Hamilton–Cayley 定理，这样的多项式一定存在，且 \(\deg m\le\deg\varphi=n\)。</p>
+              </div>
+            </section>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>结论</th><th>内容</th></tr>
+                <tr><td><strong>定理 1.19</strong></td><td>\(A\) 的最小多项式 \(m(\lambda)\) 整除任意以 \(A\) 为根的首一多项式 \(\psi(\lambda)\)（做带余除法 \(\psi=mq+r\)，则 \(r(A)=O\)，由次数最小性 \(r\equiv0\)）；且最小多项式<strong>唯一</strong>（两个首一最小多项式互相整除且同次，只能相等）。</td></tr>
+                <tr><td><strong>定理 1.20</strong></td><td>最小多项式与特征多项式的<strong>零点相同</strong>（不计重数）。一方面 \(m\mid\varphi\)（H–C 保证 \(\varphi(A)=O\)）；另一方面若 \(\varphi(\lambda_0)=0\)，取特征向量 \(x\)：\(m(A)x=m(\lambda_0)x=\mathbf 0\)，故 \(m(\lambda_0)=0\)。</td></tr>
+                <tr><td><strong>定理 1.21</strong></td><td>设特征矩阵 \(\lambda I-A\) 的全体 \(n-1\) 阶子式的最大公因式为 \(d(\lambda)\)，则
+                  <div class="eq-scroll" style="margin-top:4px">\[ m(\lambda)=\frac{\varphi(\lambda)}{d(\lambda)}. \tag{1.2.28} \]</div></td></tr>
+              </table>
+            </div>
+            <section class="card ex" id="exm-1-21">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.21–1.22</span>
+              </header>
+              <div class="card-body">
+                <p><strong>例 1.21.</strong> 对 \(A=\begin{pmatrix}3&-3&2\\-1&5&-2\\-1&3&0\end{pmatrix}\)，一次式 \(\lambda+k\) 都不满足 \(A+kI=O\)，而
+                  \[ \varphi(\lambda)=(\lambda-2)^2(\lambda-4), \]
+                  验证二次因式 \(\psi(\lambda)=(\lambda-2)(\lambda-4)=\lambda^2-6\lambda+8\) 恰使 \(\psi(A)=O\)，故 \(m(\lambda)=\lambda^2-6\lambda+8\)（是特征多项式的真因式）。</p>
+                <p><strong>例 1.22.</strong> 相似矩阵有相同的最小多项式：设 \(B=P^{-1}AP\)，则
+                  \[ m_A(B)=P^{-1}m_A(A)P=O, \]
+                  故 \(m_B\mid m_A\)；对称地 \(m_A\mid m_B\)，二者首一，故相等。</p>
+                <p style="margin-bottom:0" class="muted">反之不成立：\(\diag(2,3,3)\) 与 \(\diag(2,2,3)\) 最小多项式都是 \((\lambda-2)(\lambda-3)\)，但特征多项式不同、不相似。所以"最小多项式相同"是相似的必要非充分条件。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="eigen-independent">8. 不同特征值的特征向量线性无关</h3>
+            <section class="card thm" id="thm-1-22">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.22</span>
+              </header>
+              <div class="card-body">
+                <p>如果 \(\lambda_1,\lambda_2,\ldots,\lambda_s\) 是矩阵 \(A\) 互不相同的特征值，\(x_1,x_2,\ldots,x_s\) 分别是属于它们的特征向量，那么 \(x_1,\ldots,x_s\) 线性无关。</p>
+                <details class="proof">
+                  <summary><span>证明（数学归纳法，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>\(s=1\) 时单个非零向量当然无关。设 \(s-1\) 个时成立，令
+                      \[ k_1x_1+\cdots+k_{s-1}x_{s-1}+k_sx_s=\mathbf 0. \]
+                      用 \(A\) 左乘得
+                      \[ k_1\lambda_1x_1+\cdots+k_{s-1}\lambda_{s-1}x_{s-1}+k_s\lambda_sx_s=\mathbf 0, \]
+                      两式消去 \(x_s\)（第一式乘 \(\lambda_s\) 再相减）：
+                      \[ k_1(\lambda_1-\lambda_s)x_1+\cdots+k_{s-1}(\lambda_{s-1}-\lambda_s)x_{s-1}=\mathbf 0. \]
+                      由归纳假设 \(x_1,\ldots,x_{s-1}\) 无关，且 \(\lambda_i-\lambda_s\ne0\)，故 \(k_1=\cdots=k_{s-1}=0\)，进而 \(k_s=0\)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <section class="card thm cor" id="thm-1-23">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.23（推广）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">如果 \(\lambda_1,\ldots,\lambda_k\) 是不同特征值，而 \(x_{i1},\ldots,x_{ir_i}\) 是属于 \(\lambda_i\) 的一组线性无关特征向量（\(i=1,\ldots,k\)），那么把所有这些向量合在一起
+                  \[ x_{11},\ldots,x_{1r_1},\ldots,x_{k1},\ldots,x_{kr_k} \]
+                  仍然线性无关。即：<strong>各特征子空间取基，拼起来仍无关</strong>（证明略去，方法同定理 1.22）。</p>
+              </div>
+            </section>
+          <!-- ================= 四、对角矩阵 ================= -->
+          <section class="section" id="sec-diagonal">
+            <h2 class="sec-title"><span class="cn">四</span>对角矩阵</h2>
+            <p>对角矩阵的乘积、求逆、特征值都极易计算。问题是：哪些线性变换在适当基下的矩阵是对角矩阵？</p>
+
+            <section class="card thm" id="thm-1-24">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.24（变换形式）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">线性变换 \(T\) 在某一基下的矩阵 \(A\) 可以是对角矩阵
+                  \[ A=\diag(\lambda_1,\lambda_2,\ldots,\lambda_n) \tag{1.2.29} \]
+                  的充要条件是：<strong>\(T\) 有 \(n\) 个线性无关的特征向量</strong>。</p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>若 \(T\) 在基 \(x_1,\ldots,x_n\) 下矩阵是对角阵，比较
+                      \[ T(x_1,\ldots,x_n)=(x_1,\ldots,x_n)\diag(\lambda_1,\ldots,\lambda_n) \]
+                      两边各列得 \(Tx_i=\lambda_ix_i\)，故 \(x_1,\ldots,x_n\) 正是 \(n\) 个线性无关的特征向量。</p>
+                    <p>反之，若 \(T\) 有 \(n\) 个线性无关特征向量 \(x_i\)（\(Tx_i=\lambda_ix_i\)），取它们为基，则该基下矩阵恰为 \(\diag(\lambda_1,\ldots,\lambda_n)\)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-1-25">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.25（矩阵形式）</span><span class="card-tag">可对角化充要条件</span>
+              </header>
+              <div class="card-body">
+                <p>\(n\) 阶矩阵 \(A\) 与对角矩阵相似的充要条件是：<strong>\(A\) 有 \(n\) 个线性无关的特征向量</strong>（也称 \(A\) 有<strong>完备的特征向量系</strong>）。</p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>若有非奇异阵 \(P=(x_1,\ldots,x_n)\) 使 \(P^{-1}AP=\diag(\lambda_1,\ldots,\lambda_n)\)，即
+                      \[ A(x_1,\ldots,x_n)=(x_1,\ldots,x_n)\diag(\lambda_1,\ldots,\lambda_n)=(\lambda_1x_1,\ldots,\lambda_nx_n), \]
+                      故 \(Ax_i=\lambda_ix_i\)，\(P\) 的列向量是 \(n\) 个无关特征向量。反之，把这 \(n\) 个特征向量排成 \(P\)，即得 \(P^{-1}AP=\diag(\lambda_1,\ldots,\lambda_n)\)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0">注意 \(\lambda_1,\ldots,\lambda_n\) 的排列次序必须与特征向量 \(x_1,\ldots,x_n\) 对应，否则 \(P\) 就不是原来的矩阵。</p>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-1-23">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.23</span>
+              </header>
+              <div class="card-body">
+                <p>例 1.18 已求得 \(A=\begin{pmatrix}1&amp;2&amp;2\\2&amp;1&amp;2\\2&amp;2&amp;1\end{pmatrix}\) 的特征值 \(-1,-1,5\) 与特征向量
+                  \[ x_1=\begin{pmatrix}1\\0\\-1\end{pmatrix},\quad x_2=\begin{pmatrix}0\\1\\-1\end{pmatrix},\quad x_3=\begin{pmatrix}1\\1\\1\end{pmatrix}. \]
+                  令
+                  \[ P=(x_1,x_2,x_3)=\begin{pmatrix}1&0&1\\0&1&1\\-1&-1&1\end{pmatrix}, \]
+                  则
+                  \[ P^{-1}AP=\diag(-1,-1,5). \]
+                  这里的 \(P\) 就是由基 \(x_1,x_2,x_3\) 改变到特征向量基的过渡矩阵。</p>
+              </div>
+            </section>
+
+            <p>由定理 1.22（不同特征值的特征向量无关）立刻得到常用的<strong>充分条件</strong>：</p>
+            <section class="card thm" id="thm-1-26">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.26</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">如果 \(n\) 阶矩阵有 <strong>\(n\) 个互不相同的特征值</strong>，那么它与对角矩阵相似。</p>
+                <p class="muted" style="font-size:.92em;margin-top:6px;margin-bottom:0">注意这只是充分条件：有重根未必不能对角化（例 1.18 的二重根 \(-1\) 就有 2 个无关特征向量）。真正的判据是每个特征值的<strong>几何重数 = 代数重数</strong>。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 五、不变子空间 ================= -->
+          <section class="section" id="sec-invariant">
+            <h2 class="sec-title"><span class="cn">五</span>不变子空间</h2>
+            <p>本段讨论子空间与线性变换的关系，从而进一步简化线性变换的矩阵。</p>
+
+            <section class="card def" id="def-1-20">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.20</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">如果 \(T\) 是线性空间 \(V\) 的线性变换，\(V_1\) 是 \(V\) 的子空间，并且对任意 \(x\in V_1\) 都有 \(Tx\in V_1\)，则称 \(V_1\) 是 \(T\) 的<strong>不变子空间</strong>。</p>
+              </div>
+            </section>
+            <div class="grid2">
+              <div class="mini-card"><div class="mc-title">常见不变子空间</div><p style="margin:0">① 任何子空间都是<strong>数乘变换</strong>的不变子空间；② 求导变换 \(D\) 下，\(P_{n-1}\) 是 \(P_n\) 的不变子空间；③ 特征子空间 \(V_{\lambda_0}\) 是不变子空间；④ 整个空间 \(V\) 与零子空间对每个变换都不变；⑤ 值域 \(R(T)\) 与核 \(N(T)\) 都是不变子空间。</p></div>
+              <div class="mini-card"><div class="mc-title">交与和仍不变</div><p style="margin:0">若 \(V_1,V_2\) 都是 \(T\) 的不变子空间，则 \(V_1\cap V_2\) 与 \(V_1+V_2\) 也是 \(T\) 的不变子空间：\(x\in V_1\cap V_2\Rightarrow Tx\in V_1\) 且 \(Tx\in V_2\)，即 \(Tx\in V_1\cap V_2\)。</p></div>
+            </div>
+
+            <section class="card thm" id="thm-1-27">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.27</span><span class="card-tag">空间直和分解 → 准对角形</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(T\) 是 \(V^n\) 的线性变换，且 \(V^n\) 可分解为 \(s\) 个 \(T\) 的不变子空间的直和
+                  \[ V^n=V_1\oplus V_2\oplus\cdots\oplus V_s. \]
+                  在每个 \(V_i\) 中取基
+                  \[ x_{i1},x_{i2},\ldots,x_{in_i}\quad(i=1,\ldots,s), \tag{1.2.30} \]
+                  把它们合并为 \(V^n\) 的基，则 \(T\) 在该基下的矩阵为<strong>准对角矩阵</strong>
+                  <div class="eq-scroll">\[
+                  A=\diag(A_1,A_2,\ldots,A_s),
+                  \tag{1.2.31}
+                  \]</div>
+                  其中 \(A_i\) 就是 \(T\) 在 \(V_i\) 的基 (1.2.30) 下的矩阵（\(n_i\) 阶）。</p>
+                <details class="proof">
+                  <summary><span>证明要点（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>因 \(V_i\) 不变，\(Tx_{ij}\in V_i\)，故它只能由 \(V_i\) 自己的基线性表示，在其他块中的坐标全为 0。于是每个基象组只在对应的对角小块内有非零坐标，矩阵恰为 (1.2.31)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0"><strong>逆定理也成立</strong>：若 \(T\) 在某基下矩阵是准对角形 (1.2.31)，则各块对应子空间 \(L(x_{i1},\ldots,x_{in_i})=V_i\) 都是不变子空间。所以"<strong>矩阵分解为准对角形</strong>与<strong>空间分解为不变子空间直和</strong>是相当的"。</p>
+              </div>
+            </section>
+            <section class="card thm cor" id="cor-diag-direct">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">推论</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">\(T\) 在某基下矩阵为对角矩阵的充要条件是：\(V^n\) 可分解为 \(n\) 个 \(T\) 的一维特征子空间的直和。更一般地，若 \(\lambda_1,\ldots,\lambda_t\) 是全部不同特征值，则可对角化的充要条件是
+                  \[ \dim V_{\lambda_1}+\dim V_{\lambda_2}+\cdots+\dim V_{\lambda_t}=n, \]
+                  即各特征子空间的维数（几何重数）之和等于 \(n\)。</p>
+              </div>
+            </section>
+          </section>
+          <!-- ================= 六、Jordan 标准形介绍 ================= -->
+          <section class="section" id="sec-jordan">
+            <h2 class="sec-title"><span class="cn">六</span>Jordan 标准形介绍</h2>
+            <p>前面指出，一切 \(n\) 阶矩阵可分成许多相似类。现在要在与 \(A\) 相似的全体矩阵中找出一个较简单的矩阵作为该相似类的<strong>标准形</strong>。对角矩阵最好，但并非每个矩阵都能相似于对角阵；退而求其次，在复数域上总能相似于下面的 <strong>Jordan 标准形</strong>。</p>
+
+            <h3 class="sub-title" id="jordan-theorem">1. 定理 1.28–1.29、定义 1.21</h3>
+            <section class="card thm" id="thm-1-28">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.28</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(T\) 是复数域 \(\C\) 上线性空间 \(V^n\) 的线性变换，任取一个基，矩阵为 \(A\)，其特征多项式可分解为
+                  <div class="eq-scroll">\[
+                  \varphi(\lambda)=(\lambda-\lambda_1)^{m_1}(\lambda-\lambda_2)^{m_2}\cdots(\lambda-\lambda_s)^{m_s},
+                  \quad m_1+\cdots+m_s=n,\ \lambda_i\text{ 互异}.
+                  \tag{1.2.32}
+                  \]</div>
+                  则 \(V^n\) 可分解为不变子空间的直和
+                  \[ V^n=N_1\oplus N_2\oplus\cdots\oplus N_s, \]
+                  其中 \(N_i=\{\,x\mid (T-\lambda_iT_e)^{m_i}x=\mathbf 0,\ x\in V^n\,\}\)，是变换 \((T-\lambda_iT_e)^{m_i}\) 的核子空间（称<strong>根子空间</strong>）。</p>
+                <p style="margin-bottom:0">在每个 \(N_i\) 中选适当的基，由定理 1.27，\(T\) 在合并基下的矩阵是准对角形
+                  <div class="eq-scroll">\[
+                  J=\diag\big(J_1(\lambda_1),J_2(\lambda_2),\ldots,J_s(\lambda_s)\big),
+                  \tag{1.2.33}
+                  \]</div>
+                  其中每个对角小块形如
+                  \[
+                  J_i(\lambda_i)=
+                  \begin{pmatrix}
+                  \lambda_i&1&&\\&\lambda_i&\ddots&\\&&\ddots&1\\&&&\lambda_i
+                  \end{pmatrix}_{m_i\times m_i}.
+                  \]</p>
+              </div>
+            </section>
+            <section class="card def" id="def-1-21">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.21</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">式 (1.2.33) 的矩阵 \(J\) 称为矩阵 \(A\) 的 <strong>Jordan 标准形</strong>，\(J_i(\lambda_i)\) 称为因式 \((\lambda-\lambda_i)^{m_i}\) 对应的 <strong>Jordan 块</strong>。形如
+                  \[ \begin{pmatrix}2&1&\\&2&1\\&&2\end{pmatrix},\quad
+                  \begin{pmatrix}0&1&&\\&0&1&\\&&0&1\\&&&0\end{pmatrix},\quad
+                  \begin{pmatrix}j&1\\&j\end{pmatrix} \]
+                  都是不同阶的 Jordan 块；若干个块拼起来（如教材 p.64 的 6 阶例子）就是某个 6 阶矩阵的 Jordan 标准形。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-1-29">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.29</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\) 是 \(n\) 阶<strong>复</strong>矩阵，且其特征多项式有分解式 (1.2.32)，则存在 \(n\) 阶复非奇异矩阵 \(P\)，使
+                  \[ P^{-1}AP=J. \tag{1.2.34} \]</p>
+              </div>
+            </section>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意：m_i 是代数重数，不一定是最大块的阶</span>
+              </header>
+              <div class="card-body">
+                <p>相似矩阵特征多项式相同，故 \(J\) 的对角元就是 \(A\) 的特征值。但当 \(i\ne j\) 时可能有 \(\lambda_i=\lambda_j\)（同一个特征值对应<strong>多个</strong> Jordan 块），所以 \(\lambda_i\) 不一定是 \(A\) 的 \(m_i\) 重特征值；一般地，某特征值的重数（代数重数）<strong>大于或等于</strong>相应最大 Jordan 块的阶。</p>
+              </div>
+            </aside>
+
+            <section class="card ex" id="exm-1-24">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.24</span><span class="card-tag">同一特征多项式可对应多个 J</span>
+              </header>
+              <div class="card-body">
+                <p>设 6 阶矩阵 \(A\) 的特征多项式为
+                  \[ \varphi(\lambda)=\lambda^2(\lambda+2)(\lambda-1)^3, \]
+                  则 \(P^{-1}AP\) 只能是 6 个 Jordan 标准形之一（教材 p.64–65 列出）。之所以不确定，是因为 \(\varphi(\lambda)\) 除已写的分解外还可有 5 种因式分拆，例如
+                  \[ \lambda^2(\lambda+2)(\lambda-1)(\lambda-1)(\lambda-1), \]
+                  \[ \lambda(\lambda+2)(\lambda-1)^3\ \text{（另一个 }\lambda\text{ 与 1 阶块对应）},\ldots \]
+                  即<strong>特征多项式还不能唯一确定 Jordan 形</strong>，还需要下面的"初等因子"信息。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="jordan-lab-title">2. 动手实验：Jordan 块拼装器</h3>
+            <p>固定一个特征值，选它的代数重数 \(m\) 和分拆方式（每种分拆对应一种 Jordan 块大小的组合；块数就是几何重数）。观察矩阵 \(J\)、几何重数与最小多项式如何随分拆改变：</p>
+            <section class="card lab" data-jordan-lab></section>
+
+            <h3 class="sub-title" id="lambda-matrix">3. 多项式矩阵（λ-矩阵）与初等因子</h3>
+            <p>要准确求出 Jordan 标准形，需要形如
+              <div class="eq-scroll">\[
+              A(\lambda)=\begin{pmatrix}
+              a_{11}(\lambda)&\cdots&a_{1n}(\lambda)\\
+              \vdots&&\vdots\\
+              a_{n1}(\lambda)&\cdots&a_{nn}(\lambda)
+              \end{pmatrix}
+              \tag{1.2.35}
+              \]</div>
+              的<strong>多项式矩阵</strong>（元素是数域 \(K\) 上纯量 \(\lambda\) 的多项式）。特别地，\(A\) 的特征矩阵
+              <div class="eq-scroll">\[
+              \lambda I-A=
+              \begin{pmatrix}
+              \lambda-a_{11}&-a_{12}&\cdots&-a_{1n}\\
+              -a_{21}&\lambda-a_{22}&\cdots&-a_{2n}\\
+              \vdots&&&\vdots\\
+              -a_{n1}&-a_{n2}&\cdots&\lambda-a_{nn}
+              \end{pmatrix}
+              \tag{1.2.36}
+              \]</div>
+              就是一个特殊的多项式矩阵。</p>
+            <p>用多项式矩阵的初等变换（换行（列）、某行（列）乘非零常数、某行（列）乘 \(\lambda\)-多项式加到另一行（列））可把 \(A(\lambda)\) 化为<strong>标准形</strong>：
+              \[
+              A(\lambda)\rightarrow\begin{pmatrix}
+              d_1(\lambda)&&\\&d_2(\lambda)&\\&&\ddots&\\&&&d_s(\lambda)&\\&&&&0&\\&&&&&\ddots&\\&&&&&&0
+              \end{pmatrix},
+              \tag{1.2.37}
+              \]
+              其中 \(d_1(\lambda)\mid d_2(\lambda)\mid\cdots\mid d_s(\lambda)\)，且各 \(d_i(\lambda)\) 都是首一多项式（前面的几个可能为 1）。</p>
+            <p>若以 \(D_i(\lambda)\) 表示 \(A(\lambda)\) 的一切 \(i\) 阶子式的最大（高）公因式（称 <strong>\(i\) 阶行列式因子</strong>，不随初等变换改变），则
+              <div class="eq-scroll">\[
+              d_i(\lambda)=\frac{D_i(\lambda)}{D_{i-1}(\lambda)},\qquad D_0(\lambda)=1.
+              \tag{1.2.38}
+              \]</div>
+              \(d_i(\lambda)\) 称 <strong>\(i\) 阶不变因子</strong>，标准形被 \(D_i(\lambda)\) 唯一决定。把每个次数大于零的不变因子分解为<strong>不可约因式的幂</strong>，这些幂因子全体称 \(A(\lambda)\) 的<strong>初等因子组</strong>。</p>
+            <section class="card ex" id="exm-1-25">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 1.25（λ-矩阵化标准形）</span>
+              </header>
+              <div class="card-body">
+                <p>试用初等变换化多项式矩阵</p>
+                <div class="eq-scroll">\[ A(\lambda)=\begin{pmatrix}-\lambda+1&amp;2\lambda-1&amp;\lambda\\ \lambda&amp;\lambda^2&amp;-\lambda\\ \lambda^2+1&amp;\lambda^2+\lambda-1&amp;-\lambda^2\end{pmatrix} \]</div>
+                <p>为标准形。</p>
+                <p style="margin-bottom:0"><strong>解：</strong>按"先造出常数主元、再消去同行同列"的顺序作初等变换（教材 p.67 的消元框图）：先用 \([3]+[1]\) 造出常数 1，再交换 \([1]\leftrightarrow[3]\) 把它调入 \((1,1)\) 位置；然后 \((3)-(1)\)、\([2]-(2\lambda-1)[1]\)、\([3]+(\lambda-1)[1]\) 清除第一行与第一列，最后用列交换 \([2]\leftrightarrow[3]\) 与倍加 \([3]-\lambda[2]\)、\((-1)[3]\)、\((3)-(\lambda+1)(2)\) 消去右下角，最终得到</p>
+                <div class="eq-scroll">\[ A(\lambda)\longrightarrow \begin{pmatrix}1&amp;&amp;\\&amp;\lambda&amp;\\&amp;&amp;\lambda^3+\lambda\end{pmatrix}, \]</div>
+                <p>即 \(d_1(\lambda)=1,\ d_2(\lambda)=\lambda,\ d_3(\lambda)=\lambda^3+\lambda\)。</p>
+                <p style="margin-bottom:0"><strong>用行列式因子核验：</strong>\(D_1(\lambda)=\gcd\{-\lambda+1,\ 2\lambda-1,\ \lambda,\ \ldots\}=1\)（因 \(\lambda\) 与 \(2\lambda-1\) 互素）；全部 2 阶子式的最大公因式为 \(D_2(\lambda)=\lambda\)；而 \(\det A(\lambda)=-\lambda^2(\lambda^2+1)\)，取首一约定 \(D_3(\lambda)=\lambda^2(\lambda^2+1)\)。于是由式 (1.2.38)：\(d_1=D_1=1,\ d_2=D_2/D_1=\lambda,\ d_3=D_3/D_2=\lambda(\lambda^2+1)=\lambda^3+\lambda\)，与消元结果一致。</p>
+              </div>
+            </section>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意：初等因子随数域改变</span>
+              </header>
+              <div class="card-body">
+                <p>例 1.25 中 \(A(\lambda)\) 在有理数域、实数域上的初等因子组是 \(\lambda,\lambda,\lambda^2+1\)（由 \(d_2=\lambda\) 与 \(d_3=\lambda(\lambda^2+1)\) 分解不可约因式幂得到），但在复数域上因 \(\lambda^2+1=(\lambda-\mathrm j)(\lambda+\mathrm j)\) 可约，初等因子组变为 \(\lambda,\lambda,\lambda-\mathrm j,\lambda+\mathrm j\)。Jordan 标准形在复数域上讨论。</p>
+              </div>
+            </aside>
+
+            <h3 class="sub-title" id="jordan-steps">4. 求 Jordan 标准形的三步与例 1.26–1.27</h3>
+            <p>在复数域上求 \(n\) 阶矩阵 \(A\) 的 Jordan 标准形：</p>
+            <ol>
+              <li>求特征矩阵 \(\lambda I-A\) 的初等因子组，设为
+                \[ (\lambda-\lambda_1)^{m_1},(\lambda-\lambda_2)^{m_2},\ldots,(\lambda-\lambda_s)^{m_s}, \]
+                其中 \(\lambda_i\) 可能相同，指数也可能相同，且 \(m_1+\cdots+m_s=n\)；</li>
+              <li>写出每个初等因子 \((\lambda-\lambda_i)^{m_i}\) 对应的 Jordan 块 \(J_i(\lambda_i)\)；</li>
+              <li>用这些块构成准对角矩阵 \(J=\diag(J_1,\ldots,J_s)\)。</li>
+            </ol>
+            <section class="card ex" id="exm-1-26">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.26</span>
+              </header>
+              <div class="card-body">
+                <p>对 \(A=\begin{pmatrix}-1&1&0\\-4&3&0\\1&0&2\end{pmatrix}\)，经初等变换求得 \(\lambda I-A\) 的初等因子组为 \(\lambda-2,\,(\lambda-1)^2\)，故
+                  \[ A\sim J=\begin{pmatrix}2&0&0\\0&1&1\\0&0&1\end{pmatrix}. \]
+                  特征值 1 的代数重数为 2，但它只有一个 2 阶块，几何重数为 1，不能对角化。</p>
+              </div>
+            </section>
+            <section class="card ex" id="exm-1-27">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.27</span>
+              </header>
+              <div class="card-body">
+                <p>对 \(A=\begin{pmatrix}1&2&3&4\\&1&2&3\\&&1&2\\&&&1\end{pmatrix}\)，用式 (1.2.38) 求不变因子：\(D_4(\lambda)=(\lambda-1)^4\)，而某个 3 阶子式等于 \(-4\lambda(\lambda+1)\) 与它互素，故 \(D_3(\lambda)=1\)，从而 \(d_1=d_2=d_3=1,\ d_4=(\lambda-1)^4\)。只有一个初等因子 \((\lambda-1)^4\)，故
+                  \[ A\sim J=\begin{pmatrix}1&1&&\\&1&1&\\&&1&1\\&&&1\end{pmatrix}, \]
+                  是一个 4 阶 Jordan 块（几何重数 1 的极端亏损情形）。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-1-30">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.30（Jordan 标准形的唯一性）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">每个 \(n\) 阶<strong>复</strong>矩阵 \(A\) 都与一个 Jordan 标准形相似；这个 Jordan 标准形除去其中 Jordan 块的排列次序外，被 \(A\) <strong>唯一确定</strong>。</p>
+              </div>
+            </section>
+          </section>
+            <h3 class="sub-title" id="find-p">5. 相似变换矩阵 P 的求法：广义特征向量</h3>
+            <p>上面解决了"是否存在 Jordan 形"，下面给出求 \(P\) 的方法（计算较繁，教材仅以例题说明）。核心思想：Jordan 块中超对角线上的 1，对应一串<strong>广义特征向量</strong>。</p>
+            <p>假如
+              \[ P^{-1}AP=J=\begin{pmatrix}\lambda_1&&0\\&\lambda_2&1\\&&\lambda_2\end{pmatrix},\quad P=(x_1,x_2,x_3), \]
+              则
+              \[ A(x_1,x_2,x_3)=(\lambda_1x_1,\lambda_2x_2,\lambda_2x_3+x_2), \]
+              即
+              <div class="eq-scroll">\[
+              \left.\begin{aligned}
+              (\lambda_1 I-A)x_1&amp;=\mathbf 0,\\
+              (\lambda_2 I-A)x_2&amp;=\mathbf 0,\\
+              (\lambda_2 I-A)x_3&amp;=-x_2,
+              \end{aligned}\right\}
+              \tag{1.2.39}
+              \]</div>
+              \(x_1,x_2\) 依次是属于 \(\lambda_1,\lambda_2\) 的特征向量，\(x_3\) 是最后一个非齐次方程组的解向量。又如
+              \[ P^{-1}AP=\begin{pmatrix}\lambda_1&1&\\&\lambda_1&1\\&&\lambda_1\end{pmatrix}, \]
+              则
+              <div class="eq-scroll">\[
+              \left.\begin{aligned}
+              (\lambda_1 I-A)x_1&amp;=\mathbf 0,\\
+              (\lambda_1 I-A)x_2&amp;=-x_1,\\
+              (\lambda_1 I-A)x_3&amp;=-x_2,
+              \end{aligned}\right\}
+              \tag{1.2.40}
+              \]</div></p>
+            <p>一般地，如果 \(\lambda_1\) 是 \(A\) 的 \(k\) 重特征值，则 \(x_1,\ldots,x_k\) 可由方程组
+              <div class="eq-scroll">\[
+              (\lambda_1 I-A)x_1=\mathbf 0,\qquad
+              (\lambda_1 I-A)x_i=-x_{i-1}\quad(i=2,\ldots,k)
+              \tag{1.2.41}
+              \]</div>
+              依次获得。这样得到的 \(x_1,\ldots,x_k\) 线性无关，称 \(x_2,\ldots,x_k\) 为属于 \(\lambda_1\) 的<strong>广义特征向量</strong>。求 \(P\) 无非是求特征向量和广义特征向量而已；解不唯一，正说明 \(P\) 不唯一（得到的解向量只要无关即可替换使用）。</p>
+
+            <section class="card ex" id="exm-1-28">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.28</span><span class="card-tag">求例 1.26、1.27 的 P</span>
+              </header>
+              <div class="card-body">
+                <details class="proof">
+                  <summary><span>对例 1.26（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>\(\lambda_1=2\)（单根）与 \(\lambda_2=1\)（二重根）。由 (1.2.39) 解
+                      \[ (2I-A)x_1=\mathbf 0,\quad (I-A)x_2=\mathbf 0,\quad (I-A)x_3=-x_2, \]
+                      依次得
+                      \[ x_1=(0,0,1)^{\mathrm T},\quad x_2=(1,2,-1)^{\mathrm T},\quad x_3=(0,1,-1)^{\mathrm T}, \]
+                      故
+                      \[ P=\begin{pmatrix}0&1&0\\0&2&1\\1&-1&-1\end{pmatrix}. \]</p>
+                  </div>
+                </details>
+                <details class="proof">
+                  <summary><span>对例 1.27（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>\(\lambda_1=1\) 是四重特征值，按 (1.2.41) 解一条长度为 4 的广义特征向量链：
+                      \[ (I-A)x_1=\mathbf 0\Rightarrow x_1=(8,0,0,0)^{\mathrm T}, \]
+                      \[ x_2=(4,4,0,0)^{\mathrm T},\quad x_3=(0,-1,2,0)^{\mathrm T},\quad x_4=(0,1,-2,1)^{\mathrm T}, \]
+                      于是
+                      \[ P=\begin{pmatrix}8&4&0&0\\0&4&-1&1\\0&0&2&-2\\0&0&0&1\end{pmatrix}. \]
+                      \(x_1\) 第一分量取 8、\(x_2\) 第一分量取 4 是为了使 \(x_3,x_4\) 分量为整数。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="jordan-power">6. Jordan 形的应用</h3>
+            <section class="card ex" id="exm-1-29">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.29</span><span class="card-tag">Aᵏ 的特征值</span>
+              </header>
+              <div class="card-body">
+                <p>若 \(\lambda_1,\ldots,\lambda_s\) 是 \(A\) 的特征值，则 \(A^k\) 的特征值只能是 \(\lambda_1^k,\ldots,\lambda_s^k\)。</p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>由 \(J=P^{-1}AP\)，
+                      \[ J^2=P^{-1}AP\,P^{-1}AP=P^{-1}A^2P, \]
+                      一般地
+                      \[ J^k=P^{-1}A^kP. \]
+                      准对角阵的幂是各块幂的准对角和，而 \(m_i\) 阶 Jordan 块的 \(k\) 次幂为
+                      \[ J_i^k(\lambda_i)=\begin{pmatrix}
+                      \lambda_i^k&*&\cdots&*\\
+                      &\lambda_i^k&\ddots&\vdots\\
+                      &&\ddots&*\\
+                      &&&\lambda_i^k
+                      \end{pmatrix}, \]
+                      其对角元全是 \(\lambda_i^k\)，所以 \(J^k\) 的特征值是 \(\lambda_1^k,\ldots,\lambda_s^k\)，即 \(A^k\) 的特征值。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-1-30">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.30</span><span class="card-tag">解线性常系数微分方程组</span>
+              </header>
+              <div class="card-body">
+                <p>求解
+                  \[ \begin{cases}
+                  \dfrac{\mathrm d\xi_1}{\mathrm dt}=-\xi_1+\xi_2,\\
+                  \dfrac{\mathrm d\xi_2}{\mathrm dt}=-4\xi_1+3\xi_2,\\
+                  \dfrac{\mathrm d\xi_3}{\mathrm dt}=\xi_1+2\xi_3.
+                  \end{cases} \]</p>
+                <details class="proof">
+                  <summary><span>解（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>写成矩阵形式 \(\dfrac{\mathrm d\mathbf x}{\mathrm dt}=A\mathbf x\)，其中
+                      \[ A=\begin{pmatrix}-1&1&0\\-4&3&0\\1&0&2\end{pmatrix} \]
+                      正是例 1.26 的矩阵。作非奇异线性变换 \(\mathbf x=P\mathbf y\)（\(P\) 见例 1.28），则
+                      \[ \frac{\mathrm d\mathbf y}{\mathrm dt}=P^{-1}\frac{\mathrm d\mathbf x}{\mathrm dt}=P^{-1}AP\,\mathbf y=J\mathbf y
+                      =\begin{pmatrix}2&0&0\\0&1&1\\0&0&1\end{pmatrix}\mathbf y, \]
+                      即
+                      \[ \frac{\mathrm d\eta_1}{\mathrm dt}=2\eta_1,\quad
+                         \frac{\mathrm d\eta_2}{\mathrm dt}=\eta_2+\eta_3,\quad
+                         \frac{\mathrm d\eta_3}{\mathrm dt}=\eta_3. \]
+                      一般解分别为
+                      \[ \eta_1=c_1e^{2t},\quad \eta_2=c_2e^t+c_3te^t,\quad \eta_3=c_3e^t. \]
+                      再由 \(\mathbf x=P\mathbf y\) 回代，得到原方程组的一般解（教材 p.77）：
+                      \[ \begin{cases}
+                      \xi_1=c_2e^t+c_3te^t,\\
+                      \xi_2=2c_2e^t+c_3(2t+1)e^t,\\
+                      \xi_3=c_1e^{2t}-c_2e^t-c_3(t+1)e^t,
+                      \end{cases} \]
+                      其中 \(c_1,c_2,c_3\) 为任意常数。</p>
+                    <p><strong>方法论：</strong>化矩阵为 Jordan 标准形，实质就是适当选择基（坐标系），使问题的数学形式最简单。实数域上的标准形理论（实 Jordan 形）可参阅教材所列参考文献。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+          <!-- ================= 习题 1.2 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 1.2（共 21 题）</h2>
+            <div class="ex-toolbar">
+              <span data-fold-tools="details.solution">
+                <button type="button" data-fold="open">全部展开解答</button>
+                <button type="button" data-fold="close">全部收起</button>
+              </span>
+              <span class="ex-hint">建议先独立动笔；计算题保留关键中间步骤</span>
+            </div>
+
+            <article class="card task" id="ex2-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">线性变换判别</span></header>
+              <div class="card-body">
+                <p>判别下列变换哪些是线性变换：（1）\(\R^3\) 中 \(Tx=(\xi_1^2,\xi_1+\xi_2,\xi_3)\)；（2）\(\R^{n\times n}\) 中 \(TX=BXC\)（\(B,C\) 固定）；（3）\(P_n\) 中 \(Tf(t)=f(t+1)\)。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <h3>（1）不是</h3><p>第一分量出现 \(\xi_1^2\)：\(T(kx)\) 的第一分量为 \(k^2\xi_1^2\ne k\xi_1^2\)，不满足齐次性。</p>
+                  <h3>（2）是</h3><p>\(T(kX+lY)=B(kX+lY)C=kBXC+lBYC=k(TX)+l(TY)\)。</p>
+                  <h3>（3）是</h3><p>\(T(kf+lg)(t)=(kf+lg)(t+1)=kf(t+1)+lg(t+1)=k(Tf)(t)+l(Tg)(t)\)。"平移自变量"是线性变换（容易误判为非线性）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex2-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag">变换运算</span></header>
+              <div class="card-body">
+                <p>\(\R^2\) 中 \(T_1x=(\xi_2,-\xi_1)\)，\(T_2x=(\xi_1,-\xi_2)\)。证明二者是线性变换，并求 \(T_1+T_2,T_1T_2,T_2T_1\)。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>分量都是 \(\xi_i\) 的一次齐次式，线性性显然。矩阵分别为 \(A_1=\begin{pmatrix}0&1\\-1&0\end{pmatrix}\)（旋转 \(-\pi/2\)），\(A_2=\diag(1,-1)\)（关于横轴反射）。于是
+                  \[ (T_1+T_2)x=(\xi_1+\xi_2,-\xi_1-\xi_2), \]
+                  \[ A_1A_2=\begin{pmatrix}0&-1\\-1&0\end{pmatrix},\quad A_2A_1=\begin{pmatrix}0&1\\1&0\end{pmatrix}, \]
+                  二者不等，再次说明变换乘法一般不可交换。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex2-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag">微分与乘 t</span></header>
+              <div class="card-body">
+                <p>\(P_n\) 中 \(T_1f(t)=f'(t)\)，\(T_2f(t)=tf(t)\)。证明 \(T_1T_2-T_2T_1=T_e\)。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>对任意 \(f(t)\)，由乘积求导法则
+                  \[ (T_1T_2)f=(tf(t))'=f(t)+tf'(t),\qquad (T_2T_1)f=tf'(t), \]
+                  相减恰为 \(f(t)=T_ef\)。这是量子力学中"位置—动量对易关系"的代数原型。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex2-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag">求矩阵</span></header>
+              <div class="card-body">
+                <p>\(\R^3\) 中 \(Tx=(2\xi_1-\xi_2,\xi_2+\xi_3,\xi_1)\)，求 \(T\) 在标准基 \(e_1,e_2,e_3\) 下的矩阵。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(Te_1=(2,0,1),\ Te_2=(-1,1,0),\ Te_3=(0,1,1)\)，依次排成列：
+                  \[ A=\begin{pmatrix}2&-1&0\\0&1&1\\1&0&0\end{pmatrix}. \]</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex2-5">
+              <header class="card-head"><span class="card-label">第 5 题</span><span class="tag">变换相等</span></header>
+              <div class="card-body">
+                <p>\(x_1,x_2\) 是 \(V^2\) 的基，\(T_1x_1=y_1,T_1x_2=y_2\)，且 \(T_2(x_1+x_2)=y_1+y_2,\ T_2(x_1-x_2)=y_1-y_2\)，证明 \(T_1=T_2\)。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由线性性，两式分别加减得 \(2T_2x_1=2y_1,\ 2T_2x_2=2y_2\)，即 \(T_2x_1=y_1=T_1x_1,\ T_2x_2=y_2=T_1x_2\)。两个线性变换在一组基上作用相同，由式 (1.2.4) 知 \(T_1=T_2\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex2-6">
+              <header class="card-head"><span class="card-label">第 6 题</span><span class="tag tag-mid">函数空间中的矩阵</span></header>
+              <div class="card-body">
+                <p>六函数 \(x_1=e^{at}\cos bt,\ x_2=e^{at}\sin bt,\ x_3=tx_1,\ x_4=tx_2,\ x_5=\dfrac{t^2}{2}x_1,\ x_6=\dfrac{t^2}{2}x_2\) 张成六维空间 \(V^6\)，求微分变换 \(D\) 在该基下的矩阵。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>记 \(C=x_1,S=x_2\)，则 \(C'=aC-bS,\ S'=bC+aS\)，再配合乘积法则：
+                  \[ Dx_1=ax_1-bx_2,\ Dx_2=bx_1+ax_2, \]
+                  \[ Dx_3=x_1+ax_3-bx_4,\ Dx_4=x_2+bx_3+ax_4, \]
+                  \[ Dx_5=x_3+ax_5-bx_6,\ Dx_6=x_4+bx_5+ax_6. \]
+                  \[ A=\begin{pmatrix}
+                  a&b&1&0&0&0\\
+                  -b&a&0&1&0&0\\
+                  0&0&a&b&1&0\\
+                  0&0&-b&a&0&1\\
+                  0&0&0&0&a&b\\
+                  0&0&0&0&-b&a
+                  \end{pmatrix}. \]</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex2-7">
+              <header class="card-head"><span class="card-label">第 7 题</span><span class="tag tag-mid">换基求矩阵</span></header>
+              <div class="card-body">
+                <p>\(T\) 在基 \(x_1=(-1,1,1),x_2=(1,0,-1),x_3=(0,1,1)\) 下的矩阵是 \(A_x=\begin{pmatrix}1&0&1\\1&1&0\\-1&2&1\end{pmatrix}\)，求在标准基 \(e_1,e_2,e_3\) 下的矩阵。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>令 \(X=(x_1,x_2,x_3)\)（以各基向量为列），则 \(T(X)=XA_x\)，标准基矩阵为
+                  \[ A_e=XA_xX^{-1}. \]
+                  代入 \(X=\begin{pmatrix}-1&1&0\\1&0&1\\1&1&1\end{pmatrix}\) 计算（这是定理 1.11 的直接应用：标准基与 \(x\)-基的过渡矩阵为 \(X\)），得
+                  \[ A_e=XA_xX^{-1}=\begin{pmatrix}-1&-3&2\\2&2&0\\1&0&2\end{pmatrix}. \]</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex2-8">
+              <header class="card-head"><span class="card-label">第 8 题</span><span class="tag tag-hard">矩阵空间中的变换</span></header>
+              <div class="card-body">
+                <p>\(\R^{2\times2}\) 中 \(T_1X=AX,\ T_2X=XA,\ T_3X=AXA\)，其中 \(A=\begin{pmatrix}a&b\\c&d\end{pmatrix}\)，求三变换在基 \(E_{11},E_{12},E_{21},E_{22}\) 下的矩阵。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>把矩阵按行拉直成 4 维坐标，利用直积：
+                  \[ A_1=A\otimes I_2=\begin{pmatrix}
+                  a&0&b&0\\0&a&0&b\\c&0&d&0\\0&c&0&d
+                  \end{pmatrix}, \]
+                  \[ A_2=I_2\otimes A^{\mathrm T}=\begin{pmatrix}
+                  a&c&0&0\\b&d&0&0\\0&0&a&c\\0&0&b&d
+                  \end{pmatrix},\quad A_3=A\otimes A^{\mathrm T}=A_1A_2. \]</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex2-9">
+              <header class="card-head"><span class="card-label">第 9 题</span><span class="tag">广义特征向量链</span></header>
+              <div class="card-body">
+                <p>\(T\) 可逆否不论，设 \(T^{k-1}x\ne\mathbf 0\) 但 \(T^kx=\mathbf 0\)（\(k&gt;0\)），求证 \(x,Tx,\ldots,T^{k-1}x\) 线性无关。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>设 \(a_0x+a_1Tx+\cdots+a_{k-1}T^{k-1}x=\mathbf 0\)。作用 \(T^{k-1}\)：除第一项外其余都被映为 \(\mathbf 0\)，得 \(a_0T^{k-1}x=\mathbf 0\)，故 \(a_0=0\)。再依次作用 \(T^{k-2},T^{k-3},\ldots\)，依次得 \(a_1=a_2=\cdots=a_{k-1}=0\)。这正是 Jordan 块中广义特征向量链无关的根据。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex2-10">
+              <header class="card-head"><span class="card-label">第 10 题</span><span class="tag">象子空间与核</span></header>
+              <div class="card-body">
+                <p>\(\R^3\) 中 \(Tx=(0,\xi_1,\xi_2)\)，求 \(T^2\) 的象子空间 \(R(T^2)\) 和核子空间 \(N(T^2)\) 的基与维数。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(T^2x=(0,0,\xi_1)\)，故
+                  \[ R(T^2)=L(e_3),\ \dim=1;\qquad N(T^2)=\{x:\xi_1=0\}=L(e_2,e_3),\ \dim=2, \]
+                  满足 \(1+2=3\)（式 (1.2.14)）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex2-11">
+              <header class="card-head"><span class="card-label">第 11 题</span><span class="tag tag-mid">过渡矩阵与两基矩阵</span></header>
+              <div class="card-body">
+                <p>\(\R^3\) 两基 \(x_1=(1,0,1),x_2=(2,1,0),x_3=(1,1,1)\)；\(y_1=(1,2,-1),y_2=(2,2,-1),y_3=(2,-1,-1)\)，定义 \(Tx_i=y_i\)。求：（1）\(x\)-基到 \(y\)-基的过渡矩阵；（2）\(T\) 在 \(x\)-基下的矩阵；（3）\(T\) 在 \(y\)-基下的矩阵。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>令 \(X=(x_1,x_2,x_3),Y=(y_1,y_2,y_3)\)。（1）过渡矩阵 \(C=X^{-1}Y\)；（2）由 \(T(x_1,x_2,x_3)=(y_1,y_2,y_3)=(x_1,x_2,x_3)C\)，\(T\) 在 \(x\)-基下的矩阵就是 \(C\)；（3）由定理 1.11，在 \(y\)-基下的矩阵为 \(C^{-1}AC=C^{-1}CC=C\)（\(A=C\)），与 (2) 相同——也可直接验证：\(T(Y)=T(XC)=T(X)C=YC\)，而 \(T(Y)=YB\)，\(Y\) 可逆，故 \(B=C\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex2-12">
+              <header class="card-head"><span class="card-label">第 12 题</span><span class="tag tag-mid">复空间特征值</span></header>
+              <div class="card-body">
+                <p>\(\C\) 上 \(V^3\) 中 \(T\) 的矩阵 \(A=\begin{pmatrix}3&1&0\\-4&-1&0\\4&-8&-2\end{pmatrix}\)，求特征值与特征向量。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(\varphi(\lambda)=(\lambda+2)(\lambda-1)^2\)。
+                  \(\lambda=-2\)：特征向量 \(k(0,0,1)^{\mathrm T}\)；
+                  \(\lambda=1\)（二重）：解 \((I-A)x=0\) 得几何重数 1，特征向量 \(k(3,-6,20)^{\mathrm T}\)。几何重数小于代数重数，不可对角化，对应一个 2 阶 Jordan 块。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex2-13">
+              <header class="card-head"><span class="card-label">第 13 题</span><span class="tag">相似上三角</span></header>
+              <div class="card-body">
+                <p>把矩阵 \(A=\begin{pmatrix}-1&1&0\\-4&3&0\\1&0&2\end{pmatrix}\) 相似变换为上三角矩阵。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>特征值为 \(1\)（二重，几何重数 1）与 \(2\)。它的 Jordan 形本身就是上三角阵：
+                  \[ J=\begin{pmatrix}2&0&0\\0&1&1\\0&0&1\end{pmatrix}, \]
+                  相似变换矩阵 \(P\) 即例 1.28 所求（特征向量 \((0,0,1),(1,2,-1)\) 与广义特征向量 \((0,1,-1)\)）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex2-14">
+              <header class="card-head"><span class="card-label">第 14 题</span><span class="tag tag-hard">高次多项式</span></header>
+              <div class="card-body">
+                <p>计算 \(2A^8-3A^5+A^4+A^2-4I\)，其中 \(A=\begin{pmatrix}1&0&2\\0&-1&1\\0&1&0\end{pmatrix}\)。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(\varphi(\lambda)=\lambda^3-2\lambda+1\)，H–C 给出 \(A^3=2A-I\)，于是所有高次幂都化为 \(I,A,A^2\) 的组合。逐次递推（\(A^4=2A^2-A,\ A^5=2A^3-A^2,\ A^8=2A^6-A^5\)）后代入，得
+                  \[ 2A^8-3A^5+A^4+A^2-4I=\begin{pmatrix}
+                  -3&48&-26\\0&95&-61\\0&-61&34
+                  \end{pmatrix}. \]</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex2-15">
+              <header class="card-head"><span class="card-label">第 15 题</span><span class="tag tag-mid">矩阵多项式求逆</span></header>
+              <div class="card-body">
+                <p>设 \(A=\begin{pmatrix}1&-1\\2&5\end{pmatrix}\)，求 \((2A^4-12A^3+19A^2-29A+37I)^{-1}\)。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(\varphi(\lambda)=\lambda^2-6\lambda+7\)，故 \(A^2=6A-7I\)，递推得 \(A^3=29A-42I,\ A^4=132A-203I\)。代入括号内化简恰为 \(A+2I=\begin{pmatrix}3&-1\\2&7\end{pmatrix}\)，故
+                  \[ (A+2I)^{-1}=\frac{1}{23}\begin{pmatrix}7&1\\-2&3\end{pmatrix}. \]</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex2-16">
+              <header class="card-head"><span class="card-label">第 16 题</span><span class="tag tag-hard">最小多项式</span></header>
+              <div class="card-body">
+                <p>求下列矩阵的特征多项式与最小多项式：
+                  （1）\(A=\begin{pmatrix}7&4&-4\\4&-8&-1\\-4&-1&-8\end{pmatrix}\)；
+                  （2）四元数型矩阵 \(A=\begin{pmatrix}a_0&a_1&a_2&a_3\\-a_1&a_0&-a_3&a_2\\-a_2&a_3&a_0&-a_1\\-a_3&-a_2&a_1&a_0\end{pmatrix}\)。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>（1）\(\varphi(\lambda)=(\lambda-9)(\lambda+9)^2\)；\(A+9I\) 的秩为 1，几何重数恰为 2，故
+                  \[ m(\lambda)=(\lambda-9)(\lambda+9)=\lambda^2-81. \]</p>
+                  <p>（2）记 \(\rho^2=a_1^2+a_2^2+a_3^2\)，则特征多项式为 \(\big((\lambda-a_0)^2+\rho^2\big)^2\)，而 \(A\) 直接满足 \((A-a_0I)^2+\rho^2I=O\)，故
+                  \[ m(\lambda)=(\lambda-a_0)^2+\rho^2. \]</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex2-17">
+              <header class="card-head"><span class="card-label">第 17 题</span><span class="tag">转置</span></header>
+              <div class="card-body">
+                <p>证明任意矩阵与它的转置矩阵有相同的特征多项式和最小多项式。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>特征多项式：\(\det(\lambda I-A^{\mathrm T})=\det((\lambda I-A)^{\mathrm T})=\det(\lambda I-A)\)。最小多项式：若 \(m(A)=O\)，则 \(m(A^{\mathrm T})=m(A)^{\mathrm T}=O\)，故 \(A\) 的最小多项式以 \(A^{\mathrm T}\) 为根，反之对称地成立；两个首一最小多项式互相整除，必相等。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex2-18">
+              <header class="card-head"><span class="card-label">第 18 题</span><span class="tag">可交换与不变子空间</span></header>
+              <div class="card-body">
+                <p>\(T_1,T_2\) 可交换，证明：若 \(\lambda_0\) 是 \(T_1\) 的特征值，则其特征子空间 \(V_{\lambda_0}\) 是 \(T_2\) 的不变子空间。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>对 \(x\in V_{\lambda_0}\)：\(T_1x=\lambda_0x\)，于是
+                  \[ T_1(T_2x)=T_2(T_1x)=T_2(\lambda_0x)=\lambda_0(T_2x), \]
+                  即 \(T_2x\) 仍是属于 \(\lambda_0\) 的特征向量（或零），故 \(T_2x\in V_{\lambda_0}\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex2-19">
+              <header class="card-head"><span class="card-label">第 19 题</span><span class="tag tag-hard">求 Jordan 标准形</span></header>
+              <div class="card-body">
+                <p>求下列矩阵的 Jordan 标准形：
+                  （1）\(\begin{pmatrix}1&2&0\\0&2&0\\-2&-1&-1\end{pmatrix}\)；
+                  （2）\(\begin{pmatrix}3&7&-3\\-2&-5&2\\-4&-10&3\end{pmatrix}\)；
+                  （3）\(\begin{pmatrix}3&1&0&0\\-4&-1&0&0\\7&1&2&1\\-7&-6&-1&0\end{pmatrix}\)。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>（1）\(\varphi=(\lambda+1)(\lambda-1)(\lambda-2)\)，三特征值互异：\(J=\diag(-1,1,2)\)（次序可换）。</p>
+                  <p>（2）\(\varphi=(\lambda-1)(\lambda^2+1)\)，在 \(\C\) 上特征值 \(1,\mathrm i,-\mathrm i\) 互异：\(J=\diag(1,\mathrm i,-\mathrm i)\)。</p>
+                  <p>（3）\(\varphi=(\lambda-1)^4\)，且 \(I-A\) 的秩为 3（几何重数 1），只有一个 Jordan 块：
+                  \[ J=\begin{pmatrix}1&1&&\\&1&1&\\&&1&1\\&&&1\end{pmatrix}. \]</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex2-20">
+              <header class="card-head"><span class="card-label">第 20 题</span><span class="tag">对角化证明</span></header>
+              <div class="card-body">
+                <p>设有正整数 \(m\) 使 \(A^m=I\)，证明 \(A\) 与对角矩阵相似。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(A\) 的最小多项式整除 \(\lambda^m-1\)。在 \(\C\) 上 \(\lambda^m-1=\prod_{k=0}^{m-1}(\lambda-\omega_k)\) 是 \(m\) 个互异一次因式之积（\(\omega_k=e^{2\pi\mathrm i k/m}\) 互异），没有重根，故最小多项式也无重根，即每个 Jordan 块都是 1 阶，\(A\) 与对角阵相似。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex2-21">
+              <header class="card-head"><span class="card-label">第 21 题</span><span class="tag tag-hard">解微分方程组</span></header>
+              <div class="card-body">
+                <p>用 Jordan 标准形求解
+                  \[ \begin{cases}
+                  \xi_1'=-\xi_1+\xi_2,\\
+                  \xi_2'=-4\xi_1+3\xi_2,\\
+                  \xi_3'=-8\xi_1+8\xi_2-\xi_3.
+                  \end{cases} \]</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>系数阵 \(A\) 有 \(\varphi=(\lambda+1)(\lambda-1)^2\)，\(\lambda=1\) 的几何重数为 1，取
+                  \[ P=\begin{pmatrix}0&1&0\\0&2&1\\1&4&2\end{pmatrix},\quad P^{-1}AP=\diag(-1,\begin{pmatrix}1&1\\0&1\end{pmatrix}). \]
+                  令 \(\mathbf x=P\mathbf y\)，解耦后 \(\eta_1=c_1e^{-t},\ \eta_3=c_3e^t,\ \eta_2=c_2e^t+c_3te^t\)，回代得
+                  \[ \begin{cases}
+                  \xi_1=c_2e^t+c_3te^t,\\
+                  \xi_2=2c_2e^t+c_3(2t+1)e^t,\\
+                  \xi_3=c_1e^{-t}+4c_2e^t+c_3(4t+2)e^t.
+                  \end{cases} \]</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 本节小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结与自检</h2>
+            <div class="summary-block">
+              <p>本节把"向量之间的映射"彻底代数化：<strong>线性变换 → 矩阵 → 特征值 → 最简形</strong>。核心索引：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>主题</th><th>一句话</th><th>位置</th></tr>
+                  <tr><td>线性变换</td><td>\(T(kx+ly)=kTx+lTy\)；值域、核、秩、亏</td><td><a href="#def-1-11">定义 1.11–1.13</a></td></tr>
+                  <tr><td>五种运算</td><td>和、数乘、乘积（不可交换）、逆、多项式；构成 \(\mathrm{Hom}(V,V)\)</td><td><a href="#transform-operations">线性变换的运算</a></td></tr>
+                  <tr><td>矩阵表示</td><td>第 \(i\) 列是 \(Tx_i\) 的坐标；\(\eta=A\xi\)</td><td><a href="#def-matrix-of-t">定义 1.14·定理 1.10</a></td></tr>
+                  <tr><td>相似</td><td>换基 \(B=C^{-1}AC\)；相似类、同迹同特征多项式</td><td><a href="#similarity">定义 1.15</a></td></tr>
+                  <tr><td>特征值</td><td>\(\varphi(\lambda)=\det(\lambda I-A)\)；\(\sum\lambda_i=\tr A\)，\(\prod\lambda_i=\det A\)</td><td><a href="#char-poly">定义 1.17</a></td></tr>
+                  <tr><td>H–C / 最小多项式</td><td>\(\varphi(A)=O\)；\(m(\lambda)\) 首一次数最小且整除一切零化多项式</td><td><a href="#hc">定理 1.18–1.21</a></td></tr>
+                  <tr><td>对角化</td><td>\(n\) 个无关特征向量 ⇔ 各几何重数之和为 \(n\)</td><td><a href="#sec-diagonal">定理 1.24–1.26</a></td></tr>
+                  <tr><td>Jordan 形</td><td>复矩阵总有 \(P^{-1}AP=J\)（块次序外唯一）；块数 = 几何重数，最大块阶 = 最小多项式指数</td><td><a href="#sec-jordan">定义 1.21·定理 1.30</a></td></tr>
+                </table>
+              </div>
+              <div class="self-check">
+                <h3>四个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>已知基象 \(Tx_1,\ldots,Tx_n\)，怎样写出 \(T\) 的矩阵？为什么是列不是行？</li>
+                  <li>\(T_1,T_2\) 的矩阵是 \(A,B\)，为什么乘积 \(T_1T_2\) 的矩阵是 \(AB\) 而不是 \(BA\)？</li>
+                  <li>代数重数、几何重数、最小多项式中因式的指数、Jordan 块的个数与最大阶，这四个量怎样互相决定？</li>
+                  <li>不用翻书，复述用 Jordan 标准形解线性常系数微分方程组的三个步骤。</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="1.1-linear-spaces.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§1.1 线性空间</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="1.3-special-spaces.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§1.3 两个特殊的线性空间</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

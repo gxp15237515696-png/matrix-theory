@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§2.1 向量范数及其性质 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §2.1：向量序列的收敛、向量范数定义、1/2/∞/p 范数、Hölder 与 Minkowski 不等式、加权（椭圆）范数、函数空间范数、有限维空间范数的等价性">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§2.1 向量范数及其性质</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="2.1" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 2 章 范数理论及其应用</a><span class="sep" aria-hidden="true">/</span>
+            <span>§2.1 向量范数及其性质</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 2 章 · 范数理论及其应用</div>
+            <h1>§2.1 向量范数及其性质</h1>
+            <p class="lede">计算数学（尤其是数值代数）研究数值方法的<strong>收敛性、稳定性与误差分析</strong>，需要一个统一的"向量有多长"的度量。欧氏长度只是其中一种，本章把它推广为<strong>向量范数</strong>：同一个向量在不同范数下数值不同，但在有限维空间里所有范数<strong>等价</strong>——用哪种范数判断收敛，结论都一样。这为下一节矩阵范数与后续迭代法打基础。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.109–122</strong></span>
+              <span class="chip">建议 <strong>4 学时</strong></span>
+              <span class="chip">定义 <strong>2 个</strong></span>
+              <span class="chip">定理 <strong>2 个</strong></span>
+              <span class="chip">例题 <strong>5 道</strong></span>
+            </div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>用分量极限定义向量序列的收敛，知道收敛 ⇔ 差序列趋于零；</li>
+                  <li>陈述向量范数的三条公理（非负、齐次、三角不等式）；</li>
+                  <li>熟练计算 \(\ell_1,\ell_2,\ell_\infty\) 与一般 \(\ell_p\) 范数；</li>
+                  <li>了解 Hölder 不等式与 Minkowski 不等式在证明 \(\ell_p\) 是范数中的作用；</li>
+                  <li>会用正定矩阵构造加权（椭圆）范数，了解函数空间的 \(L_p\) 范数；</li>
+                  <li>陈述并运用<strong>范数等价定理</strong>，理解"收敛与范数选取无关"。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>范数三条件；</li>
+                      <li>\(\|x\|_1,\|x\|_2,\|x\|_\infty\) 的计算与单位球；</li>
+                      <li>范数等价不等式；</li>
+                      <li>按范数收敛 ⇔ 按分量收敛。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>\(\ell_p\) 三角不等式要用 Hölder 证；</li>
+                      <li>\(\|x\|_\infty=\lim_{p\to\infty}\|x\|_p\)；</li>
+                      <li>等价性证明中单位球面紧致性的运用。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 4 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>向量序列收敛、范数定义、\(\ell_2\) 范数</td><td class="num">p.109–112</td></tr>
+                    <tr><td class="num">2</td><td>\(\ell_\infty,\ell_1,\ell_p\) 范数、Hölder/Minkowski</td><td class="num">p.113–116</td></tr>
+                    <tr><td class="num">3</td><td>加权范数、函数空间范数、基坐标范数</td><td class="num">p.116–119</td></tr>
+                    <tr><td class="num">4</td><td>范数等价性、收敛判据与习题</td><td class="num">p.119–122</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 230" role="img" aria-label="向量范数脉络图">
+                    <defs><marker id="m21" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="20" y="30" width="150" height="46"/><rect x="210" y="30" width="170" height="46"/>
+                      <rect x="420" y="30" width="180" height="46"/><rect x="640" y="30" width="180" height="46"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="95" y="52">向量序列收敛</text><text x="95" y="68" font-size="11" fill="#666">分量极限</text>
+                      <text x="295" y="52">范数三公理</text><text x="295" y="68" font-size="11" fill="#666">非负·齐次·三角</text>
+                      <text x="510" y="52">ℓ₁ / ℓ₂ / ℓ∞ / ℓₚ</text>
+                      <text x="730" y="52">加权范数·Lₚ 函数范数</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m21)">
+                      <line x1="170" y1="53" x2="208" y2="53"/><line x1="380" y1="53" x2="418" y2="53"/><line x1="600" y1="53" x2="638" y2="53"/>
+                    </g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46">
+                      <rect x="260" y="140" width="320" height="48"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13.5" text-anchor="middle">
+                      <text x="420" y="162">有限维空间范数等价</text>
+                      <text x="420" y="180" font-size="12" fill="#666">c₁‖x‖ᵦ ≤ ‖x‖ₐ ≤ c₂‖x‖ᵦ ⇒ 收敛与范数选取无关</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m21)"><path d="M295 78 C320 110 360 120 380 138" stroke-dasharray="4 4"/><path d="M510 78 C490 110 460 120 450 138" stroke-dasharray="4 4"/></g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、向量范数概念与 lp 范数 ================= -->
+          <section class="section" id="sec-concept">
+            <h2 class="sec-title"><span class="cn">一</span>向量范数的概念及 \(\ell_p\) 范数</h2>
+
+            <h3 class="sub-title" id="sequence">1. 向量序列的收敛</h3>
+            <p>设给定 \(n\) 维向量空间 \(\R^n\) 中的向量序列 \(\{x^{(k)}\}\)，其中
+              \[ x^{(k)}=(\xi_1^{(k)},\xi_2^{(k)},\ldots,\xi_n^{(k)})\quad(k=1,2,\ldots). \]
+              如果每个分量当 \(k\to\infty\) 时都有极限 \(\xi_i\)：
+              \[ \lim_{k\to\infty}\xi_i^{(k)}=\xi_i\quad(i=1,\ldots,n), \]
+              记 \(x=(\xi_1,\ldots,\xi_n)\)，则称序列 \(\{x^{(k)}\}\) <strong>有极限 \(x\)</strong>（收敛于 \(x\)）：
+              \[ \lim_{k\to\infty}x^{(k)}=x\quad\text{或}\quad x^{(k)}\to x. \]
+              不收敛称为<strong>发散</strong>。</p>
+            <div class="grid2">
+              <div class="mini-card"><div class="mc-title">收敛例</div><p style="margin:0">\(x^{(k)}=\Big(\dfrac1{2^k},\dfrac{\sin k}{k}\Big)\) 收敛于 \((0,0)\)，因为 \(\frac1{2^k}\to0,\ \frac{\sin k}{k}\to0\)。</p></div>
+              <div class="mini-card"><div class="mc-title">发散例</div><p style="margin:0">\(x^{(k)}=\Big(\sum_{i=1}^k\frac1{2^i},\ \sum_{i=1}^k\frac1i\Big)\) 发散：第一分量趋于 1，但调和级数 \(\sum\frac1i\to\infty\)。</p></div>
+            </div>
+            <p>序列 \(\{x^{(k)}\}\) 收敛于 \(x\)，当且仅当差序列 \(\{x^{(k)}-x\}\) 收敛于零向量。当极限存在时，差向量的欧氏长度
+              \[ |x^{(k)}-x|=\sqrt{\sum_{i=1}^n(\xi_i^{(k)}-\xi_i)^2}\to0; \]
+              反之欧氏长度趋于零也迫使每个分量趋于零。<strong>向量的长度可以刻画收敛</strong>——但一般线性空间如何定义长度？这就是范数。</p>
+
+            <h3 class="sub-title" id="def-norm">2. 定义 2.1：向量范数</h3>
+            <section class="card def" id="def-2-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 2.1</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(V\) 是数域 \(K\) 上的线性空间，对任一向量 \(x\in V\) 规定一个实值函数 \(\|x\|\)，满足：</p>
+                <ol class="axiom-list" style="list-style:none">
+                  <li><span class="n">1</span><strong>非负性</strong>：\(x\ne\mathbf0\Rightarrow\|x\|&gt;0\)；\(x=\mathbf0\Rightarrow\|x\|=0\)；</li>
+                  <li><span class="n">2</span><strong>齐次性</strong>：\(\|ax\|=|a|\,\|x\|\quad(a\in K)\)；</li>
+                  <li><span class="n">3</span><strong>三角不等式</strong>：\(\|x+y\|\le\|x\|+\|y\|\)。</li>
+                </ol>
+                <p style="margin-bottom:0">则称 \(\|x\|\) 为 \(V\) 上向量 \(x\) 的<strong>范数</strong>（向量范数）。定义了范数的线性空间称<strong>赋范线性空间</strong>。</p>
+              </div>
+            </section>
+            <h3 class="sub-title" id="norm2">3. 例 2.1：2-范数（欧氏长度）</h3>
+            <section class="card ex" id="exm-2-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 2.1</span>
+              </header>
+              <div class="card-body">
+                <p>在 \(n\) 维酉空间 \(\C^n\) 上，复向量 \(x=(\xi_1,\ldots,\xi_n)\) 的欧氏长度
+                  <div class="eq-scroll">\[ \|x\|_2=\sqrt{|\xi_1|^2+|\xi_2|^2+\cdots+|\xi_n|^2} \tag{2.1.1} \]</div>
+                  是一种范数（称 <strong>2-范数</strong>；在 \(\R^n\) 上把复数改成实数即可）。</p>
+                <details class="proof">
+                  <summary><span>三条件验证（三角不等式用内积证明，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>非负、齐次（\(\|ax\|_2=\sqrt{\sum|a\xi_i|^2}=|a|\|x\|_2\)）显然。三角不等式由酉内积：
+                      \[ \|x+y\|_2^2=(x+y,x+y)=\|x\|_2^2+2\operatorname{Re}(x,y)+\|y\|_2^2, \]
+                      而 \(\operatorname{Re}(x,y)\le|(x,y)|\le\|x\|_2\|y\|_2\)（§1.3 的 Cauchy–Schwarz），故
+                      \[ \|x+y\|_2^2\le(\|x\|_2+\|y\|_2)^2. \]</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0">2-范数还满足<strong>反三角不等式</strong>
+                  <div class="eq-scroll">\[ \big|\|x\|-\|y\|\big|\le\|x-y\|, \tag{2.1.2} \]</div>
+                  它由 \(\|x\|=\|(x-y)+y\|\le\|x-y\|+\|y\|\) 与交换 \(x,y\) 联立得到；把 \(y\) 换成 \(-y\) 还有
+                  \[ \big|\|x\|-\|y\|\big|\le\|x+y\|. \tag{2.1.3} \]
+                  在 \(\R^2\) 中这就是"三角形任两边之差不大于第三边"（图 2.1）。\(\|x-y\|\) 正是向量 \(x,y\) 两终点间的距离。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="norm-inf-1">4. 例 2.2、2.3：∞-范数与 1-范数</h3>
+            <section class="card ex" id="exm-2-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 2.2</span><span class="card-tag">∞-范数（最大分量）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">\[ \|x\|_\infty=\max_i|\xi_i| \tag{2.1.4} \]
+                  是 \(\C^n\) 上的范数。非负、齐次显然；三角不等式来自
+                  \[ \|x+y\|_\infty=\max_i|\xi_i+\eta_i|\le\max_i|\xi_i|+\max_i|\eta_i|=\|x\|_\infty+\|y\|_\infty. \]</p>
+              </div>
+            </section>
+            <section class="card ex" id="exm-2-3">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 2.3</span><span class="card-tag">1-范数（分量绝对值之和）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">\[ \|x\|_1=\sum_{i=1}^n|\xi_i| \tag{2.1.5} \]
+                  是 \(\C^n\) 上的范数。三角不等式就是复数三角不等式求和：
+                  \[ \|x+y\|_1=\sum_i|\xi_i+\eta_i|\le\sum_i(|\xi_i|+|\eta_i|)=\|x\|_1+\|y\|_1. \]</p>
+              </div>
+            </section>
+            <p>在 \(\R^2\) 中，两点 \(P(\xi_1,\xi_2),Q(\eta_1,\eta_2)\) 的距离可以用三种方式度量：
+              <strong>欧氏直线距离</strong> \(\sqrt{(\xi_1-\eta_1)^2+(\xi_2-\eta_2)^2}\)（\(\ell_2\)）、
+              <strong>最长坐标差</strong> \(\max|\xi_i-\eta_i|\)（\(\ell_\infty\)，沿坐标轴走矩形长边）、
+              <strong>坐标差绝对值之和</strong> \(|\xi_1-\eta_1|+|\xi_2-\eta_2|\)（\(\ell_1\)，曼哈顿/棋盘距离，沿矩形两边走）。三种"单位长度为 1 的点集"形状完全不同，下面的交互直观展示：</p>
+            <h3 class="sub-title" id="lp-ball-title">动手实验：\(\ell_p\) 单位球随 \(p\) 变形</h3>
+            <p>切换 \(p\)，观察 \(\|x\|_p=1\) 在 \(\R^2\) 中的等高线：\(p=1\) 是菱形、\(p=2\) 是圆盘（虚线参考）、\(p\to\infty\) 趋向正方形（习题 2.1 第 2 题）。</p>
+            <section class="card lab" data-lp-ball></section>
+          </section>
+
+          <!-- ================= 二、一般 lp 范数 ================= -->
+          <section class="section" id="sec-lp">
+            <h2 class="sec-title"><span class="cn">二</span>一般 \(p\)-范数与更多范数</h2>
+
+            <h3 class="sub-title" id="lp-general">1. \(p\)-范数（\(\ell_p\) 范数）</h3>
+            <p>对任意 \(1\le p&lt;+\infty\) 及 \(x=(\xi_1,\ldots,\xi_n)\in\C^n\)，实值函数
+              <div class="eq-scroll">\[ \|x\|_p=\left(\sum_{i=1}^n|\xi_i|^p\right)^{1/p} \tag{2.1.7} \]</div>
+              满足范数三条件，称为向量 \(x\) 的 <strong>\(p\)-范数</strong>（\(\ell_p\) 范数）。非负性、齐次性显然，三角不等式（称 <strong>Minkowski 不等式</strong>）
+              \[ \Big(\sum_i|\xi_i+\eta_i|^p\Big)^{1/p}\le\Big(\sum_i|\xi_i|^p\Big)^{1/p}+\Big(\sum_i|\eta_i|^p\Big)^{1/p} \]
+              需要借助 <strong>Hölder 不等式</strong>证明。</p>
+            <section class="card thm" id="holder">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">Hölder 不等式</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">若 \(\dfrac1p+\dfrac1q=1\)，\(p&gt;1,q&gt;1\)，则
+                  <div class="eq-scroll">\[ \sum_{i=1}^n|a_ib_i|\le\left(\sum_{i=1}^n|a_i|^p\right)^{1/p}\left(\sum_{i=1}^n|b_i|^q\right)^{1/q}. \tag{2.1.6} \]</div>
+                  特例：\(p=q=2\) 时就是 Cauchy–Schwarz 不等式。Minkowski 不等式由 \(|\xi_i+\eta_i|^p\le|\xi_i+\eta_i|^{p-1}(|\xi_i|+|\eta_i|)\) 拆分后对两项分别用 Hölder（此时 \(q=p/(p-1)\)），再约去公因子得到。</p>
+              </div>
+            </section>
+            <p>令 \(p=1\) 得 \(\|x\|_1\)，令 \(p=2\) 得 \(\|x\|_2\)，并且
+              <div class="eq-scroll">\[ \|x\|_\infty=\lim_{p\to\infty}\|x\|_p. \tag{极限} \]</div>
+              设最大分量为 \(|\xi_{i_0}|\)，则
+              \[ \|x\|_p=|\xi_{i_0}|\left(\sum_i\frac{|\xi_i|^p}{|\xi_{i_0}|^p}\right)^{1/p},\qquad
+                 1\le\left(\sum_i\frac{|\xi_i|^p}{|\xi_{i_0}|^p}\right)^{1/p}\le n^{1/p}, \]
+              由 L'Hospital 法则 \(n^{1/p}\to1\)，夹逼得极限为 \(|\xi_{i_0}|=\|x\|_\infty\)。故有时依次称 \(\|x\|_1,\|x\|_2,\|x\|_\infty\) 为 \(l_1,l_2,l_\infty\) 范数。</p>
+
+            <h3 class="sub-title" id="weighted-norm">2. 例 2.4：加权范数（椭圆范数）</h3>
+            <section class="card ex" id="exm-2-4">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 2.4</span><span class="card-tag">正定矩阵造范数</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\) 是任意 \(n\) 阶<strong>对称正定矩阵</strong>，则
+                  <div class="eq-scroll">\[ \|x\|_A=(x^{\mathrm T}Ax)^{1/2} \tag{2.1.8} \]</div>
+                  是 \(\R^n\) 上的向量范数，称<strong>加权范数</strong>或<strong>椭圆范数</strong>（单位球 \(x^{\mathrm T}Ax=1\) 是椭球面；\(A=I\) 时退化为 \(\|x\|_2\)）。</p>
+                <details class="proof">
+                  <summary><span>三角不等式的证法（合同变换化为 2-范数，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>正定矩阵可分解 \(A=B^{\mathrm T}B\)（\(B=P^{-1}\) 非奇异，由 \(P^{\mathrm T}AP=I\) 得到），于是
+                      \[ \|x\|_A=\sqrt{x^{\mathrm T}B^{\mathrm T}Bx}=\|Bx\|_2, \]
+                      故 \(\|x+y\|_A=\|B(x+y)\|_2\le\|Bx\|_2+\|By\|_2=\|x\|_A+\|y\|_A\)。</p>
+                    <p class="muted" style="font-size:.9em">若 \(A\) 为 Hermite 正定矩阵、\(x\in\C^n\)，结论也成立（把 \(x^{\mathrm T}\) 改为 \(x^{\mathrm H}\)）。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="function-norm">3. 例 2.5：连续函数空间的 \(L_p\) 范数</h3>
+            <section class="card ex" id="exm-2-5">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 2.5</span><span class="card-tag">无限维空间也有范数</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">区间 \([a,b]\) 上连续函数空间 \(C[a,b]\) 上：
+                  \[ \|f(t)\|_1=\int_a^b|f(t)|\,\mathrm dt, \]
+                  \[ \|f(t)\|_p=\left[\int_a^b|f(t)|^p\,\mathrm dt\right]^{1/p}\quad(1\le p&lt;\infty), \]
+                  \[ \|f(t)\|_\infty=\max_{t\in[a,b]}|f(t)|, \]
+                  都满足范数三条件（积分形式的 Minkowski 不等式）。它们是泛函分析中 \(L_p\) 空间的离散源头。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="basis-norm">4. 例 2.6：一般线性空间按坐标定义范数</h3>
+            <p>给定线性空间 \(V^n\) 的基 \(x_1,\ldots,x_n\)，\(x\in V^n\) 的坐标为 \(\tilde x=(\xi_1,\ldots,\xi_n)^{\mathrm T}\)，定义
+              \[ \|x\|_p=\|\tilde x\|_p\quad(1\le p\le\infty). \]
+              这样在任意 \(V^n\) 上都能定义多种向量范数。它不仅依赖 \(\C^n\)（或 \(\R^n\)）上的向量范数，<strong>还与基的选取密切相关</strong>——换一组基，同一向量的坐标变了，范数值一般也变。</p>
+          </section>
+          <!-- ================= 三、范数的等价性 ================= -->
+          <section class="section" id="sec-equivalence">
+            <h2 class="sec-title"><span class="cn">三</span>线性空间 \(V^n\) 上向量范数的等价性</h2>
+            <p>同一向量在不同范数下数值一般不同，但有限维空间中各种范数之间存在极其重要的关系。</p>
+
+            <section class="card thm" id="thm-2-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 2.1（范数等价定理）</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(\|x\|_\alpha\) 与 \(\|x\|_\beta\) 为有限维线性空间 \(V\) 的任意两种向量范数（不限于 \(p\)-范数），则存在与 \(x\) 无关的正常数 \(c_1,c_2\)，使
+                  <div class="eq-scroll">\[ c_1\|x\|_\beta\le\|x\|_\alpha\le c_2\|x\|_\beta\qquad(\forall x\in V). \tag{2.1.9} \]</div></p>
+                <details class="proof">
+                  <summary><span>证明梗概（单位球面紧致性，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>只需证每种范数都与 \(\|\cdot\|_2\) 等价（两种范数的等价关系可复合）。取定基写 \(x=\sum\xi_ix_i\)，由三角不等式与齐次性，\(\varphi(\xi)=\|x\|_\alpha\) 是坐标的连续函数；在有界闭集（单位球面）
+                      \[ S=\{(\xi_1,\ldots,\xi_n):\sum|\xi_i|^2=1\} \]
+                      上连续函数取到最大值 \(c_2\) 与最小值 \(c_1&gt;0\)。任意 \(x\ne\mathbf0\) 单位化后 \(y=x/\|x\|_2\in S\)，故
+                      \[ c_1\le\|y\|_\alpha=\frac{\|x\|_\alpha}{\|x\|_2}\le c_2, \]
+                      即 \(c_1\|x\|_2\le\|x\|_\alpha\le c_2\|x\|_2\)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p>对常用三种范数可直接算出显式常数：
+                  <div class="eq-scroll">\[ \|x\|_\infty\le\|x\|_1\le n\|x\|_\infty, \]</div>
+                  <div class="eq-scroll">\[ \|x\|_\infty\le\|x\|_2\le\sqrt n\,\|x\|_\infty. \]</div>
+                  即对某一向量，一种范数小（大），另两种也小（大）。</p>
+              </div>
+            </section>
+            <section class="card def" id="def-2-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 2.2</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">满足不等式 (2.1.9) 的两种范数称为<strong>等价的</strong>。定理 2.1 即：<strong>有限维线性空间上的不同范数都是等价的</strong>。注意无限维空间（如 \(C[a,b]\)）该结论一般不成立——这是有限维的特殊性质。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="conv-thm">收敛与范数选取无关（定理 2.2）</h3>
+            <section class="card thm" id="thm-2-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 2.2</span><span class="card-tag">按范数收敛 ⇔ 按分量收敛</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">\(\C^n\) 中向量序列 \(x^{(k)}\to x\) 的充要条件是：对<strong>任一种</strong>范数 \(\|\cdot\|\)，序列 \(\{\|x^{(k)}-x\|\}\) 收敛于零。</p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>由等价性，只需对 \(\|\cdot\|_\infty\) 证明。分量收敛时 \(|\xi_j^{(k)}-\xi_j|\le\max_i|\xi_i^{(k)}-\xi_i|=\|x^{(k)}-x\|_\infty\to0\)；反之每个分量收敛，可取统一的 \(k_n\) 使所有 \(|\xi_i^{(k)}-\xi_i|&lt;\varepsilon\) 同时成立，即 \(\|x^{(k)}-x\|_\infty&lt;\varepsilon\)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0">所以尽管不同范数大小不同，<strong>用它们判断序列是否收敛、极限是谁，结论完全一致</strong>。这给数值分析带来极大方便：证明收敛时任选最容易计算的范数即可。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="norm-lab-title">动手实验：范数计算器与等价常数</h3>
+            <p>改向量、切换 \(p\)，同时看四种范数；下方自动验证等价不等式 \(\|x\|_\infty\le\|x\|_p\le n^{1/p}\|x\|_\infty\)。</p>
+            <section class="card lab" data-norm-lab></section>
+          </section>
+
+          <!-- ================= 习题 2.1 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 2.1（共 5 题）</h2>
+            <div class="ex-toolbar">
+              <span data-fold-tools="details.solution">
+                <button type="button" data-fold="open">全部展开解答</button>
+                <button type="button" data-fold="close">全部收起</button>
+              </span>
+            </div>
+
+            <article class="card task" id="ex21-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">基本计算</span></header>
+              <div class="card-body">
+                <p>求向量 \(e=(1,1,\ldots,1)\)（\(n\) 个 1）的 \(l_1,l_2,l_\infty\) 范数。</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(\|e\|_1=\sum_{i=1}^n 1=\boxed{n}\)；\(\|e\|_2=\sqrt{\sum_{i=1}^n 1}=\boxed{\sqrt n}\)；\(\|e\|_\infty=\max_i 1=\boxed{1}\)。可直接验证 \(\|e\|_\infty\le\|e\|_2\le\sqrt n\,\|e\|_\infty\)：\(1\le\sqrt n\le\sqrt n\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex21-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag tag-mid">单位球图形</span></header>
+              <div class="card-body">
+                <p>在 \(\R^2\) 中画出 \(\|x\|_1\le1\)、\(\|x\|_2\le1\)、\(\|x\|_\infty\le1\) 决定的几何图形。</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>设 \(x=(\xi_1,\xi_2)\)：</p>
+                  <ul>
+                    <li>\(|\xi_1|+|\xi_2|\le1\)：以 \((\pm1,0),(0,\pm1)\) 为顶点的<strong>菱形</strong>（旋转 45° 的正方形）；</li>
+                    <li>\(\xi_1^2+\xi_2^2\le1\)：<strong>单位圆盘</strong>；</li>
+                    <li>\(\max(|\xi_1|,|\xi_2|)\le1\)：边平行坐标轴、顶点 \((\pm1,\pm1)\) 的<strong>正方形</strong>。</li>
+                  </ul>
+                  <p>三者面积依次为 \(2,\pi,4\)，恰好体现 \(\|x\|_\infty\le\|x\|_2\le\|x\|_1\) 在 \(n=2\) 时的包含关系（菱形 ⊂ 圆盘 ⊂ 正方形）。可对照本节"单位球"交互。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex21-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag">函数范数</span></header>
+              <div class="card-body">
+                <p>证明例 2.5 所给各题（\(C[a,b]\) 上的 \(\|f\|_1,\|f\|_p,\|f\|_\infty\) 都满足范数三条件）。</p>
+                <details class="solution"><summary><span>证明思路（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>非负性（连续函数 \(|f|^p\) 积分为 0 ⇒ \(f\equiv0\)）与齐次性（积分提出常数 \(|a|^p\) 后开 \(p\) 次方得 \(|a|\)）直接由积分性质得到；三角不等式就是积分形式的 Minkowski 不等式
+                    \[ \left(\int_a^b|f+g|^p\right)^{1/p}\le\left(\int_a^b|f|^p\right)^{1/p}+\left(\int_a^b|g|^p\right)^{1/p}. \]
+                    \(p=1\) 是 \(|f+g|\le|f|+|g|\) 逐项积分；\(p=\infty\) 用 \(|f+g|\le|f|+|g|\le\max|f|+\max|g|\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex21-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag tag-mid">构造新范数</span></header>
+              <div class="card-body">
+                <p>设 \(\|x\|_\alpha,\|x\|_\beta\) 是 \(\C^n\) 上两种范数，\(k_1,k_2&gt;0\)，证明下列函数是 \(\C^n\) 上的范数：（1）\(\max(\|x\|_\alpha,\|x\|_\beta)\)；（2）\(k_1\|x\|_\alpha+k_2\|x\|_\beta\)。</p>
+                <details class="solution"><summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>两函数的非负、齐次性直接来自原范数。三角不等式：</p>
+                  <p>（1）\(\max(\|x+y\|_\alpha,\|x+y\|_\beta)\le\max(\|x\|_\alpha+\|y\|_\alpha,\|x\|_\beta+\|y\|_\beta)\le\max(\|x\|_\alpha,\|x\|_\beta)+\max(\|y\|_\alpha,\|y\|_\beta)\)。</p>
+                  <p>（2）\(k_1\|x+y\|_\alpha+k_2\|x+y\|_\beta\le k_1(\|x\|_\alpha+\|y\|_\alpha)+k_2(\|x\|_\beta+\|y\|_\beta)=[k_1\|x\|_\alpha+k_2\|x\|_\beta]+[k_1\|y\|_\alpha+k_2\|y\|_\beta]\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex21-5">
+              <header class="card-head"><span class="card-label">第 5 题</span><span class="tag">诱导新范数</span></header>
+              <div class="card-body">
+                <p>设 \(S\in\C^{m\times n}\) 列满秩，给定 \(\C^m\) 上一种向量范数 \(\|\cdot\|\)，证明 \(\|x\|_S=\|Sx\|\)（\(\forall x\in\C^n\)）是 \(\C^n\) 上的向量范数。</p>
+                <details class="solution"><summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>齐次：\(\|S(ax)\|=\|a(Sx)\|=|a|\|Sx\|\)。三角：\(\|S(x+y)\|=\|Sx+Sy\|\le\|Sx\|+\|Sy\|\)。非负性的关键是列满秩：\(Sx=\mathbf0\) 只有零解（齐次方程未知数 \(n\) 个、秩为 \(n\)），故 \(x\ne\mathbf0\Rightarrow Sx\ne\mathbf0\Rightarrow\|Sx\|&gt;0\)。这与例 2.4 的加权范数是同一思想（正定 = 合同于 \(I\)，列满秩是其推广）。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 本节小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结与自检</h2>
+            <div class="summary-block">
+              <p>本节把"长度"公理化：<strong>满足非负、齐次、三角不等式的实值函数就是范数</strong>；有限维空间中范数可以随便造（\(\ell_p\)、加权、按基坐标……），但它们彼此等价，因而收敛性唯一。</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>内容</th><th>公式 / 结论</th></tr>
+                  <tr><td>范数三条件</td><td>\(\|x\|\ge0\) 且仅零向量为 0；\(\|ax\|=|a|\|x\|\)；\(\|x+y\|\le\|x\|+\|y\|\)</td></tr>
+                  <tr><td>常用范数</td><td>\(\|x\|_1=\sum|\xi_i|\)，\(\|x\|_2=\sqrt{\sum|\xi_i|^2}\)，\(\|x\|_\infty=\max|\xi_i|\)，\(\|x\|_p=(\sum|\xi_i|^p)^{1/p}\)</td></tr>
+                  <tr><td>两大不等式</td><td>Hölder（共轭指数 \(1/p+1/q=1\)）⇒ Minkowski（\(p\)-范数三角不等式）</td></tr>
+                  <tr><td>加权范数</td><td>\(A\succ0\) 时 \(\|x\|_A=\sqrt{x^{\mathrm T}Ax}\) 是范数（合同化为 2-范数）</td></tr>
+                  <tr><td>等价性</td><td>\(c_1\|x\|_\beta\le\|x\|_\alpha\le c_2\|x\|_\beta\)；\(\|x\|_\infty\le\|x\|_2\le\sqrt n\,\|x\|_\infty\)</td></tr>
+                  <tr><td>收敛判据</td><td>\(x^{(k)}\to x\) ⇔ 分量收敛 ⇔ 任一种范数下 \(\|x^{(k)}-x\|\to0\)</td></tr>
+                </table>
+              </div>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>不看书写出 \(\ell_1,\ell_2,\ell_\infty\) 定义，并默画三者在 \(\R^2\) 的单位球，说出包含关系。</li>
+                  <li>为什么证明 \(\ell_p\) 是范数时，非负和齐次很容易、三角不等式却要动用 Hölder？</li>
+                  <li>"范数等价"为什么能推出"用哪种范数判断收敛都一样"？这个结论在无限维空间为什么可能失效？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="../ch1/1.3-special-spaces.html"><span class="ln-dir">上一章</span><span class="ln-ttl">第 1 章 §1.3 两个特殊的线性空间</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="2.2-matrix-norms.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§2.2 矩阵的范数</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

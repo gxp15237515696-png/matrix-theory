@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§6.2 广义逆矩阵的存在、性质及构造方法 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §6.2：Penrose 四方程与 Moore–Penrose 逆 A⁺（定义 6.4）、存在唯一性（定理 6.3，SVD 构造）、{i,…,l}-逆与 15 类（定义 6.5）、{1}-逆的性质（定理 6.4–6.7）、{1,2,3}/{1,2,4} 构造（定理 6.8）、A⁺ 的乘积表示（定理 6.9）与六条性质（定理 6.10）、满秩公式 (6.2.3)(6.2.4)、Moore 等价定义（定义 6.6、定理 6.11–6.13）">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§6.2 广义逆矩阵的存在、性质及构造方法</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="6.2" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 6 章 广义逆矩阵</a><span class="sep" aria-hidden="true">/</span>
+            <span>§6.2 广义逆矩阵的存在、性质及构造方法</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 6 章 · 核心</div>
+            <h1>§6.2 广义逆矩阵的存在、性质及构造方法</h1>
+            <p class="lede">Penrose 用四个方程给"逆"下了一个可以检验的定义：\(AXA=A,\ XAX=X,\ (AX)^{\mathrm H}=AX,\ (XA)^{\mathrm H}=XA\)。满足全部四条的 \(X=A^+\) 对<strong>任意</strong>矩阵存在且唯一（用 SVD 直接造出来）；只满足其中部分方程的称为 \(\{i,\cdots,l\}\)-逆，共 15 类，其中常用的 5 类构成一张"逆的谱系表"。本节给出各类广义逆的存在性、性质与显式构造，并最终证明：Moore 1920 年的投影定义与 Penrose 1955 年的方程定义是同一件事。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.296–308</strong></span>
+              <span class="chip">建议 <strong>3 学时</strong></span>
+              <span class="chip">定义 <strong>3 个</strong></span>
+              <span class="chip">定理 <strong>11 个 + 引理</strong></span>
+              <span class="chip">例题 <strong>1 道</strong></span>
+
+              <span class="chip">引理 <strong>1 个</strong></span>
+              <span class="chip">推论 <strong>2 个</strong></span></div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>默写 Penrose 四方程，说出 \(A^+\) 与 \(A\{i,\cdots,l\}\) 的记号含义；</li>
+                  <li>用 SVD 构造 \(A^+\) 并复述存在唯一性证明（定理 6.3）；</li>
+                  <li>运用 \(\{1\}\)-逆的八条性质（定理 6.5）与 \(A^+\) 的六条性质（定理 6.10）；</li>
+                  <li>用定理 6.8/6.9 由 \(\{1\}\)-逆组装 \(\{1,2,3\},\{1,2,4\}\)-逆与 \(A^+\)；</li>
+                  <li>用满秩公式 (6.2.3)(6.2.4) 与向量公式 (6.2.5) 直接计算 \(A^+\)；</li>
+                  <li>陈述 Moore 等价定义（定理 6.11–6.13）及其与 §6.1 的联系。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>四方程与 \(A^+\) 存在唯一性；</li>
+                      <li>定理 6.5、6.10 的性质表；</li>
+                      <li>满秩/向量计算公式。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>唯一性证明的连环等式；</li>
+                      <li>\(\{1\}\)-逆不唯一性的"扰动列"论证；</li>
+                      <li>定理 6.8 中 \(R(A^{\mathrm H}A)=R(A^{\mathrm H})\) 的使用。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 3 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>Penrose 定义、例 6.3、存在唯一性（定理 6.3）、15 类谱系</td><td class="num">p.296–299</td></tr>
+                    <tr><td class="num">2</td><td>\(\{1\}\)-逆性质（定理 6.4–6.7）、构造（定理 6.8、6.9）</td><td class="num">p.298–303</td></tr>
+                    <tr><td class="num">3</td><td>\(A^+\) 性质与公式（定理 6.10、推论）、Moore 等价定义、习题</td><td class="num">p.303–308</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 210" role="img" aria-label="广义逆谱系图">
+                    <defs><marker id="m62" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="30" y="24" width="220" height="52"/><rect x="310" y="24" width="220" height="52"/><rect x="590" y="24" width="220" height="52"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="140" y="46">Penrose 四方程</text><text x="140" y="64" font-size="11" fill="#666">(i)(ii)(iii)(iv)</text>
+                      <text x="420" y="46">A{i,…,l}-逆，15 类</text><text x="420" y="64" font-size="11" fill="#666">常用 5 类</text>
+                      <text x="700" y="46">A⁺ = A{1,2,3,4}</text><text x="700" y="64" font-size="11" fill="#666">存在且唯一（SVD）</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m62)"><line x1="250" y1="50" x2="308" y2="50"/><line x1="530" y1="50" x2="588" y2="50"/></g>
+                    <g class="fm-edge" marker-end="url(#m62)"><line x1="420" y1="76" x2="420" y2="116"/></g>
+                    <g class="fm-node" fill="#f4f0e2" stroke="#a06a17"><rect x="220" y="118" width="400" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="420" y="140">构造链：{1}-逆 → YAZ（6.6）→ {1,2} → (A^HA)⁽¹A^H（6.8）</text><text x="420" y="158" font-size="11" fill="#666">→ {1,2,3}/{1,2,4} → A⁺=A⁽¹·⁴⁾AA⁽¹·³⁾（6.9）；满秩公式 (6.2.3)(6.2.4)</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m62)"><line x1="620" y1="144" x2="700" y2="144"/><line x1="700" y1="144" x2="700" y2="78"/></g>
+                    <g class="fm-node" fill="#eef7f0" stroke="#3d7a4e"><rect x="640" y="118" width="180" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="730" y="140">Moore 投影定义</text><text x="730" y="158" font-size="11" fill="#666">AX=P_{R(A)}（定理 6.11）</text>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、Penrose 定义 ================= -->
+          <section class="section" id="sec-penrose">
+            <h2 class="sec-title"><span class="cn">一</span>Penrose 的广义逆矩阵定义</h2>
+
+            <section class="card def" id="def-6-4">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 6.4：Moore–Penrose 逆 A⁺</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{m\times n}\)。若矩阵 \(X\in\C^{n\times m}\) 满足如下四个 <strong>Penrose 方程</strong></p>
+                <div class="eq-scroll">\[
+                \begin{aligned}
+                &AXA=A &&\text{(i)}\\
+                &XAX=X &&\text{(ii)}\\
+                &(AX)^{\mathrm H}=AX &&\text{(iii)}\\
+                &(XA)^{\mathrm H}=XA &&\text{(iv)}
+                \end{aligned}
+                \]</div>
+                <p style="margin-bottom:0">则称 \(X\) 为 \(A\) 的 <strong>Moore–Penrose 逆</strong>，记为 \(A^+\)。</p>
+              </div>
+            </section>
+
+            <p><strong>逐条解读。</strong>(i) 是"逆"的最低要求：\(AX\) 在 \(R(A)\) 上是恒等（对照 §6.1：这正是投影）；(ii) 使 \(X\) 自身也被 \(A\) "反弹"回来，称自反性；(iii)(iv) 要求两个投影 \(AX,\ XA\) 是<strong>正交</strong>投影（Hermite 幂等，定理 6.2）。当 \(A\) 可逆时四式被 \(X=A^{-1}\) 全部满足，条件 (3)"退化为通常逆"成立。</p>
+
+            <section class="card ex" id="exm-6-3">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 6.3：直接验算四例</span>
+              </header>
+              <div class="card-body">
+                <p>由定义直接验算（把 \(X\) 代入四方程逐一核对）：</p>
+                <div class="eq-scroll">\[
+                A=\begin{pmatrix}1&1\\0&0\end{pmatrix}\Rightarrow A^+=\begin{pmatrix}\tfrac12&0\\\tfrac12&0\end{pmatrix};\qquad
+                A=\begin{pmatrix}1\\1\end{pmatrix}\Rightarrow A^+=\begin{pmatrix}\tfrac12&\tfrac12\end{pmatrix};
+                \]</div>
+                <div class="eq-scroll">\[
+                A=\begin{pmatrix}B&O\\O&O\end{pmatrix}\ (B\text{ 可逆})\Rightarrow A^+=\begin{pmatrix}B^{-1}&O\\O&O\end{pmatrix};\qquad
+                A\text{ 非奇异}\Rightarrow A^+=A^{-1}.
+                \]</div>
+                <p style="margin-bottom:0">以第一例示范：\(AX=\begin{pmatrix}1&1\\0&0\end{pmatrix}\begin{pmatrix}\tfrac12&0\\\tfrac12&0\end{pmatrix}=\begin{pmatrix}1&0\\0&0\end{pmatrix}\)，幂等且 Hermite ✓ (iii)，且 \(AXA=A\) ✓ (i)；\(XA=\begin{pmatrix}\tfrac12&0\\\tfrac12&0\end{pmatrix}\begin{pmatrix}1&1\\0&0\end{pmatrix}=\begin{pmatrix}\tfrac12&\tfrac12\\\tfrac12&\tfrac12\end{pmatrix}\)，幂等且 Hermite ✓ (iv)，且 \(XAX=X(AX)=\begin{pmatrix}\tfrac12&0\\\tfrac12&0\end{pmatrix}\begin{pmatrix}1&0\\0&0\end{pmatrix}=X\) ✓ (ii)。</p>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-6-3">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.3：A⁺ 对任意矩阵存在且唯一</span>
+              </header>
+              <div class="card-body">
+                <p>对任意 \(A\in\C^{m\times n}\)，\(A^+\) 存在并且唯一。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p><strong>存在性（SVD 构造）。</strong>设 \(\operatorname{rank}A=r\)。若 \(r=0\)，\(A=O\)，取 \(X=O\) 即满足四方程。若 \(r&gt;0\)，由奇异值分解（定理 4.16 / §4.4）\(A=UDV^{\mathrm H}\)，其中</p>
+                  <div class="eq-scroll">\[ D=\begin{pmatrix}\sigma_1&&&\\&\ddots&&O\\&&\sigma_r&\\O&&&O\end{pmatrix}_{m\times n},\quad \sigma_i&gt;0, \]</div>
+                  <p>\(U,V\) 为酉矩阵。取</p>
+                  <div class="eq-scroll">\[ X=V\begin{pmatrix}\sigma_1^{-1}&&&\\&\ddots&&O\\&&\sigma_r^{-1}&\\O&&&O\end{pmatrix}_{n\times m}U^{\mathrm H}, \]</div>
+                  <p>直接代入可验证四方程全部成立（核心是 \(DD^+D=D,\ D^+DD^+=D^+\) 与对角阵的 Hermite 性）。故 \(A^+\) 总存在。</p>
+                  <p><strong>唯一性。</strong>设 \(X,Y\) 均满足 (i)–(iv)。利用各方程及其共轭转置形式连环替换：</p>
+                  <div class="eq-scroll">\[
+                  X=X(AX)^{\mathrm H}=XX^{\mathrm H}A^{\mathrm H}=X(AX)^{\mathrm H}(AY)^{\mathrm H}=XAY=(XA)^{\mathrm H}(YA)^{\mathrm H}Y=A^{\mathrm H}Y^{\mathrm H}Y=(YA)^{\mathrm H}Y=Y.
+                  \]</div>
+                  <p>（连环等式的每一步都只是四方程或其共轭转置形式的代入：首步用 (ii) 与 (iii)，中段用 \(A^{\mathrm H}=(AYA)^{\mathrm H}\) 插入因子、用 (iv) 的 Hermite 性合并，末步用 (ii) 于 \(Y\)。）故满足四方程者至多一个。</p>
+                </details>
+              </div>
+            </section>
+
+            <p>本节的讨论对象比 \(A^+\) 更宽：满足四个方程中<strong>一部分</strong>的矩阵也算广义逆。</p>
+
+            <section class="card def" id="def-6-5">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 6.5：{i, j, …, l}-逆</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">对任意 \(A\in\C^{m\times n}\)，若 \(X\in\C^{n\times m}\) 满足 Penrose 方程中的第 \((i),(j),\cdots,(l)\) 个方程，则称 \(X\) 为 \(A\) 的 <strong>\(\{i,j,\cdots,l\}\)-逆</strong>，记为 \(A^{(i,j,\cdots,l)}\)；其全体记为 \(A\{i,j,\cdots,l\}\)。</p>
+              </div>
+            </section>
+
+            <div class="card note" id="note-15classes">
+              <header class="card-head"><span class="card-label">注：15 类谱系与常用的 5 类</span></header>
+              <div class="card-body">
+                <p>由定理 6.3，\(A^+=A^{(1,2,3,4)}\) 且 \(A\{1,2,3,4\}\) 只含一个元素；又 \(A^+\in A\{i,j,\cdots,l\}\) 对任意指标子集成立，故每类广义逆都非空。非空子集共</p>
+                <div class="eq-scroll">\[ C_4^1+C_4^2+C_4^3+C_4^4=15 \]</div>
+                <p style="margin-bottom:0">类。应用最多的是 5 类：\(A\{1\},\ A\{1,2\},\ A\{1,3\},\ A\{1,4\},\ A\{1,2,3,4\}\)。本节围绕它们展开：\(\{1\}\)-逆解方程、\(\{1,2\}\)-逆自反、\(\{1,3\}/\{1,4\}\)-逆给出最小二乘与最小范数解（§6.5）。</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 二、{1}-逆的性质与构造 ================= -->
+          <section class="section" id="sec-ginv1">
+            <h2 class="sec-title"><span class="cn">二</span>{1}-逆：唯一性、性质与构造</h2>
+            <p>首先指出：对一般矩阵，\(\{1\}\)-逆<strong>不唯一</strong>。何时唯一？</p>
+
+            <section class="card thm" id="thm-6-4">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.4：{1}-逆唯一 ⇔ 非奇异</span>
+              </header>
+              <div class="card-body">
+                <p>矩阵 \(A\in\C^{m\times n}\) 有唯一 \(\{1\}\)-逆的充要条件是 \(A\) 为非奇异方阵，且此时该 \(\{1\}\)-逆就是 \(A^{-1}\)。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>设 \(X\in A\{1\}\)，按列分块 \(X=(x_1,\cdots,x_m)\)。取非零 \(u\in N(A)\)（若存在），把 \(u\) 加到第 \(i\) 列得 \(Y=(x_1,\cdots,x_i+u,\cdots,x_m)\)，则 \(AYA=AXA=A\)，即 \(Y\in A\{1\}\) 而 \(Y\ne X\)；同理，取非零 \(v\in N(A^{\mathrm H})\)，把 \(v^{\mathrm H}\) 加到 \(X\) 的任意一行也得另一个 \(\{1\}\)-逆。故唯一性要求 \(N(A)=\{0\}\) 且 \(N(A^{\mathrm H})=\{0\}\)，即 \(\operatorname{rank}A=n\) 且 \(\operatorname{rank}A=m\)，亦即 \(m=n\) 且 \(A\) 非奇异；反之非奇异时 \(AXA=A\) 左、右乘 \(A^{-1}\) 即得 \(X=A^{-1}\)，唯一。</p>
+                </details>
+                <p style="margin:8px 0 0;font-size:.86rem;color:#7a6a4a">（教材此处编号印作"定义 6.4"，与 p.297 的 Penrose 定义重号；按全节定理编号缺 6.4 判断，此条应为定理 6.4，本页从之。）</p>
+              </div>
+            </section>
+
+            <p>为统一记号，对标量定义 \(\lambda^+\)：</p>
+            <div class="eq-scroll">\[ \lambda^+=\begin{cases}\lambda^{-1},&\lambda\ne0,\\0,&\lambda=0.\end{cases} \tag{6.2.1} \]</div>
+            <p>它与 (6.2.1) 的精神一致：对角阵的 \(A^+\) 就是把每个对角元换成 \(\lambda^+\)（习题 6.2 第 7 题）。</p>
+
+            <section class="card thm" id="thm-6-5">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.5：{1}-逆的八条性质</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{m\times n},\ B\in\C^{m\times p},\ \lambda\in\C\)，则</p>
+                <div class="table-wrap">
+                  <table class="book">
+                    <tr><th>#</th><th>结论</th></tr>
+                    <tr><td class="num">(1)</td><td>\((A^{(1)})^{\mathrm H}\in A^{\mathrm H}\{1\}\)</td></tr>
+                    <tr><td class="num">(2)</td><td>\(\lambda^+A^{(1)}\in(\lambda A)\{1\}\)</td></tr>
+                    <tr><td class="num">(3)</td><td>若 \(S,T\) 非奇异，则 \(T^{-1}A^{(1)}S^{-1}\in(SAT)\{1\}\)</td></tr>
+                    <tr><td class="num">(4)</td><td>\(\operatorname{rank}A^{(1)}\ge\operatorname{rank}A\)</td></tr>
+                    <tr><td class="num">(5)</td><td>\(AA^{(1)}\) 与 \(A^{(1)}A\) 均为幂等矩阵，且与 \(A\) 同秩</td></tr>
+                    <tr><td class="num">(6)</td><td>\(R(AA^{(1)})=R(A),\quad N(A^{(1)}A)=N(A),\quad R((A^{(1)}A)^{\mathrm H})=R(A^{\mathrm H})\)</td></tr>
+                    <tr><td class="num">(7)</td><td>\(A^{(1)}A=I_n\Leftrightarrow\operatorname{rank}A=n\)；\(AA^{(1)}=I_m\Leftrightarrow\operatorname{rank}A=m\)</td></tr>
+                    <tr><td class="num">(8)</td><td>\(AB(AB)^{(1)}A=A\Leftrightarrow\operatorname{rank}(AB)=\operatorname{rank}A\)；\(B(AB)^{(1)}AB=B\Leftrightarrow\operatorname{rank}(AB)=\operatorname{rank}B\)</td></tr>
+                  </table>
+                </div>
+                <details class="proof"><summary><span>证明要点</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>(1) 对 \(AA^{(1)}A=A\) 取共轭转置即得 \(A^{\mathrm H}(A^{(1)})^{\mathrm H}A^{\mathrm H}=A^{\mathrm H}\)。(2)(3) 直接代入验证（注意 \(\lambda=0\) 时两边皆零阵）。(4) \(\operatorname{rank}A=\operatorname{rank}(AA^{(1)}A)\le\operatorname{rank}A^{(1)}\)（乘积不增秩）。(5) \((AA^{(1)})^2=AA^{(1)}AA^{(1)}=AA^{(1)}\)；秩：\(\operatorname{rank}(AA^{(1)})\le\operatorname{rank}A\) 且 \(\ge\operatorname{rank}(AA^{(1)}A)=\operatorname{rank}A\)。(6) 夹逼：\(R(A)\supset R(AA^{(1)})\supset R(AA^{(1)}A)=R(A)\)，故相等；零空间同法；第三式对 \(A^{\mathrm H}\) 用第一式。(7) 充分性：\(\operatorname{rank}A=n\) 时 \(A^{(1)}A\) 是 \(n\) 阶幂等阵且满秩（(5)），幂等的可逆阵只能是 \(I\)（在 \((A^{(1)}A)^2=A^{(1)}A\) 上左乘其逆）；必要性：\(A^{(1)}A=I_n\) 给出 \(n=\operatorname{rank}(A^{(1)}A)\le\operatorname{rank}A\le n\)。(8) 充分性：\(\operatorname{rank}(AB)=\operatorname{rank}A\) 连同 \(R(AB)\subset R(A)\) 给出 \(R(AB)=R(A)\)，而 \((AB)(AB)^{(1)}\) 是幂等阵，由定理 6.1 它是投影矩阵 \(P_{L,M}\)，且 \(L=R(AB)=R(A)\)，故它对 \(A\) 的每一列作用不变，即 \(AB(AB)^{(1)}A=A\)；必要性显然（从等式取秩）。</p>
+                </details>
+              </div>
+            </section>
+
+            <p>由 \(\{1\}\)-逆可以"组装"出更强的广义逆。</p>
+
+            <section class="card thm" id="thm-6-6">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.6：YAZ 构造 {1,2}-逆</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(Y,Z\in A\{1\}\)，又设 \(X=YAZ\)，则 \(X\in A\{1,2\}\)。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>\(AXA=AY(AZA)=AYA=A\)，故 \(X\in A\{1\}\)；又 \(XAX=(YAZA)(YAZ)=Y(AZA)YAZ=YAYAZ=Y(AYA)Z=YAZ=X\)（三处分别用到 \(AZA=A\) 与 \(AYA=A\)），故 \(X\in A\{1,2\}\)。</p>
+                </details>
+              </div>
+            </section>
+
+            <p>在 Penrose 方程 (i) 与 (ii) 中 \(A\) 与 \(X\) 的地位<strong>对称</strong>：\(X\in A\{1,2\}\) 当且仅当 \(A\in X\{1,2\}\)。这与 \((A^{-1})^{-1}=A\) 相似，故 \(\{1,2\}\)-逆又称<strong>自反广义逆</strong>。它的判据非常干净：</p>
+
+            <section class="card thm" id="thm-6-7">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.7：{1,2}-逆的秩判据</span>
+              </header>
+              <div class="card-body">
+                <p>给定矩阵 \(A\) 和 \(X\in A\{1\}\)，则 \(X\in A\{1,2\}\) 的充要条件是 \(\operatorname{rank}X=\operatorname{rank}A\)。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>充分性：显然 \(R(XA)\subset R(X)\)；若 \(\operatorname{rank}X=\operatorname{rank}A\)，由定理 6.5(5) 得 \(\operatorname{rank}(XA)=\operatorname{rank}A=\operatorname{rank}X\)，故 \(R(XA)=R(X)\)，存在 \(Y\) 使 \(X=XAY\)，于是 \(XAX=XA(XAY)=XAY=X\)。必要性：\(A\) 与 \(X\) 互为 \(\{1,2\}\)-逆，对 \(X\) 用定理 6.5(4)（角色互换）即得 \(\operatorname{rank}A\ge\operatorname{rank}X\) 与 \(\operatorname{rank}X\ge\operatorname{rank}A\)。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card thm" id="lem-6-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 3v18"/><path d="M5 8l7-5 7 5"/><path d="M5 16l7 5 7-5"/></svg></span>
+                <span class="card-label">引理 2：rank(A^H A) = rank A</span>
+              </header>
+              <div class="card-body">
+                <p>对任意矩阵 \(A\)，\(\operatorname{rank}(A^{\mathrm H}A)=\operatorname{rank}A=\operatorname{rank}(AA^{\mathrm H})\)。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>\(Ax=0\Rightarrow A^{\mathrm H}Ax=0\)；反之 \(A^{\mathrm H}Ax=0\Rightarrow x^{\mathrm H}A^{\mathrm H}Ax=0\Rightarrow(Ax)^{\mathrm H}(Ax)=0\Rightarrow Ax=0\)。故 \(A\) 与 \(A^{\mathrm H}A\) 同零空间，又同列数 \(n\)，故同秩。交换 \(A\) 与 \(A^{\mathrm H}\) 的角色得第二式。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-6-8">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.8：{1,2,3}-逆与 {1,2,4}-逆的显式构造</span>
+              </header>
+              <div class="card-body">
+                <p>设矩阵 \(A\) 给定，则</p>
+                <div class="eq-scroll">\[ Y=(A^{\mathrm H}A)^{(1)}A^{\mathrm H}\in A\{1,2,3\},\qquad Z=A^{\mathrm H}(AA^{\mathrm H})^{(1)}\in A\{1,2,4\}. \]</div>
+                <details class="proof"><summary><span>证明（第一式）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>由引理 2，\(\operatorname{rank}(A^{\mathrm H}A)=\operatorname{rank}A^{\mathrm H}\)，结合 \(R(A^{\mathrm H}A)\subset R(A^{\mathrm H})\) 得 \(R(A^{\mathrm H}A)=R(A^{\mathrm H})\)，故存在 \(U\) 使 \(A^{\mathrm H}=A^{\mathrm H}AU\)，取共轭转置得 \(A=U^{\mathrm H}A^{\mathrm H}A\)。于是</p>
+                  <div class="eq-scroll">\[ AYA=U^{\mathrm H}A^{\mathrm H}A(A^{\mathrm H}A)^{(1)}A^{\mathrm H}A=U^{\mathrm H}A^{\mathrm H}A=A, \]</div>
+                  <p>即 \(Y\in A\{1\}\)。秩：由定理 6.5(4) 有 \(\operatorname{rank}Y\ge\operatorname{rank}A\)，又由定义 \(\operatorname{rank}Y\le\operatorname{rank}A^{\mathrm H}=\operatorname{rank}A\)，故 \(\operatorname{rank}Y=\operatorname{rank}A\)，由定理 6.7 得 \(Y\in A\{1,2\}\)。最后</p>
+                  <div class="eq-scroll">\[ AY=U^{\mathrm H}A^{\mathrm H}A(A^{\mathrm H}A)^{(1)}A^{\mathrm H}AU=U^{\mathrm H}A^{\mathrm H}AU=(AY)^{\mathrm H}, \]</div>
+                  <p>即 (iii) 成立。第二式对 \(A^{\mathrm H}\) 用第一式再取共轭转置即得（注意 \(\{1,2,3\}\) 与 \(\{1,2,4\}\) 在共轭转置下互换，习题 6.2 第 10 题）。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-6-9">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.9：A⁺ 的乘积表示</span>
+              </header>
+              <div class="card-body">
+                <p>设矩阵 \(A\) 给定，则 \(A^+=A^{(1,4)}AA^{(1,3)}\)（右端与所选的具体 \(\{1,4\}\)-逆、\(\{1,3\}\)-逆无关）。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>记 \(X=A^{(1,4)}AA^{(1,3)}\)。由定理 6.6（取 \(Y=A^{(1,4)},\ Z=A^{(1,3)}\)）知 \(X\in A\{1,2\}\)。又 \(AX=AA^{(1,4)}AA^{(1,3)}=AA^{(1,3)}\) 是 Hermite 阵（(iii)），\(XA=A^{(1,4)}AA^{(1,3)}A=A^{(1,4)}A\) 是 Hermite 阵（(iv)），故 \(X\in A\{1,2,3,4\}\)。而 \(A\{1,2,3,4\}\) 只含一个元素 \(A^+\)（定理 6.3），故 \(X=A^+\)。</p>
+                </details>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 三、A⁺ 的性质与计算公式 ================= -->
+          <section class="section" id="sec-aplus">
+            <h2 class="sec-title"><span class="cn">三</span>A⁺ 的性质与计算公式</h2>
+
+            <section class="card thm" id="thm-6-10">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.10：A⁺ 的六条性质</span>
+              </header>
+              <div class="card-body">
+                <div class="table-wrap">
+                  <table class="book">
+                    <tr><th>#</th><th>结论</th></tr>
+                    <tr><td class="num">(1)</td><td>\(\operatorname{rank}A^+=\operatorname{rank}A\)</td></tr>
+                    <tr><td class="num">(2)</td><td>\((A^+)^+=A\)</td></tr>
+                    <tr><td class="num">(3)</td><td>\((A^{\mathrm H})^+=(A^+)^{\mathrm H},\quad(A^{\mathrm T})^+=(A^+)^{\mathrm T}\)</td></tr>
+                    <tr><td class="num">(4)</td><td>\((A^{\mathrm H}A)^+=A^+(A^{\mathrm H})^+,\quad(AA^{\mathrm H})^+=(A^{\mathrm H})^+A^+\)</td></tr>
+                    <tr><td class="num">(5)</td><td>\(A^+=(A^{\mathrm H}A)^+A^{\mathrm H}=A^{\mathrm H}(AA^{\mathrm H})^+\)</td></tr>
+                    <tr><td class="num">(6)</td><td>\(R(A^+)=R(A^{\mathrm H}),\quad N(A^+)=N(A^{\mathrm H})\)</td></tr>
+                  </table>
+                </div>
+                <details class="proof"><summary><span>证明要点</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>(1) 由定理 6.7（\(A\) 与 \(A^+\) 互为 \(\{1,2\}\)-逆）。(2) 四方程中 \(A\) 与 \(A^+\) 地位对称。(3)(4) 对四方程取共轭转置（或转置）直接验证。(5) 记 \(X=(A^{\mathrm H}A)^+A^{\mathrm H}\)：由定理 6.8（取 \((A^{\mathrm H}A)^+\in(A^{\mathrm H}A)\{1,2,3\}\subset(A^{\mathrm H}A)\{1\}\)）知 \(X\in A\{1,2,3\}\)；又 \(XA=(A^{\mathrm H}A)^+A^{\mathrm H}A\) 是 Hermite 阵（\(A^{\mathrm H}A\) 的投影），故 \(X\in A\{1,2,3,4\}\)，即 \(X=A^+\)。(6) \(R(A^+)=R(A^+AA^+)=R(A^{\mathrm H}(A^+)^{\mathrm H}A^+)\subset R(A^{\mathrm H})\)，\(N(A^+)=N(A^+AA^+)=N(A^+(A^+)^{\mathrm H}A^{\mathrm H})\supset N(A^{\mathrm H})\)，再由 (1) 两边维数相等，故皆取等。</p>
+                </details>
+              </div>
+            </section>
+
+            <p>由 (5) 立得两条<strong>实用计算公式</strong>（把 \(A^+\) 化为普通逆）：</p>
+
+            <section class="card cor" id="cor-6-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></span>
+                <span class="card-label">推论 1：满秩情形公式</span>
+              </header>
+              <div class="card-body">
+                <p>若 \(A\in\C^{m\times n}\) 列满秩（\(\operatorname{rank}A=n\)），则 \(A^{\mathrm H}A\) 可逆，且</p>
+                <div class="eq-scroll">\[ A^+=(A^{\mathrm H}A)^{-1}A^{\mathrm H}. \tag{6.2.3} \]</div>
+                <p style="margin-bottom:0">若 \(A\) 行满秩（\(\operatorname{rank}A=m\)），则 \(AA^{\mathrm H}\) 可逆，且</p>
+                <div class="eq-scroll">\[ A^+=A^{\mathrm H}(AA^{\mathrm H})^{-1}. \tag{6.2.4} \]</div>
+              </div>
+            </section>
+
+            <section class="card cor" id="cor-6-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></span>
+                <span class="card-label">推论 2：非零向量情形</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(\alpha\) 为 \(n\) 维列向量且 \(\alpha\ne0\)，则</p>
+                <div class="eq-scroll">\[ \alpha^+=(\alpha^{\mathrm H}\alpha)^{-1}\alpha^{\mathrm H}, \tag{6.2.5} \]</div>
+                <p style="margin-bottom:0">而 \((\alpha^{\mathrm H})^+=(\alpha^+)^{\mathrm H}=\alpha(\alpha^{\mathrm H}\alpha)^{-1}\)。　(6.2.6)</p>
+              </div>
+            </section>
+
+            <div class="card note" id="note-ab-plus">
+              <header class="card-head"><span class="card-label">注：(AB)⁺ 一般不等于 B⁺A⁺</span></header>
+              <div class="card-body">
+                <p>对可逆阵有 \((AB)^{-1}=B^{-1}A^{-1}\)；定理 6.10(4) 说明对 \(A\) 与 \(A^{\mathrm H}\) 这一特殊配对也有类似性质。但一般不成立：取 \(A=\begin{pmatrix}1&0\end{pmatrix},\ B=\begin{pmatrix}1\\1\end{pmatrix}\)，则 \(AB=(1)\)，\((AB)^+=(1)\)；而由 (6.2.5)(6.2.6)，\(A^+=\begin{pmatrix}1\\0\end{pmatrix},\ B^+=\begin{pmatrix}\tfrac12&\tfrac12\end{pmatrix}\)，\(B^+A^+=\begin{pmatrix}\tfrac12\end{pmatrix}\ne(AB)^+\)。</p>
+                <p style="margin-bottom:0">判定 \((AB)^+=B^+A^+\) 的充要条件（满足其一即可，证明见参考文献）：(1) \(A^+ABB^{\mathrm H}A^{\mathrm H}=BB^{\mathrm H}A^{\mathrm H}\) 且 \(BB^+A^{\mathrm H}AB=A^{\mathrm H}AB\)；(2) \(R(A^{\mathrm H}AB)\subset R(B)\) 且 \(R(BB^{\mathrm H}A^{\mathrm H})\subset R(A^{\mathrm H})\)；(3) \(A^+ABB^{\mathrm H}\) 与 \(A^{\mathrm H}ABB^+\) 均为 Hermite 阵；(4) \(A^+ABB^{\mathrm H}A^{\mathrm H}ABB^+=BB^{\mathrm H}A^{\mathrm H}A\)；(5) \(A^+AB=B(AB)^+AB\) 且 \(BB^+A^{\mathrm H}=A^{\mathrm H}AB(AB)^+\)。</p>
+              </div>
+            </div>
+
+            <h3 class="sub-title" id="penrose-lab-title">动手实验：Moore–Penrose 逆验证器</h3>
+            <p>输入 2×2 矩阵 \(A\)，工具按秩分流计算 \(A^+\)（秩 2 用普通逆；秩 1 用 \(A^+=A^{\mathrm T}/\|A\|_F^2\)；秩 0 得零阵），并<strong>逐条报告四个 Penrose 方程的残差</strong> \(\|AXA-A\|_F,\ \|XAX-X\|_F,\ \|(AX)^{\mathrm T}-AX\|_F,\ \|(XA)^{\mathrm T}-XA\|_F\)——全部为 0 才算验过定理 6.3。同时核对定理 6.10 的 (1)(2)：\(\operatorname{rank}A^+=\operatorname{rank}A\) 与 \((A^+)^+=A\)。</p>
+            <section class="card lab" data-penrose-lab></section>
+          </section>
+
+          <!-- ================= 四、Moore 等价定义 ================= -->
+          <section class="section" id="sec-moore">
+            <h2 class="sec-title"><span class="cn">四</span>Moore–Penrose 逆的等价定义</h2>
+            <p>1920 年 E. H. Moore 用<strong>投影算子</strong>（§6.1）定义了另一种广义逆。本节证明它与 Penrose 定义等价——这正是把 §6.1 放在章首的原因。</p>
+
+            <section class="card def" id="def-6-6">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 6.6：Moore 广义逆</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\C^{m\times n}\)。若矩阵 \(X\in\C^{n\times m}\) 满足</p>
+                <div class="eq-scroll">\[ AX=P_{R(A)},\qquad XA=P_{R(X)}, \tag{6.2.7} \]</div>
+                <p style="margin-bottom:0">其中 \(P_L\) 表示子空间 \(L\) 上的正交投影矩阵，则称 \(X\) 为 \(A\) 的 <strong>Moore 广义逆矩阵</strong>。</p>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-6-11">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.11：Moore 定义 ⇔ Penrose 定义</span>
+              </header>
+              <div class="card-body">
+                <p>Moore 的广义逆矩阵与 Penrose 的广义逆矩阵（定义 6.4）是等价的。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>设 \(X\) 满足 (6.2.7)。由正交投影是幂等 Hermite 阵（定理 6.2）：\(AXA=P_{R(A)}A=A\)（因 \(A\) 的每列都在 \(R(A)\) 中，被投影固定）；\(XAX=P_{R(X)}X=X\) 同法；\((AX)^{\mathrm H}=P_{R(A)}^{\mathrm H}=P_{R(A)}=AX\)；\((XA)^{\mathrm H}=P_{R(X)}^{\mathrm H}=P_{R(X)}=XA\)。四方程全满足。</p>
+                  <p>反之，设 \(X\) 满足 (i)–(iv)。由 \((AX)^2=AX\) 与 \((AX)^{\mathrm H}=AX\)，据定理 6.2 知 \(AX\) 是正交投影矩阵，且 \(AX=P_{R(AX)}\)；由定理 6.5(6)（\(X\in A\{1\}\)）得 \(R(AX)=R(A)\)，故 \(AX=P_{R(A)}\)。同理 \(XA=P_{R(X)}\)。</p>
+                </details>
+              </div>
+            </section>
+
+            <p>还有两个"方程更少但解唯一"的等价刻画：</p>
+
+            <section class="card thm" id="thm-6-12">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.12：三条件刻画（值域型）</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{m\times n}\)。若存在 \(X\in\C^{n\times m}\) 和 \(U\in\C^{m\times m},\ V\in\C^{n\times n}\) 满足</p>
+                <div class="eq-scroll">\[ AXA=A,\qquad X=A^{\mathrm H}U,\qquad X=VA^{\mathrm H}, \tag{6.2.8} \]</div>
+                <p>则 \(X\) 唯一确定，且 \(X=A^+\)。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p><strong>存在。</strong>\(A^+\) 本身就满足 (6.2.8)：第一式即 Penrose (i)；由 (ii) 与 (iv)，\(A^+=(A^+A)A^+=(A^+A)^{\mathrm H}A^+=A^{\mathrm H}(A^+)^{\mathrm H}A^+\)，取 \(U=(A^+)^{\mathrm H}A^+\) 即得 \(A^+=A^{\mathrm H}U\)；由 (ii) 与 (iii)，\(A^+=A^+(AA^+)=A^+(AA^+)^{\mathrm H}=A^+(A^+)^{\mathrm H}A^{\mathrm H}\)，取 \(V=A^+(A^+)^{\mathrm H}\) 即得 \(A^+=VA^{\mathrm H}\)。</p>
+                  <p><strong>唯一。</strong>设 \(X_1\) 也满足 (6.2.8)（对应 \(U_1,V_1\)）。记 \(X_2=X-X_1,\ U_2=U-U_1,\ V_2=V-V_1\)，则 \(AX_2A=O,\ X_2=A^{\mathrm H}U_2,\ X_2=V_2A^{\mathrm H}\)。于是 \((X_2A)^{\mathrm H}(X_2A)=A^{\mathrm H}X_2^{\mathrm H}X_2A=A^{\mathrm H}(A^{\mathrm H}U_2)^{\mathrm H}X_2A=A^{\mathrm H}U_2^{\mathrm H}(AX_2A)=O\)，得 \(X_2A=O\)；进而 \(X_2X_2^{\mathrm H}=X_2(V_2A^{\mathrm H})^{\mathrm H}=(X_2A)V_2^{\mathrm H}=O\)，得 \(X_2=O\)，即 \(X=X_1=A^+\)。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-6-13">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.13：两条件刻画（夹心型）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\C^{m\times n}\)。若存在 \(X\in\C^{n\times m}\) 和 \(Z\in\C^{m\times n}\) 满足</p>
+                <div class="eq-scroll">\[ AXA=A,\qquad X=A^{\mathrm H}ZA^{\mathrm H}, \tag{6.2.9} \]</div>
+                <p style="margin-bottom:0">则 \(X=A^+\)。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">分别取 \(U=ZA^{\mathrm H}\in\C^{m\times m}\) 与 \(V=A^{\mathrm H}Z\in\C^{n\times n}\)，则 (6.2.9) 即 (6.2.8)，由定理 6.12 即得 \(X=A^+\)。</p>
+                </details>
+              </div>
+            </section>
+
+            <div class="card note" id="note-4defs">
+              <header class="card-head"><span class="card-label">小结：A⁺ 的四个等价定义</span></header>
+              <div class="card-body">
+                <p style="margin-bottom:0">矩阵 \(A\) 的 Moore–Penrose 逆 \(X\) 可由下列任一组条件唯一刻画：(1) Penrose 方程 (i)–(iv)；(2) \(AX=P_{R(A)},\ XA=P_{R(X)}\)（Moore，1920）；(3) \(AXA=A,\ X=A^{\mathrm H}U,\ X=VA^{\mathrm H}\)；(4) \(AXA=A,\ X=A^{\mathrm H}ZA^{\mathrm H}\)。条件数从 4 个方程降到 2 个方程，代价是引入辅助矩阵 \(U,V,Z\)——"唯一性"始终由 Hermite 结构保证。</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 习题 6.2 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 6.2（教材 p.307–308）</h2>
+            <div class="fold-bar no-print" data-fold-tools=".card.task">
+              <button type="button" data-fold="open">全部展开</button>
+              <button type="button" data-fold="close">全部收起</button>
+            </div>
+
+            <article class="card task" id="ex62-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">零矩阵</span></header>
+              <div class="card-body">
+                <p>设 \(A\) 是 \(m\times n\) 零矩阵，哪一类矩阵 \(X\) 是 \(A\) 的 \(\{1\}\)-逆？</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(AXA=A\) 化为 \(O=O\)，恒成立。故<strong>任意</strong> \(n\times m\) 矩阵都是 \(A\) 的 \(\{1\}\)-逆（\(A\{1\}=\C^{n\times m}\)）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex62-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag">单 1 矩阵</span></header>
+              <div class="card-body">
+                <p>设 \(m\times n\) 矩阵 \(A\) 除第 \(i\) 行第 \(j\) 列的元素为 1 外，其余元素均为 0，哪一类矩阵 \(X\) 是 \(A\) 的 \(\{1\}\)-逆？</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(A=e_ie_j^{\mathrm T}\)。\(AXA=e_i(e_j^{\mathrm T}Xe_i)e_j^{\mathrm T}=X_{ji}A\)，故 \(AXA=A\Leftrightarrow X_{ji}=1\)。即：<strong>第 \(j\) 行第 \(i\) 列元素为 1</strong> 的任意 \(n\times m\) 矩阵（其余元素任意）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex62-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag">I 与 J 的组合</span></header>
+              <div class="card-body">
+                <p>设 \(I\) 是 \(n\) 阶单位矩阵，\(J\) 是所有元素均为 1 的 \(n\) 阶矩阵，记 \(A=(a-b)I+bJ\)。证明：若 \(a+(n-1)b=0\)，则 \(X=(a-b)^{-1}I\) 是 \(A\) 的 \(\{1\}\)-逆。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>利用 \(J^2=nJ\)：\(A^2=(a-b)^2I+2(a-b)bJ+b^2nJ=(a-b)^2I+b\big(2(a-b)+nb\big)J\)。由条件 \(a+(n-1)b=0\) 得 \(nb=b-a\)，故 \(2(a-b)+nb=a-b\)，于是 \(A^2=(a-b)^2I+b(a-b)J=(a-b)A\)。因此 \(AXA=(a-b)^{-2}A^3=(a-b)^{-2}(a-b)^2A=A\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex62-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag">叉积矩阵</span></header>
+              <div class="card-body">
+                <p>已知 \(A=\begin{pmatrix}0&-a_3&a_2\\a_3&0&-a_1\\-a_2&a_1&0\end{pmatrix}\)，证明 \(X=-(a_1^2+a_2^2+a_3^2)^{-1}A\) 是 \(A\) 的 \(\{1\}\)-逆。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>记 \(s=a_1^2+a_2^2+a_3^2\)，\(a=(a_1,a_2,a_3)^{\mathrm T}\)。\(A\) 即叉积矩阵：\(Ax=a\times x\)，故 \(Aa=a\times a=0\)；直接计算得 \(A^2=aa^{\mathrm T}-sI\)。于是 \(A^3=A\cdot A^2=A(aa^{\mathrm T})-sA=(Aa)a^{\mathrm T}-sA=-sA\)。代入 \(X=-s^{-1}A\)：\(AXA=A(-s^{-1}A)A=-s^{-1}A^3=-s^{-1}(-sA)=A\)。故 \(X\in A\{1\}\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex62-5">
+              <header class="card-head"><span class="card-label">第 5 题</span><span class="tag">定理 6.5 补证</span></header>
+              <div class="card-body">
+                <p>证明定理 6.5 之 (2)–(5)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>(2) \(\lambda\ne0\)：\((\lambda A)(\lambda^+A^{(1)})(\lambda A)=\lambda A\lambda^{-1}A^{(1)}\lambda A=\lambda AA^{(1)}A=\lambda A\)；\(\lambda=0\)：\(\lambda^+A^{(1)}=O\) 且 \(\lambda A=O\)，\(O\cdot O\cdot O=O\) 成立。(3) \((SAT)(T^{-1}A^{(1)}S^{-1})(SAT)=SAA^{(1)}AT=SAT\)。(4) \(\operatorname{rank}A=\operatorname{rank}(AA^{(1)}A)\le\operatorname{rank}A^{(1)}\)。(5) \((AA^{(1)})^2=AA^{(1)}\)、\((A^{(1)}A)^2=A^{(1)}A\) 直接展开；秩：\(\operatorname{rank}(AA^{(1)})\le\operatorname{rank}A\) 且 \(\operatorname{rank}(AA^{(1)})\ge\operatorname{rank}(AA^{(1)}A)=\operatorname{rank}A\)，故相等；\(A^{(1)}A\) 同法。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex62-6">
+              <header class="card-head"><span class="card-label">第 6 题</span><span class="tag">定理 6.10 补证</span></header>
+              <div class="card-body">
+                <p>证明定理 6.10 之 (3)、(4)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>(3) 把 \(A\) 的四个 Penrose 方程（以 \(X=A^+\) 代入）整体取共轭转置，即得 \((A^+)^{\mathrm H}\) 满足 \(A^{\mathrm H}\) 的四个方程，由唯一性 \((A^{\mathrm H})^+=(A^+)^{\mathrm H}\)；转置情形把共轭转置换成转置同法。</p>
+                  <p>(4) 记 \(B=A^{\mathrm H}A,\ X=A^+(A^{\mathrm H})^+=A^+(A^+)^{\mathrm H}\)（用了 (3)）。先立两条辅助等式：\(A^{\mathrm H}AA^+=A^{\mathrm H}(AA^+)^{\mathrm H}=(AA^+A)^{\mathrm H}=A^{\mathrm H}\)，以及 \((A^+)^{\mathrm H}A^{\mathrm H}=(AA^+)^{\mathrm H}=AA^+\)。逐条验证：(i) \(BXB=(A^{\mathrm H}AA^+)\big((A^+)^{\mathrm H}A^{\mathrm H}A\big)=A^{\mathrm H}(AA^+A)=A^{\mathrm H}A=B\)；(ii) \(XBX=A^+\big((A^+)^{\mathrm H}A^{\mathrm H}\big)\big(AA^+\big)(A^+)^{\mathrm H}=A^+(AA^+)(A^+)^{\mathrm H}=(A^+AA^+)(A^+)^{\mathrm H}=X\)；(iii) \(BX=A^{\mathrm H}AA^+(A^+)^{\mathrm H}=A^{\mathrm H}(A^+)^{\mathrm H}=(A^+A)^{\mathrm H}=A^+A\)，Hermite；(iv) \(XB=A^+(A^+)^{\mathrm H}A^{\mathrm H}A=A^+(AA^+)A=(A^+AA^+)A=A^+A\)，Hermite。故 \(X=B^+\)，即 \((A^{\mathrm H}A)^+=A^+(A^{\mathrm H})^+\)；对 \(A^{\mathrm H}\) 应用此式再结合 (3) 即得第二式 \((AA^{\mathrm H})^+=(A^{\mathrm H})^+A^+\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex62-7">
+              <header class="card-head"><span class="card-label">第 7 题</span><span class="tag">对角阵</span></header>
+              <div class="card-body">
+                <p>设 \(D=\operatorname{diag}(d_1,d_2,\cdots,d_n)\)，证明 \(D^+=\operatorname{diag}(d_1^+,d_2^+,\cdots,d_n^+)\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>记 \(X=\operatorname{diag}(d_i^+)\)。对角阵相乘逐元素：\((DXD)_{ii}=d_id_i^+d_i=d_i\)（标量情形 \(d\,d^+d=d\) 对 \(d=0\) 与 \(d\ne0\) 均真），故 (i) 成立；\((XDX)_{ii}=d_i^+d_id_i^+=d_i^+\)，(ii) 成立；\(DX=\operatorname{diag}(d_id_i^+)\) 与 \(XD\) 同为实对角（复数时对角的共轭转置即共轭对角，而 \(d_id_i^+\) 为实数：\(d\ne0\) 时为 1，\(d=0\) 时为 0），故 (iii)(iv) 成立。由唯一性即得。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex62-8">
+              <header class="card-head"><span class="card-label">第 8 题</span><span class="tag">分块</span></header>
+              <div class="card-body">
+                <p>证明 \(\begin{pmatrix}A\\O\end{pmatrix}^+=\begin{pmatrix}A^+&O\end{pmatrix}\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>记 \(M=\begin{pmatrix}A\\O\end{pmatrix},\ X=\begin{pmatrix}A^+&O\end{pmatrix}\)。分块相乘：\(MXM=\begin{pmatrix}AA^+A\\O\end{pmatrix}=\begin{pmatrix}A\\O\end{pmatrix}=M\)；\(XMX=\begin{pmatrix}A^+AA^+&O\end{pmatrix}=\begin{pmatrix}A^+&O\end{pmatrix}=X\)；\(MX=\begin{pmatrix}AA^+&O\\O&O\end{pmatrix}\) 是 Hermite（因 \(AA^+\) Hermite）；\(XM=A^+A\) Hermite。四方程满足，故 \(M^+=X\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex62-9">
+              <header class="card-head"><span class="card-label">第 9 题</span><span class="tag">酉等价</span></header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{m\times n}\)，又设 \(U\in\C^{m\times m}\) 和 \(V\in\C^{n\times n}\) 均为酉矩阵，证明 \((UAV)^+=V^{\mathrm H}A^+U^{\mathrm H}\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>记 \(X=V^{\mathrm H}A^+U^{\mathrm H}\)，\(M=UAV\)。用 \(U^{\mathrm H}U=I,\ VV^{\mathrm H}=I\)：\(MXM=UAVV^{\mathrm H}A^+U^{\mathrm H}UAV=UAA^+AV=UAV=M\)；\(XMX=V^{\mathrm H}A^+AA^+U^{\mathrm H}\) 同法 \(=V^{\mathrm H}A^+U^{\mathrm H}=X\)；\(MX=UAA^+U^{\mathrm H}\)，其共轭转置 \(=U(AA^+)^{\mathrm H}U^{\mathrm H}=UAA^+U^{\mathrm H}=MX\)；\(XM=V^{\mathrm H}A^+AV\) 同法 Hermite。故 \(X=M^+\)。（这正是 SVD 中"酉因子可提出"的依据。）</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex62-10">
+              <header class="card-head"><span class="card-label">第 10 题</span><span class="tag">共轭转置对偶</span></header>
+              <div class="card-body">
+                <p>证明：(1) \(X\in A\{i\}\) 的充要条件是 \(X^{\mathrm H}\in A^{\mathrm H}\{i\}\)（\(i=1,2\)）；(2) \(X\in A\{3\}\) 的充要条件是 \(X^{\mathrm H}\in A^{\mathrm H}\{4\}\)；(3) \(X\in A\{4\}\) 的充要条件是 \(X^{\mathrm H}\in A^{\mathrm H}\{3\}\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>(1) 对 (i) 取共轭转置：\(AXA=A\Leftrightarrow A^{\mathrm H}X^{\mathrm H}A^{\mathrm H}=A^{\mathrm H}\)，即方程 (i) 在 \((A,X)\to(A^{\mathrm H},X^{\mathrm H})\) 下不变；(ii) 同。(2) \(X\in A\{3\}\) 即 \((AX)^{\mathrm H}=AX\)，取共轭转置得 \(X^{\mathrm H}A^{\mathrm H}=AX\)；再检验 \(X^{\mathrm H}\) 对 \(A^{\mathrm H}\) 的方程 (iv)：\((X^{\mathrm H}A^{\mathrm H})^{\mathrm H}=AX=(AX)^{\mathrm H}=X^{\mathrm H}A^{\mathrm H}\) ✓。(3) 对偶同法。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex62-11">
+              <header class="card-head"><span class="card-label">第 11 题</span><span class="tag">幂等 Hermite</span></header>
+              <div class="card-body">
+                <p>设 \(H\) 是幂等 Hermite 矩阵，证明 \(H^+=H\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>把 \(X=H\) 代入四方程：\(HHH=H^2=H\) ✓；同 ✓；\((HH)^{\mathrm H}=H^{\mathrm H}=H=HH\) ✓；同 ✓。由唯一性 \(H^+=H\)。（对照定理 6.2：正交投影矩阵的 Moore–Penrose 逆是它自己。）</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex62-12">
+              <header class="card-head"><span class="card-label">第 12 题</span><span class="tag tag-hard">H⁺=H 的刻画</span></header>
+              <div class="card-body">
+                <p>证明：\(H^+=H\) 的充要条件是 \(H^2\) 为幂等 Hermite 矩阵且 \(\operatorname{rank}H^2=\operatorname{rank}H\)。</p>
+                <details class="solution"><summary><span>查看提示</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p><strong>必要性。</strong>若 \(H^+=H\)：由 (i) 得 \(H^3=H\)；由 (iii)(iv) 得 \(H^2\) 是 Hermite 阵；在 \(H^3=H\) 两侧乘 \(H\) 得 \((H^2)^2=H^4=H^2\)，即 \(H^2\) 幂等；\(\operatorname{rank}H^2=\operatorname{rank}H\) 即定理 6.10(1)。</p>
+                  <p><strong>充分性。</strong>设 \(P=H^2\) 幂等、Hermite 且 \(\operatorname{rank}P=\operatorname{rank}H\)。验证 \(X=H\) 满足 \(H\) 的四方程。(iii)(iv)：\((HH)^{\mathrm H}=P^{\mathrm H}=P=HH\)，两式同时成立。(i) 与 (ii)（此处都是等式 \(HHH=H\)）：由 \(R(P)=R(H^2)\subset R(H)\) 且维数相等得 \(R(P)=R(H)\)；幂等阵在自己值域上是恒等（\(w=Pz\Rightarrow Pw=P^2z=Pz=w\)），而 \(H\) 的每列都属于 \(R(H)=R(P)\)，故 \(PH=H\)，于是 \(HHH=H^2H=PH=H\)。四方程齐备，故 \(H^+=H\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex62-13">
+              <header class="card-head"><span class="card-label">第 13 题</span><span class="tag tag-hard">正规矩阵</span></header>
+              <div class="card-body">
+                <p>证明：若 \(A\) 是正规矩阵（即满足 \(A^{\mathrm H}A=AA^{\mathrm H}\)），则 \(A^+A=AA^+\)，且 \((A^n)^+=(A^+)^n\)，其中 \(n\) 是正整数。</p>
+                <details class="solution"><summary><span>查看提示</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>正规阵可酉对角化 \(A=U\Lambda U^{\mathrm H}\)，则 \(A^+=U\Lambda^+U^{\mathrm H}\)（习题 9 与第 7 题），而 \(\Lambda\Lambda^+=\Lambda^+\Lambda=\operatorname{diag}(\lambda_i\lambda_i^+)\)，故 \(A^+A=AA^+=U\operatorname{diag}(\lambda_i\lambda_i^+)U^{\mathrm H}\)。幂等式 \((A^n)^+=(A^+)^n\) 对 \(\Lambda\) 逐元素即 \((\lambda^n)^+=(\lambda^+)^n\)（标量验证：\(\lambda\ne0\) 两边皆 \(\lambda^{-n}\)；\(\lambda=0\) 皆 0），再经酉相似返回。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex62-14">
+              <header class="card-head"><span class="card-label">第 14 题</span><span class="tag">直积</span></header>
+              <div class="card-body">
+                <p>证明 \((A\otimes B)^+=A^+\otimes B^+\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>用 §5.4 的性质 \((A\otimes B)(C\otimes D)=AC\otimes BD\) 与 \((A\otimes B)^{\mathrm H}=A^{\mathrm H}\otimes B^{\mathrm H}\)，把 \(X=A^+\otimes B^+\) 代入四方程：\((A\otimes B)X(A\otimes B)=AA^+A\otimes BB^+B=A\otimes B\)；第二式同；\(((A\otimes B)X)^{\mathrm H}=(AA^+\otimes BB^+)^{\mathrm H}=AA^+\otimes BB^+=(A\otimes B)X\)；第四式同。由唯一性即得。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex62-15">
+              <header class="card-head"><span class="card-label">第 15 题</span><span class="tag">反例</span></header>
+              <div class="card-body">
+                <p>举例说明：对非奇异矩阵 \(P,Q\)，结论 \((PAQ)^+=Q^{-1}A^+P^{-1}\) 不真。并与习题 9 比较。</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>取 \(A=\begin{pmatrix}1&0\end{pmatrix},\ P=(1),\ Q=\begin{pmatrix}1&1\\0&1\end{pmatrix}\)（非奇异）。则 \(PAQ=\begin{pmatrix}1&1\end{pmatrix}\)，由 (6.2.5) 型公式 \((PAQ)^+=\tfrac12\begin{pmatrix}1\\1\end{pmatrix}\)；而 \(Q^{-1}A^+P^{-1}=\begin{pmatrix}1&-1\\0&1\end{pmatrix}\begin{pmatrix}1\\0\end{pmatrix}=\begin{pmatrix}1\\0\end{pmatrix}\ne(PAQ)^+\)。与习题 9 比较：酉矩阵保持内积（\(U^{\mathrm H}U=I\)），故不破坏 (iii)(iv) 的 Hermite 结构；一般非奇异阵只保持秩与可逆性，不保持正交投影性质。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex62-16">
+              <header class="card-head"><span class="card-label">第 16 题</span><span class="tag tag-hard">三方程唯一性</span></header>
+              <div class="card-body">
+                <p>证明满足如下三个矩阵方程 \(AX=B,\ XA=D,\ XAX=X\) 的矩阵 \(X\) 是唯一的（如果它存在的话）。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>设 \(X_1,X_2\) 均满足。则 \(X_1=X_1AX_1=X_1(AX_1)=X_1B=X_1(AX_2)=(X_1A)X_2=DX_2=(X_2A)X_2=X_2AX_2=X_2\)。故至多一个。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex62-17">
+              <header class="card-head"><span class="card-label">第 17 题</span><span class="tag tag-hard">正交和的逆</span></header>
+              <div class="card-body">
+                <p>设 \(A_i\in\C^{m\times n}\)，\(A_iA_j^{\mathrm H}=O,\ A_i^{\mathrm H}A_j=O\)（\(i\ne j;\ i,j=1,\cdots,r\)），证明 \(\big(\sum_{i=1}^rA_i\big)^+=\sum_{i=1}^rA_i^+\)。</p>
+                <details class="solution"><summary><span>查看提示</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>记 \(A=\sum A_i,\ X=\sum A_i^+\)。由条件及 \(A_j^+=A_j^{\mathrm H}(A_jA_j^{\mathrm H})^+\)（定理 6.10(5)）得 \(i\ne j\) 时 \(A_iA_j^+=A_iA_j^{\mathrm H}(\cdots)=O\)；由 \(A_j^+=(A_j^{\mathrm H}A_j)^+A_j^{\mathrm H}\) 得 \(A_j^+A_i=(\cdots)A_j^{\mathrm H}A_i=O\)。于是 \(AX=\sum_iA_iA_i^+\)（交叉项为零），每项 Hermite 故 \(AX\) Hermite；同法 \(XA=\sum_iA_i^+A_i\) Hermite。又 \(AXA=\sum_{i,j}A_iA_i^+A_j=\sum_iA_iA_i^+A_i=\sum_iA_i=A\)（交叉项 \(A_i^+A_j=O\)）；同法 \(XAX=X\)。四方程满足。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结</h2>
+            <div class="summary-block">
+              <p>广义逆是一张"逆的谱系表"：方程越全，解越唯一、性质越强。</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>对象</th><th>结论</th></tr>
+                  <tr><td>Penrose 四方程（定义 6.4）</td><td>\(A^+\) 对任意 \(A\) 存在且唯一（定理 6.3，SVD 构造）</td></tr>
+                  <tr><td>\(\{i,\cdots,l\}\)-逆（定义 6.5）</td><td>15 类；常用 \(A\{1\},A\{1,2\},A\{1,3\},A\{1,4\},A\{1,2,3,4\}\)</td></tr>
+                  <tr><td>\(\{1\}\)-逆</td><td>唯一 \(\Leftrightarrow A\) 非奇异（定理 6.4）；八条性质（定理 6.5）</td></tr>
+                  <tr><td>构造链</td><td>\(YAZ\to\{1,2\}\)（6.6）；秩判据（6.7）；\((A^{\mathrm H}A)^{(1)}A^{\mathrm H}\to\{1,2,3\}\)（6.8）；\(A^{(1,4)}AA^{(1,3)}=A^+\)（6.9）</td></tr>
+                  <tr><td>\(A^+\) 性质（定理 6.10）</td><td>同秩、自反、与 \({}^{\mathrm H}/{}^{\mathrm T}\) 交换、值域零空间对偶</td></tr>
+                  <tr><td>计算公式</td><td>列满秩 (6.2.3)、行满秩 (6.2.4)、向量 (6.2.5)(6.2.6)</td></tr>
+                  <tr><td>等价定义（6.11–6.13）</td><td>Moore 投影式 (6.2.7)；值域型 (6.2.8)；夹心型 (6.2.9)</td></tr>
+                </table>
+              </div>
+              <p style="margin-top:12px"><strong>承上启下：</strong>§6.3 将给出不用 SVD 的实用算法（Hermite 标准形法、满秩分解法、Zlobec 公式）；§6.4 用 \(A^+\) 写线性方程组的通解与最小二乘解；§6.5 给出 \(\{1,3\}/\{1,4\}\)-逆的极值意义。</p>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>Penrose 四方程中，哪一条保证"存在"、哪几条保证"唯一"？把定理 6.3 的唯一性连环等式默写一遍。</li>
+                  <li>为什么 \(\{1\}\)-逆一般不唯一，而 \(A^+\) 一定唯一？定理 6.4 的"扰动列"论证与 (iii)(iv) 的 Hermite 要求各自排除掉了什么自由度？</li>
+                  <li>定理 6.8 与定理 6.9 合起来说明：只要会算 \(\{1\}\)-逆，就能得到 \(A^+\)。这条路线与 SVD 路线（定理 6.3）相比，计算代价差在哪里？（提示：§6.3 的 Hermite 标准形。）</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="6.1-projection-matrices.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§6.1 投影矩阵</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="6.3-generalized-inverse-computation.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§6.3 广义逆矩阵的计算方法</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

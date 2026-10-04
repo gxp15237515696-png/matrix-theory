@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§4.4 矩阵的奇异值分解 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §4.4：正交对角分解、奇异值定义、SVD 定理（A=UΣVᵀ）、奇异值的唯一性、零空间/值域与外积展开、Frobenius 范数/谱范数与奇异值、矩阵正交相抵">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§4.4 矩阵的奇异值分解</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="4.4" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 4 章 矩阵分解</a><span class="sep" aria-hidden="true">/</span>
+            <span>§4.4 矩阵的奇异值分解</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 4 章 · 矩阵分解（收官 · 全书最重要的分解之一）</div>
+            <h1>§4.4 矩阵的奇异值分解</h1>
+            <p class="lede">谱分解只适用于正规矩阵，而<strong>奇异值分解（SVD）适用于任意矩阵——包括长方矩阵和奇异矩阵</strong>。它把 \(A\) 拆成"左旋转 × 伸缩 × 右旋转"：\(A=U\Sigma V^{\mathrm H}\)，其中 \(U,V\) 是酉（正交）矩阵，\(\Sigma\) 对角元是非负的<strong>奇异值</strong> \(\sigma_i\)。奇异值是 \(A^{\mathrm H}A\) 特征值的平方根，它统一了前面几乎所有知识：\(\|A\|_2=\sigma_1\)、\(\|A\|_F=\sqrt{\sum\sigma_i^2}\)、零空间/值域由 \(V/U\) 的列给出、秩等于非零奇异值个数。SVD 是最小二乘、PCA、低秩逼近、广义逆的共同基础。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.225–234</strong></span>
+              <span class="chip">建议 <strong>3 学时</strong></span>
+              <span class="chip">定义 <strong>2 个</strong></span>
+              <span class="chip">定理 <strong>4 个</strong></span>
+              <span class="chip">例题 <strong>2 道</strong></span>
+            </div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>陈述对称矩阵的正交对角分解与非奇异矩阵的正交对角分解；</li>
+                  <li>定义奇异值 \(\sigma_i=\sqrt{\lambda_i(A^{\mathrm H}A)}\)，说明其非负性与个数；</li>
+                  <li>陈述并推导 SVD 定理（构造 \(U_1=AV_1\Sigma^{-1}\) 再扩充为酉矩阵）；</li>
+                  <li>写出完整 SVD \(A=U\begin{pmatrix}\Sigma&O\\O&O\end{pmatrix}V^{\mathrm H}\) 与紧 SVD；</li>
+                  <li>用奇异值表示秩、零空间、值域、\(\|A\|_2\) 与 \(\|A\|_F\)；</li>
+                  <li>理解正交相抵与奇异值不变性。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>SVD 定理与构造；</li>
+                      <li>奇异值求法；</li>
+                      <li>外积展开；</li>
+                      <li>范数与奇异值。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>U 与 V 的列必须"配套"；</li>
+                      <li>U₁ 为何自动标准正交；</li>
+                      <li>长方阵 Σ 的形状。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 3 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>正交对角分解、奇异值定义</td><td class="num">p.226–227</td></tr>
+                    <tr><td class="num">2</td><td>SVD 定理与构造、例 4.14</td><td class="num">p.227–231</td></tr>
+                    <tr><td class="num">3</td><td>性质（零空间/值域/外积）、正交相抵、习题</td><td class="num">p.231–234</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 200" role="img" aria-label="SVD 脉络图">
+                    <defs><marker id="m44" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="30" y="30" width="200" height="50"/><rect x="320" y="30" width="200" height="50"/><rect x="610" y="30" width="200" height="50"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="130" y="52">AᴴA（Hermite 半正定）</text><text x="130" y="69" font-size="11" fill="#666">特征值 λ₁≥…≥λᵣ&gt;0</text>
+                      <text x="420" y="52">奇异值 σᵢ=√λᵢ</text><text x="420" y="69" font-size="11" fill="#666">V 是 AᴴA 的酉特征向量阵</text>
+                      <text x="710" y="52">A = UΣVᴴ</text><text x="710" y="69" font-size="11" fill="#666">U=AVΣ⁻¹ 再扩充</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m44)"><line x1="230" y1="55" x2="318" y2="55"/><line x1="520" y1="55" x2="608" y2="55"/></g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="220" y="124" width="400" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13.5" text-anchor="middle">
+                      <text x="420" y="147">秩·零空间·值域·‖A‖₂=σ₁·‖A‖F=√Σσ²ᵢ</text>
+                      <text x="420" y="166" font-size="11.5" fill="#666">外积展开 A=Σσᵢuᵢvᵢᴴ → 低秩逼近 / PCA / 广义逆</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m44)"><path d="M420 82 C420 108 420 116 420 122" stroke-dasharray="4 4"/></g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、正交对角分解 ================= -->
+          <section class="section" id="sec-orth-diag">
+            <h2 class="sec-title"><span class="cn">一</span>矩阵的正交对角分解</h2>
+            <p>由定理 1.42 推论 1，实对称矩阵 \(A\) 可正交对角化：
+              <div class="eq-scroll">\[ Q^{\mathrm T}AQ=\diag(\lambda_1,\ldots,\lambda_n), \tag{4.4.1} \]</div>
+              其中 \(\lambda_i\) 是特征值，\(Q\) 的列是完备标准正交特征向量系。对<strong>非对称的非奇异矩阵</strong>，虽没有式 (4.4.1)，但可以用<strong>两个</strong>正交矩阵把它对角化：</p>
+            <section class="card thm" id="thm-4-15">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 4.15（正交对角分解）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\R^{n\times n}\) 非奇异，则存在正交矩阵 \(P,Q\)，使
+                  <div class="eq-scroll">\[ P^{\mathrm T}AQ=\diag(\sigma_1,\sigma_2,\ldots,\sigma_n),\quad \sigma_i&gt;0. \tag{4.4.2} \]</div></p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>\(A\) 非奇异 ⇒ \(A^{\mathrm T}A\) 实对称<strong>正定</strong>，存在正交 \(Q\) 使
+                      \[ Q^{\mathrm T}(A^{\mathrm T}A)Q=\diag(\lambda_1,\ldots,\lambda_n),\quad \lambda_i&gt;0. \]</p>
+                    <p>令 \(\sigma_i=\sqrt{\lambda_i}\)，\(\Lambda=\diag(\sigma_i)\)，则 \(Q^{\mathrm T}A^{\mathrm T}AQ=\Lambda^2\)，即 \((AQ\Lambda^{-1})^{\mathrm T}(AQ\Lambda^{-1})=I\)。令 \(P=AQ\Lambda^{-1}\)，则 \(P^{\mathrm T}P=I\)（正交），且
+                      \[ P^{\mathrm T}AQ=\Lambda Q^{-1}Q=\Lambda=\diag(\sigma_1,\ldots,\sigma_n). \]</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0">改写即
+                  <div class="eq-scroll">\[ A=P\,\diag(\sigma_1,\ldots,\sigma_n)\,Q^{\mathrm T}, \tag{4.4.3} \]</div>
+                  称式 (4.4.3) 为矩阵 \(A\) 的<strong>正交对角分解</strong>。这里的 \(\sigma_i=\sqrt{\lambda_i(A^{\mathrm T}A)}\) 正是下面定义的奇异值。</p>
+              </div>
+            </section>
+          </section>
+          <!-- ================= 二、奇异值与 SVD ================= -->
+          <section class="section" id="sec-svd">
+            <h2 class="sec-title"><span class="cn">二</span>矩阵的奇异值与奇异值分解</h2>
+            <p>先列出三个预备结论（请读者自证）：</p>
+            <ol style="margin-left:1.2em">
+              <li>设 \(A\in\C_r^{m\times n}\)（\(r&gt;0\)），则 \(A^{\mathrm H}A\) 是 Hermite 矩阵，<strong>特征值均为非负实数</strong>：\(x^{\mathrm H}A^{\mathrm H}Ax=(Ax)^{\mathrm H}(Ax)=\|Ax\|_2^2\ge0\)；</li>
+              <li>\(\operatorname{rank}(A^{\mathrm H}A)=\operatorname{rank}A\)（齐次方程 \(A^{\mathrm H}Ax=0\) 与 \(Ax=0\) 同解，参 §4.3 习题 5）；</li>
+              <li>\(A=O\Longleftrightarrow A^{\mathrm H}A=O\)。</li>
+            </ol>
+            <section class="card def" id="def-4-11">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 4.11：奇异值</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\C_r^{m\times n}\)，\(A^{\mathrm H}A\) 的特征值为
+                  <div class="eq-scroll">\[ \lambda_1\ge\lambda_2\ge\cdots\ge\lambda_r&gt;\lambda_{r+1}=\cdots=\lambda_n=0, \]</div>
+                  则称
+                  <div class="eq-scroll">\[ \sigma_i=\sqrt{\lambda_i}\quad(i=1,2,\ldots,r) \]</div>
+                  为矩阵 \(A\) 的<strong>奇异值</strong>；零矩阵的奇异值全为 0。奇异值总共有 \(n\) 个（含零），<strong>非零奇异值的个数恰为 \(\operatorname{rank}A\)</strong>。</p>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-4-16">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></span>
+                <span class="card-label">定理 4.16（SVD 存在性）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\C_r^{m\times n}\)（\(r&gt;0\)），则存在 \(m\) 阶酉矩阵 \(U\) 和 \(n\) 阶酉矩阵 \(V\)，使
+                  <div class="eq-scroll">\[
+                  U^{\mathrm H}AV=\begin{bmatrix}\Sigma&O\\O&O\end{bmatrix},
+                  \qquad \Sigma=\diag(\sigma_1,\ldots,\sigma_r),\quad \sigma_i&gt;0.
+                  \tag{4.4.4}
+                  \]</div>
+                  即
+                  <div class="eq-scroll">\[
+                  \boxed{\ A=U\begin{bmatrix}\Sigma&O\\O&O\end{bmatrix}V^{\mathrm H}\ }
+                  \tag{4.4.7}
+                  \]</div></p>
+                <details class="proof" open="">
+                  <summary><span>证明（标准构造，点击折叠）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p><strong>第一步：求右奇异向量 \(V\)。</strong>\(A^{\mathrm H}A\) 是 Hermite 半正定矩阵，由定理 1.42 存在酉矩阵 \(V\) 使其酉对角化：
+                      <div class="eq-scroll">\[ V^{\mathrm H}(A^{\mathrm H}A)V=\diag(\lambda_1,\ldots,\lambda_n)=\begin{bmatrix}\Sigma^2&O\\O&O\end{bmatrix}. \tag{4.4.5} \]</div>
+                      分块 \(V=[V_1\ \vdots\ V_2]\)，其中 \(V_1\in\C^{n\times r}\)，则
+                      <div class="eq-scroll">\[ A^{\mathrm H}AV_1=V_1\Sigma^2,\qquad A^{\mathrm H}AV_2=O\ \Rightarrow\ AV_2=O. \tag{4.4.6} \]</div>
+                    <p><strong>第二步：构造左奇异向量 \(U_1\)。</strong>令
+                      <div class="eq-scroll">\[ U_1=AV_1\Sigma^{-1}. \]</div>
+                      则
+                      \[ U_1^{\mathrm H}U_1=\Sigma^{-1}V_1^{\mathrm H}A^{\mathrm H}AV_1\Sigma^{-1}
+                        =\Sigma^{-1}\Sigma^2\Sigma^{-1}=I_r, \]</p>
+                      即 \(U_1\) 的 \(r\) 列是两两正交的单位向量。</p>
+                    <p><strong>第三步：扩充为酉矩阵。</strong>把 \(u_1,\ldots,u_r\) 扩充为 \(\C^m\) 的标准正交基，得 \(U_2\)，令 \(U=[U_1\ \vdots\ U_2]\)。于是
+                      <div class="eq-scroll">\[
+                      U^{\mathrm H}AV=[U_1\ U_2]^{\mathrm H}[AV_1\ AV_2]
+                      =\begin{bmatrix}U_1^{\mathrm H}U_1\Sigma&O\\U_2^{\mathrm H}U_1\Sigma&O\end{bmatrix}
+                      =\begin{bmatrix}\Sigma&O\\O&O\end{bmatrix}.
+                      \]</div>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0"><strong>奇异值由 \(A\) 唯一确定</strong>（它们是 \(A^{\mathrm H}A\) 特征值的平方根），但酉矩阵 \(U,V\) 一般不唯一。</p>
+              </div>
+            </section>
+
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">U 和 V 必须"配套"，不能各自随便取</span>
+              </header>
+              <div class="card-body">
+                <p>虽然 \(U\) 的列是 \(AA^{\mathrm H}\) 的特征向量、\(V\) 的列是 \(A^{\mathrm H}A\) 的特征向量，且两者非零特征值相同（定理 1.16），但<strong>分别取的酉阵未必满足 \(A=U\Sigma V^{\mathrm H}\)</strong>——必须用 \(U_1=AV_1\Sigma^{-1}\) 把二者锁定。教材反例：
+                  \[ A=\begin{pmatrix}-1&0\\0&1\\2&0\end{pmatrix},\quad A^{\mathrm T}A=\diag(5,1), \]</p>
+                  <p>若取 \(V=I\)，\(AA^{\mathrm T}=\begin{pmatrix}1&0&-2\\0&1&0\\-2&0&4\end{pmatrix}\)，任取一组正交特征向量拼成的 \(U\) 往往不成立；只有按 (4.4.6) 配套选取（如教材最终取第 1 列为 \((-1,0,2)^{\mathrm T}/\sqrt5\)）才有 \(U\Sigma V^{\mathrm T}=A\)。</p>
+              </div>
+            </aside>
+
+            <section class="card ex" id="exm-4-14">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 4.14</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">求 \(A=\begin{pmatrix}1&0&1\\0&1&1\\0&0&0\end{pmatrix}\) 的 SVD。</p>
+                <details class="proof">
+                  <summary><span>解（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>\(A^{\mathrm T}A=\begin{pmatrix}1&0&1\\0&1&1\\1&1&2\end{pmatrix}\) 的特征值为 \(3,1,0\)，故 \(\Sigma=\diag(\sqrt3,1)\)。对应单位特征向量依次取
+                      \[ \xi_1=\tfrac1{\sqrt6}(1,1,2)^{\mathrm T},\quad
+                         \xi_2=\tfrac1{\sqrt2}(1,-1,0)^{\mathrm T},\quad
+                         \xi_3=\tfrac1{\sqrt3}(1,1,-1)^{\mathrm T}, \]</p>
+                    <p>令 \(V_1=(\xi_1,\xi_2)\)，则 \(U_1=AV_1\Sigma^{-1}=\begin{pmatrix}1/\sqrt2&1/\sqrt2\\1/\sqrt2&-1/\sqrt2\\0&0\end{pmatrix}\)，补 \(u_3=(0,0,1)^{\mathrm T}\) 得
+                      \[ U=\begin{pmatrix}
+                      1/\sqrt2&1/\sqrt2&0\\
+                      1/\sqrt2&-1/\sqrt2&0\\
+                      0&0&1
+                      \end{pmatrix}, \]
+                      \[ A=U\begin{pmatrix}\sqrt3&0&0\\0&1&0\\0&0&0\end{pmatrix}V^{\mathrm T}. \]</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <section class="card ex" id="exm-4-15">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 4.15：U 的列确为 AAᴴ 的特征向量</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">由 (4.4.7) 直接计算
+                  <div class="eq-scroll">\[ AA^{\mathrm H}=U\begin{bmatrix}\Sigma^2&O\\O&O\end{bmatrix}U^{\mathrm H}, \]</div>
+                  故 \((AA^{\mathrm H})u_i=\lambda_i u_i\)（\(i\le r\)）；当 \(i&gt;r\) 时 \(\lambda_i=0\)。同理 \(V\) 的列是 \(A^{\mathrm H}A\) 的特征向量。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 三、SVD 的性质 ================= -->
+          <section class="section" id="sec-properties">
+            <h2 class="sec-title"><span class="cn">三</span>SVD 的重要性质</h2>
+            <p>分块记 \(U=[U_1\ U_2]\)、\(V=[V_1\ V_2]\)（\(U_1\) 取前 \(r\) 列、\(V_1\) 取前 \(r\) 列），则 SVD 可写成<strong>紧奇异值分解</strong>：
+              <div class="eq-scroll">\[ A=U_1\Sigma V_1^{\mathrm H}. \tag{4.4.11} \]</div>
+            </p>
+            <section class="card thm" id="thm-4-17">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 4.17（零空间、值域、外积展开）</span>
+              </header>
+              <div class="card-body">
+                <div class="eq-scroll">\[ N(A)=L(v_{r+1},v_{r+2},\ldots,v_n), \tag{4.4.8} \]</div>
+                <div class="eq-scroll">\[ R(A)=L(u_1,u_2,\ldots,u_r), \tag{4.4.9} \]</div>
+                <div class="eq-scroll">\[ A=\sigma_1u_1v_1^{\mathrm H}+\sigma_2u_2v_2^{\mathrm H}+\cdots+\sigma_ru_rv_r^{\mathrm H}. \tag{4.4.10} \]</div>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>由 (4.4.11)，\(Ax=0\Longleftrightarrow U_1\Sigma V_1^{\mathrm H}x=0\Longleftrightarrow V_1^{\mathrm H}x=0\)，即 \(x\) 与 \(v_1,\ldots,v_r\) 正交，只能是 \(v_{r+1},\ldots,v_n\) 的线性组合，得 (4.4.8)。</p>
+                    <p>值域方面 \(R(A)=R(U_1\Sigma V_1^{\mathrm H})=R(U_1)=L(u_1,\ldots,u_r)\)（\(\Sigma,V_1^{\mathrm H}\) 满秩，不改变列空间），得 (4.4.9)。把 \(U_1,\Sigma,V_1^{\mathrm H}\) 按列/行展开相乘即得外积和 (4.4.10)。</p>
+                    <p>式 (4.4.10) 是 Hermite 矩阵谱分解 (1.3.29) 的推广：把<strong>任意矩阵</strong>表示成 \(r\) 个秩 1 矩阵 \(\sigma_i u_iv_i^{\mathrm H}\) 之和。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>由 SVD 立即得到</th><th>结论</th></tr>
+                <tr><td>秩</td><td>\(\operatorname{rank}A=r\) = 非零奇异值个数</td></tr>
+                <tr><td>谱范数（§2.2 式 2.2.8）</td><td>\(\|A\|_2=\sigma_1\)（最大奇异值）；非奇异时 \(\|A^{-1}\|_2=1/\sigma_n\)</td></tr>
+                <tr><td>Frobenius 范数</td><td>\(\|A\|_F^2=\operatorname{tr}(A^{\mathrm H}A)=\lambda_1+\cdots+\lambda_r=\displaystyle\sum_{i=1}^r\sigma_i^2\)</td></tr>
+                <tr><td>行列式（方阵非奇异）</td><td>\(|\det A|=\sigma_1\sigma_2\cdots\sigma_n\)</td></tr>
+                <tr><td>零空间 / 值域</td><td>\(N(A)=L(v_{r+1},\ldots,v_n)\)，\(R(A)=L(u_1,\ldots,u_r)\)</td></tr>
+                <tr><td>最优低秩逼近（Eckart–Young）</td><td>截去最小的奇异值：\(A_k=\displaystyle\sum_{i=1}^k\sigma_iu_iv_i^{\mathrm H}\) 是秩 \(k\) 矩阵中在 \(\|\cdot\|_2,\|\cdot\|_F\) 下最接近 \(A\) 的</td></tr>
+              </table>
+            </div>
+          </section>
+
+          <!-- ================= 四、正交相抵 ================= -->
+          <section class="section" id="sec-equivalent">
+            <h2 class="sec-title"><span class="cn">四</span>矩阵正交相抵的概念</h2>
+            <section class="card def" id="def-4-12">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 4.12</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A,B\in\R^{m\times n}\)，若存在 \(m\) 阶正交阵 \(U\) 和 \(n\) 阶正交阵 \(V\)，使
+                  <div class="eq-scroll">\[ B=U^{-1}AV=U^{\mathrm T}AV, \]</div>
+                  则称 <strong>\(A\) 与 \(B\) 正交相抵</strong>。当 \(U=V\) 时就是正交相似，故正交相抵是正交相似的推广（允许行列数不同时两侧维数不同）。</p>
+              </div>
+            </section>
+            <p>正交相抵具有自反性、对称性、传递性，是等价关系。</p>
+            <section class="card thm" id="thm-4-18">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/></svg></span>
+                <span class="card-label">定理 4.18：正交相抵矩阵有相同奇异值</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">若 \(B=U^{-1}AV\)，则
+                  <div class="eq-scroll">\[ B^{\mathrm T}B=(U^{-1}AV)^{\mathrm T}(U^{-1}AV)=V^{\mathrm T}(A^{\mathrm T}A)V, \]</div>
+                  即 \(B^{\mathrm T}B\) 与 \(A^{\mathrm T}A\) <strong>（正交）相似</strong>，特征值相同，故奇异值相同。因此 SVD 中的对角阵 \(D=\Sigma\) 是正交相抵等价类的<strong>标准形矩阵</strong>：同一类中的矩阵共享同一组奇异值。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="svd-lab-title">动手实验：2×2 SVD 计算器</h3>
+            <p>改矩阵，工具先求 \(A^{\mathrm T}A\) 的特征值与单位特征向量（得 \(V,\sigma\)），再按 \(U=AV\Sigma^{-1}\) 配套构造 \(U\)，最后验证 \(U\Sigma V^{\mathrm T}=A\)，并报告 \(\|A\|_2=\sigma_1\)。注意切换到奇异矩阵（秩 1）时 \(\sigma_2=0\)。</p>
+            <section class="card lab" data-svd-lab></section>
+          </section>
+
+          <!-- ================= 习题 4.4 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 4.4（共 5 题）</h2>
+            <div class="ex-toolbar">
+              <span data-fold-tools="details.solution">
+                <button type="button" data-fold="open">全部展开解答</button>
+                <button type="button" data-fold="close">全部收起</button>
+              </span>
+            </div>
+
+            <article class="card task" id="ex44-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">谱范数</span></header>
+              <div class="card-body">
+                <p>设 \(\sigma_1,\sigma_n\) 是矩阵 \(A\) 的最大、最小奇异值。证明 \(\|A\|_2=\sigma_1\)；当 \(A\) 非奇异时 \(\|A^{-1}\|_2=1/\sigma_n\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由 §2.2 式 (2.2.8) \(\|A\|_2=\sqrt{\lambda_{\max}(A^{\mathrm H}A)}=\sqrt{\lambda_1}=\sigma_1\)。非奇异时所有奇异值为正，而 \((A^{-1})^{\mathrm H}A^{-1}=(AA^{\mathrm H})^{-1}\)，其最大特征值为 \(1/\lambda_{\min}(AA^{\mathrm H})=1/\sigma_n^2\)（\(AA^{\mathrm H}\) 与 \(A^{\mathrm H}A\) 非零特征值相同），故 \(\|A^{-1}\|_2=1/\sigma_n\)。几何意义：\(\sigma_1,\sigma_n\) 是单位球在 \(A\) 下的最长、最短半轴。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex44-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag">解齐次方程</span></header>
+              <div class="card-body">
+                <p>给出应用 SVD (4.4.7) 求解齐次线性方程组 \(Ax=0\) 的方法。</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由定理 4.17，零空间 \(N(A)=L(v_{r+1},\ldots,v_n)\)。故求 SVD 后，<strong>取 \(V\) 中对应零奇异值的列</strong> \(v_{r+1},\ldots,v_n\)，它们就是齐次方程的一组基础解系，通解为
+                    \[ x=k_{r+1}v_{r+1}+\cdots+k_nv_n. \]</p>
+                  <p>数值上即使 \(A\) 不满秩，SVD 通过"小奇异值"（接近 0）判断秩，比直接消元更稳健——这是 SVD 求解欠定/病态齐次方程（如基础矩阵、本质矩阵估计）的标准方法。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex44-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag tag-mid">F 范数</span></header>
+              <div class="card-body">
+                <p>设 \(A\in\R^{m\times n}\)（\(r&gt;0,m\ge n\)），奇异值为 \(\sigma_i\)，证明 \(\|A\|_F^2=\displaystyle\sum_{i=1}^r\sigma_i^2\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>Frobenius 范数（§2.2 式 2.2.3）：
+                    \[ \|A\|_F=(\operatorname{tr}(A^{\mathrm T}A))^{1/2}. \]</p>
+                  <p>矩阵的迹等于特征值之和（§1.2），而 \(A^{\mathrm T}A\) 的非零特征值正是 \(\sigma_1^2,\ldots,\sigma_r^2\)，其余为 0，故
+                    \[ \|A\|_F^2=\operatorname{tr}(A^{\mathrm T}A)=\sum_{i=1}^r\lambda_i=\sum_{i=1}^r\sigma_i^2. \]</p>
+                  <p>也可由 SVD 与正交矩阵的酉不变性直接得：\(\|A\|_F=\|U\Sigma V^{\mathrm T}\|_F=\|\Sigma\|_F\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex44-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag tag-mid">求 SVD</span></header>
+              <div class="card-body">
+                <p>求 \(A=\begin{pmatrix}1&0\\0&1\\1&1\end{pmatrix}\) 的奇异值分解。</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(A^{\mathrm T}A=\begin{pmatrix}2&1\\1&2\end{pmatrix}\)，特征值 \(\lambda_1=3,\lambda_2=1\)，奇异值 \(\sigma_1=\sqrt3,\sigma_2=1\)，\(\Sigma=\diag(\sqrt3,1)\)。对应单位特征向量 \(v_1=\frac1{\sqrt2}(1,1)^{\mathrm T},\ v_2=\frac1{\sqrt2}(1,-1)^{\mathrm T}\)，故 \(V=\frac1{\sqrt2}\begin{pmatrix}1&1\\1&-1\end{pmatrix}\)。</p>
+                  <p>配套求左奇异向量：
+                    \[ U_1=AV\Sigma^{-1}
+                       =\begin{pmatrix}1/\sqrt6&1/\sqrt2\\1/\sqrt6&-1/\sqrt2\\2/\sqrt6&0\end{pmatrix}, \]</p>
+                  <p>补单位向量 \(u_3=\frac1{\sqrt3}(1,1,-1)^{\mathrm T}\)（与前两列正交），得 \(3\times3\) 正交阵 \(U\)，于是
+                    \[ A=U\begin{pmatrix}\sqrt3&0\\0&1\\0&0\end{pmatrix}V^{\mathrm T}. \]</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex44-5">
+              <header class="card-head"><span class="card-label">第 5 题</span><span class="tag tag-hard">叠矩阵的 SVD</span></header>
+              <div class="card-body">
+                <p>设 \(A\in\C_r^{m\times n}\) 的 SVD 为 (4.4.7)，求矩阵 \(B=\begin{bmatrix}A\\ \overline A\end{bmatrix}\)（\(2m\times n\)）的一个奇异值分解。</p>
+                <details class="solution"><summary><span>解法提示</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>计算
+                    \[ B^{\mathrm H}B=[A^{\mathrm H}\ \ A^{\mathrm T}]\begin{bmatrix}A\\\overline A\end{bmatrix}
+                       =A^{\mathrm H}A+A^{\mathrm T}\overline A. \]</p>
+                  <p>当 \(A\) 为实矩阵时 \(\overline A=A\)，\(B^{\mathrm T}B=2A^{\mathrm T}A\)，故 \(B\) 的奇异值为 \(\sqrt2\,\sigma_i\)，右奇异向量矩阵仍为 \(V\)，左奇异向量由
+                    \[ U_B=B\,V(\sqrt2\,\Sigma)^{-1}
+                       =\frac1{\sqrt2}\begin{bmatrix}U_1\\U_1\end{bmatrix} \]
+                    再扩充为 \(2m\) 阶正交阵得到。一般复矩阵情形按 \(B^{\mathrm H}B\) 重新特征分解即可。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 本节小结 / 第4章总结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结（兼第 4 章回顾）</h2>
+            <div class="summary-block">
+              <p>SVD 是"任意矩阵都有的奇异值版谱分解"，构造链清晰：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>对象</th><th>内容</th></tr>
+                  <tr><td>奇异值</td><td>\(\sigma_i=\sqrt{\lambda_i(A^{\mathrm H}A)}\)，非负，非零个数 = 秩</td></tr>
+                  <tr><td>右奇异向量</td><td>\(V\)：\(A^{\mathrm H}A\) 的酉特征向量阵</td></tr>
+                  <tr><td>左奇异向量</td><td>\(U_1=AV_1\Sigma^{-1}\)（配套！），再扩充为酉阵</td></tr>
+                  <tr><td>完整 SVD</td><td>\(A=U\begin{pmatrix}\Sigma&O\\O&O\end{pmatrix}V^{\mathrm H}\)</td></tr>
+                  <tr><td>紧 SVD / 外积</td><td>\(A=U_1\Sigma V_1^{\mathrm H}=\sum\sigma_i u_iv_i^{\mathrm H}\)</td></tr>
+                  <tr><td>四大子空间</td><td>\(R(A)=L(u_1,\ldots,u_r)\)，\(N(A)=L(v_{r+1},\ldots,v_n)\)</td></tr>
+                  <tr><td>不变量</td><td>正交相抵保持奇异值；\(\|A\|_2=\sigma_1\)、\(\|A\|_F^2=\sum\sigma_i^2\)、\(|\det A|=\prod\sigma_i\)</td></tr>
+                </table>
+              </div>
+              <p style="margin-top:12px"><strong>第 4 章四种分解总览：</strong>
+                <strong>LU/LDU</strong>（三角×三角，条件：顺序主子式非零；对称正定→<strong>Cholesky</strong> \(GG^{\mathrm T}\)）→
+                <strong>QR</strong>（正交×上三角，任意非奇异矩阵，数值稳定）→
+                <strong>满秩分解</strong> \(FG\)（任意秩 \(r\) 矩阵，通向广义逆）→
+                <strong>SVD</strong>（酉×对角×酉，任意矩阵，信息最全：秩、子空间、范数、低秩逼近）。</p>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>为什么说"\(U,V\) 分别取 \(AA^{\mathrm H},A^{\mathrm H}A\) 的特征向量"还不足以保证 SVD 成立？正确的配套关系 \(U_1=AV_1\Sigma^{-1}\) 是怎么来的？</li>
+                  <li>不用翻书，从 \(A^{\mathrm H}A\) 半正定出发，完整推导一遍 2×2 矩阵的 SVD，并说明 \(\sigma_2=0\) 时如何补 \(U\) 的第二列。</li>
+                  <li>SVD 一个式子同时回答了哪些问题？至少说出秩、零空间、\(\|A\|_2\)、最小二乘与低秩逼近五者与 \(U,\Sigma,V\) 的关系。</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="4.3-full-rank-decomposition.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§4.3 矩阵的满秩分解</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="../ch5/5.1-eigenvalue-estimation.html"><span class="ln-dir">下一章</span><span class="ln-ttl">第 5 章 §5.1 特征值的估计</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

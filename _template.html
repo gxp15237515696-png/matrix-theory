@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  矩阵论课程 · 单节课母版 _template.html
+  用法：
+    1. 复制本文件到 chapters/chN/N.M-slug.html
+    2. 把下方所有 @@ROOT@@ 替换为 ../../（课时页在 chapters/chN/ 下）
+    3. 修改 <title>、面包屑、h1、页码学时 chip、data-active="N.M"，以及页脚翻页
+       ln-prev / ln-next（把示例链接换成真实的上一节/下一节；同章写「上一节|下一节」+
+       「§N.M 节名」，跨章写「上一章|下一章」+「第 N 章 §N.M 节名」）
+    4. 按蓝图填正文；在 common.js 的 COURSE_TOC 登记本节（ready:true）
+  约定：
+    行内公式 \( ... \)  独立公式 \[ ... \]  公式编号用 \tag{1.1.7}
+    ⚠ 公式中的小于号必须写成实体 &lt;（例如 r 小于 n 要写 r&lt;n），否则会被
+      浏览器当成 HTML 标签截断；大于号建议写 &gt;，与号写 &amp;
+    交稿前在项目根目录运行：node check-katex.js 本文件路径
+    定义 .card.def / 定理 .card.thm / 推论 .card.thm.cor /
+    例题 .card.ex / 注意 .card.note / 习题 .card.task / 实验 .card.lab
+    证明与解答一律 <details class="proof|solution"> 折叠
+  无障碍约定（新增课时请照做，勿删）：
+    - 标题层级必须连续（h1 → h2 → h3 → h4 逐级），页内目录只收 h2[id] / h3[id]，
+      所以别给 h3/h4 加 id，也别在 h2 之后直接跳到 h4；
+    - 纯装饰图标（.card-icon、.chev、按钮与 .ln-home 内的 svg）一律
+      aria-hidden="true" focusable="false"；承载内容的示意图才用 role="img" + aria-label；
+    - 三个 nav 已写好 aria-label（面包屑 / 课时翻页 / 本页目录），新增 nav 也要补；
+    - 表单控件必须有可访问名：能用 <label> 就用 <label>，否则 aria-label。
+  ============================================================
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§N.M 节标题 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §N.M ……">
+  <link rel="stylesheet" href="@@ROOT@@vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="@@ROOT@@assets/css/base.css">
+  <link rel="stylesheet" href="@@ROOT@@assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+
+  <!-- 移动端顶栏 -->
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§N.M 节标题</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <!-- 左：课程树（common.js 注入；data-active 为当前节号） -->
+    <aside id="sidebar" class="sidebar no-print" data-active="N.M" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="@@ROOT@@index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <!-- 中：正文 -->
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="@@ROOT@@index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="@@ROOT@@index.html">第 N 章 ……</a><span class="sep" aria-hidden="true">/</span>
+            <span>§N.M ……</span>
+          </nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 N 章 · ……</div>
+            <h1>§N.M 节标题</h1>
+            <p class="lede">本节引入语：一两句话说明这一节解决什么问题、在全书中的位置。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.XX–XX</strong></span>
+              <span class="chip">建议 <strong>X 学时</strong></span>
+              <span class="chip">核心概念 <strong>X 个</strong></span>
+
+              <span class="chip">定义 <strong>1 个</strong></span>
+              <span class="chip">定理 <strong>1 个</strong></span>
+              <span class="chip">例题 <strong>1 道</strong></span></div>
+          </header>
+
+          <!-- ===== 教学计划 ===== -->
+          <section class="lesson-plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>学完本节，你能够……</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div><h4>重点</h4><ul><li>……</li></ul></div>
+                  <div><h4>难点</h4><ul><li>……</li></ul></div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>……</td><td class="num">p.X</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络</h3>
+                <div class="flow-map"><!-- 内联 SVG 脉络图 --></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ===== 正文 ===== -->
+          <section class="section">
+            <h2 class="sec-title" id="sec-xxx"><span class="cn">一</span>小节名</h2>
+
+            <section class="card def" id="def-x-x">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 X.X</span>
+              </header>
+              <div class="card-body">
+                <p>定义正文，行内公式示例：\(x\in\R^n\)。</p>
+                <div class="eq-scroll">
+                  \[ A=(a_{ij})_{m\times n}\in\R^{m\times n} \tag{x.x.x} \]
+                </div>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-x-x">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 X.X</span>
+              </header>
+              <div class="card-body">
+                <p>定理结论。</p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span>
+                    <svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg>
+                  </summary>
+                  <div class="proof-body">
+                    <p>证明过程……</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-x-x">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 X.X</span>
+              </header>
+              <div class="card-body"><p>例题……</p></div>
+            </section>
+
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意</span>
+              </header>
+              <div class="card-body"><p>易错点、直观解释……</p></div>
+            </aside>
+          </section>
+
+          <!-- ===== 习题 ===== -->
+          <section class="section" id="sec-exercises">
+            <h2 class="sec-title"><span class="cn">习</span>习题 N.M</h2>
+            <div class="ex-toolbar" data-fold-scope>
+              <span data-fold-tools="details.solution">
+                <button type="button" data-fold="open">全部展开解答</button>
+                <button type="button" data-fold="close">全部收起</button>
+              </span>
+              <span class="ex-hint">建议先独立动笔，再展开详解对照</span>
+            </div>
+
+            <article class="card task" id="ex-1">
+              <header class="card-head"><span class="card-label">习题 N.M · 1</span><span class="tag">标签</span></header>
+              <div class="card-body">
+                <p>题面……</p>
+                <details class="solution">
+                  <summary><span>查看详细解答（建议先独立思考）</span>
+                    <svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg>
+                  </summary>
+                  <div class="solution-body">
+                    <h3>思路</h3><p>……</p>
+                    <h3>解答</h3><p>……</p>
+                    <h3>注</h3><p>……</p>
+                  </div>
+                </details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ===== 小结 ===== -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结</h2>
+            <div class="summary-block">
+              <p>概念地图、公式索引表、自检问题……</p>
+            </div>
+          </section>
+
+          <!-- ===== 页脚导航 ===== -->
+          <nav class="lesson-nav" aria-label="课时翻页">
+            <a class="ln-prev" href="@@ROOT@@chapters/ch1/1.1-linear-spaces.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§1.1 线性空间</span></a>
+            <a class="ln-home" href="@@ROOT@@index.html" title="回课程主页" aria-label="回课程主页">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </a>
+            <a class="ln-next" href="@@ROOT@@chapters/ch1/1.2-linear-transformations.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§1.2 线性变换及其矩阵</span></a>
+          </nav>
+
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <!-- 右：本页目录（common.js 自动生成） -->
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="@@ROOT@@vendor/katex/katex.min.js"></script>
+  <script defer src="@@ROOT@@vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="@@ROOT@@assets/js/common.js"></script>
+  <script defer src="@@ROOT@@assets/js/interactives.js"></script>
+</body>
+</html>

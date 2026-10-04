@@ -1,0 +1,13 @@
+# Publish scope for GitHub Pages (site is zero-build: these files ARE the site)
+# ---------------------------------------------------------------
+# 版权红线：textbook/ 是受版权保护的教材扫描原件，绝不入库、绝不发布。
+textbook/
+
+# node_modules 仅供 check-katex.js 跑离线校验时使用，网站运行完全不需要它。
+node_modules/
+
+# audit/ 是审查台账与截图，含"逐条对照教材"的痕迹，不随站点发布。
+audit/
+
+# tmp/ 临时区
+tmp/

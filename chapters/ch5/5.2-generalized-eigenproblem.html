@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§5.2 广义特征值问题 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §5.2：广义特征值问题 Ax=λBx（A 对称、B 对称正定）、两种等价形式（B⁻¹A 与 Cholesky 对称化 Sy=λy）、按 B 标准正交化向量系、特征向量的 B-正交性与完备性">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§5.2 广义特征值问题</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="5.2" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 5 章 特征值的估计及对称矩阵的极性</a><span class="sep" aria-hidden="true">/</span>
+            <span>§5.2 广义特征值问题</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 5 章 · 特征值的估计及对称矩阵的极性</div>
+            <h1>§5.2 广义特征值问题</h1>
+            <p class="lede">振动理论、结构有限元中大量出现形如 \(Ax=\lambda Bx\) 的问题：刚度矩阵 \(A\) 对称、质量矩阵 \(B\) 对称<strong>正定</strong>。它不是普通特征值问题（\(B\ne I\)），但可以<strong>等价地化为普通对称特征值问题</strong>：用 Cholesky 分解 \(B=GG^{\mathrm T}\) 做变量替换 \(y=G^{\mathrm T}x\)，得对称矩阵 \(S=G^{-1}A(G^{-1})^{\mathrm T}\) 的普通特征值问题 \(Sy=\lambda y\)。由此特征值全为实数，特征向量关于 \(B\) 正交且构成完备系。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.264–266</strong></span>
+              <span class="chip">建议 <strong>2 学时</strong></span>
+              <span class="chip">定义 <strong>2 个</strong></span>
+            </div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>陈述广义特征值问题 \(Ax=\lambda Bx\) 及广义特征值/特征向量的定义；</li>
+                  <li>写出两种等价形式：\(B^{-1}Ax=\lambda x\) 与 \(Sy=\lambda y\)（Cholesky 对称化）；</li>
+                  <li>说明为什么第二种形式更好（\(S\) 对称 ⇒ 实特征值、正交特征向量）；</li>
+                  <li>理解按 \(B\) 标准正交化向量系：\(x_i^{\mathrm T}Bx_j=\delta_{ij}\)；</li>
+                  <li>证明广义特征向量线性无关、构成完备系。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>Cholesky 对称化；</li>
+                      <li>B-正交条件；</li>
+                      <li>完备性结论。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>\(B^{-1}A\) 不对称，不能直接用谱定理；</li>
+                      <li>替换 \(y=G^{\mathrm T}x\) 的来龙去脉；</li>
+                      <li>B-正交 ⇒ 线性无关的证明。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 2 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>定义、两种等价形式</td><td class="num">p.264–265</td></tr>
+                    <tr><td class="num">2</td><td>B-正交性、完备性、习题</td><td class="num">p.265–266</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 190" role="img" aria-label="广义特征值脉络图">
+                    <defs><marker id="m52" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="30" y="30" width="200" height="50"/><rect x="320" y="30" width="200" height="50"/><rect x="610" y="30" width="200" height="50"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="130" y="52">Ax = λBx</text><text x="130" y="69" font-size="11" fill="#666">A 对称，B 对称正定</text>
+                      <text x="420" y="52">Cholesky B=GGᵀ</text><text x="420" y="69" font-size="11" fill="#666">y=Gᵀx ⇒ Sy=λy</text>
+                      <text x="710" y="52">S 对称谱定理</text><text x="710" y="69" font-size="11" fill="#666">实 λ、正交 y</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m52)"><line x1="230" y1="55" x2="318" y2="55"/><line x1="520" y1="55" x2="608" y2="55"/></g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="250" y="124" width="340" height="48"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13.5" text-anchor="middle">
+                      <text x="420" y="153">x=(G⁻¹)ᵀy：B-正交完备特征向量系</text>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、定义与等价形式 ================= -->
+          <section class="section" id="sec-definition">
+            <h2 class="sec-title"><span class="cn">一</span>广义特征值问题与等价形式</h2>
+            <p>在振动理论中，常常碰到形式如下的特征值问题：求数 \(\lambda\) 使方程
+              <div class="eq-scroll">\[ Ax=\lambda Bx \tag{5.2.1} \]</div>
+              有非零解 \(x\)。这里 \(A\) 为 \(n\) 阶<strong>实对称</strong>矩阵，\(B\) 为 \(n\) 阶<strong>实对称正定</strong>矩阵，\(x\) 为 \(n\) 维列向量。当 \(B=I\) 时式 (5.2.1) 就是普通特征值问题，因此它是普通问题的推广。</p>
+            <section class="card def" id="def-5-5">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 5.5</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">称形如式 (5.2.1) 的特征值问题为<strong>矩阵 \(A\) 相对于矩阵 \(B\) 的广义特征值问题</strong>，简称广义特征值问题；满足式 (5.2.1) 要求的数 \(\lambda\) 为<strong>矩阵 \(A\) 相对于矩阵 \(B\) 的特征值</strong>；与 \(\lambda\) 对应的非零解 \(x\) 称为<strong>属于 \(\lambda\) 的特征向量</strong>。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="two-forms">两种等价形式</h3>
+            <p><strong>第一种（左乘 \(B^{-1}\)）：</strong>由 \(B\) 正定可逆，式 (5.2.1) 两端左乘 \(B^{-1}\)：
+              <div class="eq-scroll">\[ B^{-1}Ax=\lambda x. \tag{5.2.2} \]</div>
+              这把广义问题化为矩阵 \(B^{-1}A\) 的普通特征值问题。<strong>缺点：</strong>虽然 \(A,B^{-1}\) 都对称，但 \(B^{-1}A\) 一般<strong>不再对称</strong>，不能直接使用实对称矩阵的谱定理。</p>
+            <p><strong>第二种（Cholesky 对称化）：</strong>对正定矩阵 \(B\) 作 Cholesky 分解（§4.1）：\(B=GG^{\mathrm T}\)，\(G\) 下三角。代入式 (5.2.1)：
+              <div class="eq-scroll">\[ Ax=\lambda GG^{\mathrm T}x. \tag{5.2.3} \]</div>
+              令 \(y=G^{\mathrm T}x\)（可逆替换，\(x=(G^{-1})^{\mathrm T}y\)），代入并左乘 \(G^{-1}\) 整理得
+              <div class="eq-scroll">\[ Sy=\lambda y,\qquad S=G^{-1}A(G^{-1})^{\mathrm T}. \tag{5.2.4} \]</div>
+              关键：\(S^{\mathrm T}=((G^{-1})^{\mathrm T})^{\mathrm T}A^{\mathrm T}(G^{-1})^{\mathrm T}=G^{-1}A^{\mathrm T}(G^{-1})^{\mathrm T}=S\)（\(A\) 对称），<strong>\(S\) 是实对称矩阵</strong>。于是广义问题等价地化为<strong>对称矩阵 \(S\) 的普通特征值问题</strong>，谱定理全部适用。</p>
+
+            <h3 class="sub-title" id="orthogonality">二、特征向量的 B-正交性</h3>
+            <p>\(S\) 实对称 ⇒ 特征值 \(\lambda_1,\ldots,\lambda_n\) 全为实数，且存在完备的标准正交特征向量系 \(y_1,\ldots,y_n\)：
+              <div class="eq-scroll">\[ y_i^{\mathrm T}y_j=\begin{cases}0&(i\ne j)\\1&(i=j)\end{cases}. \]</div>
+              令
+              <div class="eq-scroll">\[ x_i=(G^{-1})^{\mathrm T}y_i\quad(i=1,\ldots,n), \]</div>
+              则
+              <div class="eq-scroll">\[ x_i^{\mathrm T}Bx_j=x_i^{\mathrm T}GG^{\mathrm T}x_j=(G^{\mathrm T}x_i)^{\mathrm T}(G^{\mathrm T}x_j)=y_i^{\mathrm T}y_j=
+              \begin{cases}0&(i\ne j)\\1&(i=j)\end{cases}. \tag{5.2.5} \]</div></p>
+            <section class="card def" id="def-5-6">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 5.6：按 B 标准正交化向量系</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">满足式 (5.2.5) 的向量系 \(x_1,\ldots,x_n\) 称为<strong>按 \(B\) 标准正交化向量系</strong>；式 (5.2.5) 的第一式（\(i\ne j\) 时 \(x_i^{\mathrm T}Bx_j=0\)）称作 <strong>\(B\) 正交条件</strong>。它把普通内积 \((u,v)=u^{\mathrm T}v\) 换成了以 \(B\) 为度量的内积 \((u,v)_B=u^{\mathrm T}Bv\)（\(B\) 正定保证这是合法内积）。</p>
+              </div>
+            </section>
+            <p>按 \(B\) 标准正交化向量系有两条基本性质：</p>
+            <div class="grid2">
+              <div class="mini-card"><div class="mc-title">性质 1</div><p style="margin:0">\(x_i\ne\mathbf0\)（\(i=1,\ldots,n\)）。因为 \(x_i^{\mathrm T}Bx_i=1\ne0\)。</p></div>
+              <div class="mini-card"><div class="mc-title">性质 2：线性无关</div><p style="margin:0">若 \(\sum c_jx_j=\mathbf0\)，用 \(x_i^{\mathrm T}B\) 左乘得 \(\sum_j c_jx_i^{\mathrm T}Bx_j=c_i=0\)，故全部系数为零。</p></div>
+            </div>
+            <p>再由式 (5.2.4) 回代：\(Sy_i=\lambda_iy_i\) 且 \(y_i=G^{\mathrm T}x_i\)，代入即得
+              <div class="eq-scroll">\[ Ax_i=\lambda_iBx_i\quad(i=1,2,\ldots,n). \tag{5.2.6} \]</div>
+              因此诸 \(\lambda_i\) 就是广义特征值问题 (5.2.1) 的特征值，\(x_i\) 是属于 \(\lambda_i\) 的特征向量。由于 \(x_1,\ldots,x_n\) 线性无关（性质 2），它们构成一个<strong>完备的特征向量系</strong>。</p>
+
+            <h3 class="sub-title" id="geig-lab-title">动手实验：广义特征值转换器（2×2）</h3>
+            <p>改 \(A\)（对称）与 \(B\)（对称正定），工具自动做 Cholesky 分解、构造对称化矩阵 \(S=G^{-1}A(G^{-1})^{\mathrm T}\)、求广义特征值与特征向量，并验证 \(B\)-正交条件 \(x_i^{\mathrm T}Bx_j=\delta_{ij}\)。</p>
+            <section class="card lab" data-geig-lab></section>
+          </section>
+
+          <!-- ================= 习题 5.2 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 5.2（共 2 题）</h2>
+            <div class="ex-toolbar">
+              <span data-fold-tools="details.solution">
+                <button type="button" data-fold="open">全部展开解答</button>
+                <button type="button" data-fold="close">全部收起</button>
+              </span>
+            </div>
+
+            <article class="card task" id="ex52-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">B-正交矩阵化</span></header>
+              <div class="card-body">
+                <p>设 \(\lambda_1,\ldots,\lambda_n\) 为实对称矩阵 \(A\) 相对于正定矩阵 \(B\) 的特征值，相应特征向量 \(x_1,\ldots,x_n\) 为按 \(B\) 标准正交化向量系。令 \(Q=(x_1,\ldots,x_n)\)，试证
+                  \[ Q^{\mathrm T}AQ=\Lambda=\diag(\lambda_1,\ldots,\lambda_n),\qquad Q^{\mathrm T}BQ=I. \]</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(Q^{\mathrm T}BQ\) 的第 \((i,j)\) 元为 \(x_i^{\mathrm T}Bx_j=\delta_{ij}\)（式 5.2.5），故 \(Q^{\mathrm T}BQ=I\)。</p>
+                  <p>\(Q^{\mathrm T}AQ\) 的第 \((i,j)\) 元为 \(x_i^{\mathrm T}Ax_j=x_i^{\mathrm T}(\lambda_jBx_j)=\lambda_j(x_i^{\mathrm T}Bx_j)=\lambda_j\delta_{ij}\)，故 \(Q^{\mathrm T}AQ=\diag(\lambda_1,\ldots,\lambda_n)=\Lambda\)。即按 \(B\) 标准正交的特征向量系<strong>同时</strong>把 \(A\) 对角化、把 \(B\) 单位化——这是广义问题"同时对角化"的标准结论，也是振动模态分析中模态矩阵的性质。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex52-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag tag-mid">两种方法求解</span></header>
+              <div class="card-body">
+                <p>已知
+                  \[ A=\begin{pmatrix}1&-1&1\\-1&2&0\\1&0&3\end{pmatrix},\quad
+                     B=\begin{pmatrix}5&2&-4\\2&1&-2\\-4&-2&5\end{pmatrix}, \]
+                  试用两种方法求解广义特征值问题 \(Ax=\lambda Bx\)（转化成普通特征值问题即可）。</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p><strong>验证前提：</strong>\(A\) 对称；\(B\) 的顺序主子式 \(5,1,1\) 均正，对称正定。</p>
+                  <p><strong>方法一（\(B^{-1}A\)）：</strong>计算得
+                    \[ B^{-1}A=\begin{pmatrix}3&-5&1\\-9&20&4\\-1&4&3\end{pmatrix} \]
+                    （非对称），求其普通特征值即广义特征值。</p>
+                  <p><strong>方法二（Cholesky 对称化）：</strong>\(B=GG^{\mathrm T}\)，
+                    \[ G=\begin{pmatrix}\sqrt5&0&0\\ \frac{2}{\sqrt5}&\frac{1}{\sqrt5}&0\\ -\frac{4}{\sqrt5}&-\frac{2}{\sqrt5}&1\end{pmatrix},\quad
+                       S=G^{-1}A(G^{-1})^{\mathrm T}\approx\begin{pmatrix}0.2&-1.4&-0.447\\-1.4&14.8&9.839\\-0.447&9.839&11\end{pmatrix} \]
+                    （对称）。求 \(S\) 的特征值得广义特征值
+                    \[ \lambda_1\approx0.0146,\quad \lambda_2\approx2.9833,\quad \lambda_3\approx23.0022, \]
+                    与方法一（解 \(\det(A-\lambda B)=0\) 的三次方程）结果相同。特征向量由 \(x=(G^{-1})^{\mathrm T}y\) 回代，且满足 \(x_i^{\mathrm T}Bx_j=\delta_{ij}\)。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 本节小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结与自检</h2>
+            <div class="summary-block">
+              <p>广义问题的一切性质都来自"换一个好内积"：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>对象</th><th>结论</th></tr>
+                  <tr><td>问题</td><td>\(Ax=\lambda Bx\)，\(A\) 对称、\(B\) 对称正定（定义 5.5）</td></tr>
+                  <tr><td>形式一</td><td>\(B^{-1}Ax=\lambda x\)：可行但 \(B^{-1}A\) 不对称</td></tr>
+                  <tr><td>形式二</td><td>\(B=GG^{\mathrm T}\)，\(y=G^{\mathrm T}x\)，\(S=G^{-1}A(G^{-1})^{\mathrm T}\) 对称（式 5.2.4）</td></tr>
+                  <tr><td>谱性质</td><td>\(\lambda_i\) 全实；\(y_i\) 标准正交；\(x_i=(G^{-1})^{\mathrm T}y_i\) 满足 \(x_i^{\mathrm T}Bx_j=\delta_{ij}\)（定义 5.6）</td></tr>
+                  <tr><td>完备性</td><td>\(x_1,\ldots,x_n\) 线性无关（性质 2），构成完备特征向量系（式 5.2.6）</td></tr>
+                  <tr><td>同时对角化</td><td>\(Q^{\mathrm T}AQ=\Lambda,\ Q^{\mathrm T}BQ=I\)（习题 1）</td></tr>
+                </table>
+              </div>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>为什么 \(B\) 必须正定？如果 \(B\) 只是对称可逆（不定），式 (5.2.4) 的 \(S\) 还对称吗？特征值还保证全实吗？</li>
+                  <li>不看书推导一遍：从 \(Ax=\lambda GG^{\mathrm T}x\) 出发，怎样换元得到 \(Sy=\lambda y\)？回代 \(x=(G^{-1})^{\mathrm T}y\) 后 \(B\)-正交条件从何而来？</li>
+                  <li>\(B\)-正交条件 \(x_i^{\mathrm T}Bx_j=0\) 的几何意义是什么（用内积 \((u,v)_B=u^{\mathrm T}Bv\) 解释）？为什么它能直接推出线性无关？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="5.1-eigenvalue-estimation.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§5.1 特征值的估计</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="5.3-rayleigh-extremum.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§5.3 对称矩阵特征值的极性</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

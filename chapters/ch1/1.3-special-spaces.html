@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§1.3 两个特殊的线性空间 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §1.3：Euclid 空间（内积、度量矩阵、长度夹角、正交性、Schmidt 正交化、正交补、正交变换、对称变换）与酉空间（酉矩阵、Hermite 变换、Schur 定理、正规矩阵、谱分解）">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§1.3 两个特殊的线性空间</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="1.3" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 1 章 线性空间与线性变换</a><span class="sep" aria-hidden="true">/</span>
+            <span>§1.3 两个特殊的线性空间</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 1 章 · 线性空间与线性变换</div>
+            <h1>§1.3 两个特殊的线性空间</h1>
+            <p class="lede">前两节的线性空间只有"线性运算"，无法谈论<strong>长度、夹角、垂直</strong>。本节给空间再装一套"乘法"——<strong>内积</strong>：实数域上得到 <strong>Euclid 空间（欧氏空间）</strong>，复数域上得到<strong>酉空间</strong>。内积一经引入，正交基、正交补、正交（酉）变换、对称（Hermite）变换、谱定理便依次展开，它们是数值代数与机器学习（最小二乘、PCA、QR 分解）的几何基石。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.80–108</strong></span>
+              <span class="chip">建议 <strong>8 学时</strong></span>
+              <span class="chip">定义 <strong>10 个</strong></span>
+              <span class="chip">定理 <strong>11 个</strong></span>
+              <span class="chip">例题 <strong>5 道</strong></span>
+
+              <span class="chip">推论 <strong>2 个</strong></span></div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标（学完本节你将能够）</h3>
+                <ul>
+                  <li>陈述内积的四条公理，验证一个二元运算是否为内积；</li>
+                  <li>用<strong>度量（Gram）矩阵</strong>计算任意基下向量的内积与长度；</li>
+                  <li>用 Cauchy–Schwarz 不等式定义夹角，掌握长度的三角不等式；</li>
+                  <li>熟练执行 <strong>Schmidt 正交化</strong>，求标准正交基；</li>
+                  <li>运用正交补分解 \(V^n=V_1\oplus V_1^\perp\)，理解矩阵四个子空间的正交关系；</li>
+                  <li>判别正交矩阵、正交变换与对称变换，知道实对称矩阵可正交对角化；</li>
+                  <li>说清酉空间与欧氏空间的平行与差异（共轭、酉矩阵、Hermite 矩阵），陈述正规矩阵的酉对角化定理。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>本节重点</h4>
+                    <ul>
+                      <li>内积公理与度量矩阵；</li>
+                      <li>标准正交基与 Schmidt 正交化；</li>
+                      <li>正交补与子空间直和分解；</li>
+                      <li>正交矩阵 \(Q^{\mathrm T}Q=I\)；</li>
+                      <li>实对称矩阵谱定理。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>学习难点</h4>
+                    <ul>
+                      <li>内积依赖基的选择，但空间维数不变；</li>
+                      <li>不同基的度量矩阵彼此合同；</li>
+                      <li>酉内积对第二变元的共轭线性；</li>
+                      <li>正规矩阵 \(A^{\mathrm H}A=AA^{\mathrm H}\) 的含义。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 8 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>内积、欧氏空间、度量矩阵</td><td class="num">p.80–84</td></tr>
+                    <tr><td class="num">2</td><td>长度、夹角、Cauchy 不等式</td><td class="num">p.84–87</td></tr>
+                    <tr><td class="num">3–4</td><td>正交性、标准正交基、Schmidt 正交化</td><td class="num">p.87–92</td></tr>
+                    <tr><td class="num">5</td><td>正交补、四个子空间、正交变换</td><td class="num">p.92–97</td></tr>
+                    <tr><td class="num">6</td><td>对称变换、实对称矩阵谱定理</td><td class="num">p.97–100</td></tr>
+                    <tr><td class="num">7–8</td><td>酉空间、Schur 加强、正规矩阵与习题</td><td class="num">p.100–108</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 300" role="img" aria-label="内积空间知识脉络图">
+                    <defs><marker id="marrow3" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="30" y="26" width="150" height="44"/><rect x="210" y="26" width="150" height="44"/>
+                      <rect x="390" y="26" width="150" height="44"/><rect x="570" y="26" width="230" height="44"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="105" y="54">内积 (x,y)</text><text x="285" y="54">长度·夹角</text>
+                      <text x="465" y="54">正交·标准正交基</text><text x="685" y="54">Schmidt 正交化·正交补</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#marrow3)">
+                      <line x1="180" y1="48" x2="208" y2="48"/><line x1="360" y1="48" x2="388" y2="48"/><line x1="540" y1="48" x2="568" y2="48"/>
+                    </g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46">
+                      <rect x="90" y="128" width="200" height="44"/><rect x="330" y="128" width="200" height="44"/>
+                      <rect x="570" y="128" width="200" height="44"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="190" y="150">正交变换·正交矩阵</text><text x="430" y="150">对称变换·实对称矩阵</text>
+                      <text x="670" y="150">谱定理（正交对角化）</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#marrow3)">
+                      <line x1="290" y1="150" x2="328" y2="150"/><line x1="530" y1="150" x2="568" y2="150"/>
+                      <path d="M465 72 C465 100 430 100 430 126" stroke-dasharray="4 4"/>
+                    </g>
+                    <g class="fm-node" fill="#f3f0fa" stroke="#6b4e9e">
+                      <rect x="230" y="226" width="170" height="44"/><rect x="440" y="226" width="170" height="44"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="315" y="247">酉空间·酉矩阵</text><text x="525" y="247">Hermite·正规矩阵</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#marrow3)"><line x1="400" y1="248" x2="438" y2="248"/></g>
+                    <g class="fm-edge" marker-end="url(#marrow3)">
+                      <path d="M105 72 C60 160 230 190 280 224" stroke-dasharray="4 4"/>
+                      <path d="M685 72 C650 160 560 190 540 224" stroke-dasharray="4 4"/>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、Euclid 空间的定义与性质 ================= -->
+          <section class="section" id="sec-euclid">
+            <h2 class="sec-title"><span class="cn">一</span>Euclid 空间的定义与性质</h2>
+            <p>线性空间中向量的基本运算仅是线性运算。但以解析几何的三维空间 \(\R^3\) 为模型，向量的<strong>长度、夹角</strong>在实际问题（包括几何问题）中地位特殊。这些度量都可通过<strong>数量积</strong>表达，于是先引入与数量积类似的概念——内积。</p>
+
+            <h3 class="sub-title" id="def-inner-product">1. 内积公理（定义 1.22）</h3>
+            <section class="card def" id="def-1-22">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.22</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(V\) 是实数域 \(\R\) 上的线性空间，对 \(V\) 中任二向量 \(x,y\)，按某规则定义一个实数，记为 \((x,y)\)，且它满足下列四个条件：</p>
+                <ol class="axiom-list" style="list-style:none">
+                  <li><span class="n">1</span>交换律：\((x,y)=(y,x)\)；</li>
+                  <li><span class="n">2</span>分配律：\((x,y+z)=(x,y)+(x,z)\)；</li>
+                  <li><span class="n">3</span>齐次性：\((kx,y)=k(x,y)\quad(\forall k\in\R)\)；</li>
+                  <li><span class="n">4</span>非负性：\((x,x)\ge 0\)，当且仅当 \(x=\mathbf 0\) 时 \((x,x)=0\)。</li>
+                </ol>
+                <p style="margin-bottom:0">则称 \(V\) 为 <strong>Euclid 空间</strong>，简称<strong>欧氏空间</strong>或<strong>实内积空间</strong>。欧氏空间首先是定义了内积的实线性空间，因此又称有内积空间；它是一种<strong>特殊的实线性空间</strong>。</p>
+              </div>
+            </section>
+            <p>内积与向量的线性运算是彼此无关的运算，所以<strong>不论内积如何规定，都不影响该线性空间的维数</strong>。欧氏空间的子空间显然也是欧氏空间。</p>
+
+            <h3 class="sub-title" id="inner-product-examples">2. 三个标准欧氏空间</h3>
+            <div class="grid3">
+              <div class="mini-card">
+                <div class="mc-title">① \(\R^n\)：数量积</div>
+                <p style="margin:0">对 \(x=(\xi_1,\ldots,\xi_n)\)、\(y=(\eta_1,\ldots,\eta_n)\)，规定
+                  \[ (x,y)=\xi_1\eta_1+\cdots+\xi_n\eta_n=xy^{\mathrm T}. \tag{1.3.1} \]
+                  直接验证四公理成立，故 \(\R^n\) 是欧氏空间。</p>
+              </div>
+              <div class="mini-card">
+                <div class="mc-title">② \(C(a,b)\)：积分内积（无限维）</div>
+                <p style="margin:0">对连续函数 \(f(t),g(t)\)，规定
+                  \[ (f(t),g(t))=\int_a^b f(t)g(t)\,\mathrm dt. \tag{1.3.2} \]
+                  由定积分性质满足四公理，故 \(C(a,b)\) 是无限维欧氏空间。</p>
+              </div>
+              <div class="mini-card">
+                <div class="mc-title">③ \(\R^{n\times n}\)：Frobenius 内积</div>
+                <p style="margin:0">对矩阵 \(A=(a_{ij}),B=(b_{ij})\)，规定
+                  \[ (A,B)=\sum_{i,j=1}^n a_{ij}b_{ij}=\tr(AB^{\mathrm T}). \]
+                  故矩阵空间 \(\R^{n\times n}\) 也是欧氏空间。</p>
+              </div>
+            </div>
+
+            <h3 class="sub-title" id="ip-props">3. 内积的基本性质</h3>
+            <p>由定义 1.22 直接可得：</p>
+            <ul>
+              <li><strong>性质 1：</strong>\((x,ky)=k(x,y)\)（第二变元也齐次，因为交换律）；</li>
+              <li><strong>性质 2：</strong>\((x,\mathbf 0)=(\mathbf 0,x)=0\)；</li>
+              <li><strong>性质 3（双线性）：</strong>
+                <div class="eq-scroll">\[ \left(\sum_{i=1}^n\xi_i x_i,\ \sum_{j=1}^n\eta_j y_j\right)=\sum_{i,j=1}^n \xi_i\eta_j(x_i,y_j). \]</div></li>
+            </ul>
+
+            <h3 class="sub-title" id="gram-matrix">4. 度量矩阵（Gram 矩阵）</h3>
+            <p>设 \(x_1,\ldots,x_n\) 是 \(n\) 维欧氏空间 \(V^n\) 的一个基，
+              \[ x=\sum_{i=1}^n\xi_i x_i,\qquad y=\sum_{j=1}^n\eta_j x_j. \]
+              由性质 3，
+              <div class="eq-scroll">\[ (x,y)=\sum_{i,j=1}^n \xi_i\eta_j(x_i,x_j)=\sum_{i,j=1}^n a_{ij}\xi_i\eta_j, \tag{1.3.4} \]</div>
+              其中 \(a_{ij}=(x_i,x_j)\)。写成矩阵形式：
+              <div class="eq-scroll">\[ (x,y)=(\xi_1,\ldots,\xi_n)\,A\,(\eta_1,\ldots,\eta_n)^{\mathrm T}, \tag{1.3.5} \]</div>
+              矩阵
+              <div class="eq-scroll">\[
+              A=(a_{ij})=\begin{pmatrix}
+              (x_1,x_1)&\cdots&(x_1,x_n)\\
+              \vdots&&\vdots\\
+              (x_n,x_1)&\cdots&(x_n,x_n)
+              \end{pmatrix}
+              \tag{1.3.6}
+              \]</div>
+              称为基 \(x_1,\ldots,x_n\) 下的<strong>度量矩阵</strong>（<strong>Gram 矩阵</strong>）。</p>
+            <p>因为 \((x_i,x_j)=(x_j,x_i)\)，所以 \(A\) 是<strong>对称矩阵</strong>；又因对任意 \(x\ne\mathbf 0\) 有 \((x,x)&gt;0\)，所以 \(A\) 是<strong>正定矩阵</strong>。若矩阵 \(A\) 非奇异，则 \(A^{\mathrm T}A\) 必对称正定——因为 \(A\) 的列向量可视为 \(\R^n\) 的一个基，而 \(\R^n\) 对该基的度量矩阵正是 \(A^{\mathrm T}A\)。</p>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意：知道度量矩阵 = 知道一切内积</span>
+              </header>
+              <div class="card-body">
+                <p>由式 (1.3.6)，只要知道任意两个基向量的内积，就知道了 \(A\)，也就知道了任意两向量的内积。<strong>度量矩阵完全确定了内积</strong>，因此可以用任意正定矩阵作为度量矩阵来规定内积。稍后向量的长度、夹角等度量都能用内积刻画——这就是"度量矩阵"名称的涵义。</p>
+              </div>
+            </aside>
+
+            <section class="card ex" id="exm-1-31">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.31</span><span class="card-tag">不同基的度量矩阵合同</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(x_1,\ldots,x_n\) 与 \(y_1,\ldots,y_n\) 是欧氏空间 \(V^n\) 的两个基，度量矩阵分别为 \(A=(a_{ij})\)、\(B=(b_{ij})\)。求证 \(A\) 与 \(B\) <strong>合同</strong>。</p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>设 \((y_1,\ldots,y_n)=(x_1,\ldots,x_n)C\)，\(C=(c_{ij})\) 为过渡矩阵，则 \(y_i=\sum_{s=1}^n c_{si}x_s\)。于是
+                      <div class="eq-scroll">\[
+                      (y_i,y_j)=\sum_{s,t=1}^n c_{si}c_{tj}(x_s,x_t)=(c_{1i},\ldots,c_{ni})\,A\,(c_{1j},\ldots,c_{nj})^{\mathrm T},
+                      \]</div>
+                      按矩阵乘法这正是 \(C^{\mathrm T}AC\) 的第 \((i,j)\) 元，故
+                      \[ B=C^{\mathrm T}AC. \]</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+          </section>
+          <!-- ================= 二、长度、夹角与正交性 ================= -->
+          <section class="section" id="sec-orthogonality">
+            <h2 class="sec-title"><span class="cn">二</span>长度、夹角与正交性</h2>
+
+            <h3 class="sub-title" id="length">1. 向量的长度（定义 1.23）</h3>
+            <section class="card def" id="def-1-23">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.23</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">在欧氏空间 \(V\) 中，非负实数 \(\sqrt{(x,x)}\) 称为向量 \(x\) 的<strong>长度</strong>（或<strong>模、范数</strong>），记为 \(|x|\)（或 \(\|x\|_2\)）：
+                  <div class="eq-scroll">\[ |x|=\sqrt{(x,x)}. \tag{1.3.7} \]</div>
+                  非零向量长度为正，只有零向量长度才是零。</p>
+              </div>
+            </section>
+            <p>长度满足：
+              <div class="eq-scroll">\[ |kx|=|k|\,|x|, \tag{1.3.8} \]</div>
+              <div class="eq-scroll">\[ |x+y|\le |x|+|y|\quad\text{（三角不等式）}. \tag{1.3.9} \]</div>
+              式 (1.3.8) 由 \(|kx|=\sqrt{k^2(x,x)}=|k|\sqrt{(x,x)}\) 立得。</p>
+            <p>在 \(\R^n\) 中 \(|x|=\sqrt{\xi_1^2+\cdots+\xi_n^2}\)；在 \(C(a,b)\) 中 \(|f(t)|=\sqrt{\int_a^b f^2(t)\,\mathrm dt}\)。长度为 1 的向量称<strong>单位向量</strong>；若 \(x\ne\mathbf 0\)，则
+              <div class="eq-scroll">\[ \frac{1}{|x|}x \tag{1.3.10} \]</div>
+              是单位向量，此过程称把 \(x\) <strong>单位化（规范化）</strong>。</p>
+
+            <h3 class="sub-title" id="cauchy">2. 夹角与 Cauchy–Schwarz 不等式（定义 1.24）</h3>
+            <p>解析几何中夹角余弦可由数量积表示：
+              <div class="eq-scroll">\[ \cos\langle x,y\rangle=\frac{(x,y)}{|x|\,|y|}. \tag{1.3.11} \]</div>
+              要用它定义一般欧氏空间的夹角，须先证明右端绝对值不超过 1，即
+              <div class="eq-scroll">\[ |(x,y)|\le |x|\,|y|. \tag{1.3.12} \]</div></p>
+            <section class="card thm" id="thm-cs">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">Cauchy–Буняковский 不等式</span><span class="card-tag">等号 ⇔ 线性相关</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">对任意 \(x,y\) 有 \(|(x,y)|\le|x||y|\)，当且仅当 \(x,y\) 线性相关时等号成立。</p>
+                <details class="proof">
+                  <summary><span>证明（配方法，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>对任意实数 \(t\)，由非负性 \((x-ty,x-ty)\ge0\)，展开为关于 \(t\) 的二次三项式
+                      \[ (y,y)t^2-2(x,y)t+(x,x)\ge0. \]
+                      恒非负要求判别式不大于零：\((x,y)^2-(x,x)(y,y)\le0\)，即 \((x,y)^2\le|x|^2|y|^2\)，开方得 (1.3.12)。</p>
+                    <p>若 \(x,y\) 线性相关，直接代入知等号成立；反之若等号成立，取 \(t=|x|/|y|\) 得 \(|x-ty|^2=0\)，即 \(x=ty\)，二者线性相关。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <section class="card def" id="def-1-24">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.24</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">非零向量 \(x,y\) 的夹角规定为
+                  <div class="eq-scroll">\[ \langle x,y\rangle=\arccos\frac{(x,y)}{|x||y|},\qquad 0\le\langle x,y\rangle\le\pi. \tag{1.3.13} \]</div></p>
+              </div>
+            </section>
+            <div class="grid2">
+              <div class="mini-card"><div class="mc-title">在 \(\R^n\) 中（Cauchy 不等式）</div><p style="margin:0">
+                \[ |\xi_1\eta_1+\cdots+\xi_n\eta_n|\le\sqrt{\sum\xi_i^2}\sqrt{\sum\eta_i^2}. \tag{1.3.14} \]</p></div>
+              <div class="mini-card"><div class="mc-title">在 \(C(a,b)\) 中（Schwarz 不等式）</div><p style="margin:0">
+                \[ \left|\int_a^b f(t)g(t)\,\mathrm dt\right|\le\left(\int_a^b f^2\right)^{1/2}\left(\int_a^b g^2\right)^{1/2}. \tag{1.3.15} \]</p></div>
+            </div>
+            <p>利用 (1.3.12) 可证三角不等式 (1.3.9)：
+              \[ |x+y|^2=(x+y,x+y)=(x,x)+2(x,y)+(y,y)\le |x|^2+2|x||y|+|y|^2=(|x|+|y|)^2, \]
+              开平方即可。它表明三角形任意两边之和不小于第三边。</p>
+
+            <h3 class="sub-title" id="orthogonal-basis">3. 正交、正交向量组与标准正交基</h3>
+            <section class="card def" id="def-1-25">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.25</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">若 \((x,y)=0\)，则称 \(x\) 与 \(y\) <strong>正交（垂直）</strong>，记 \(x\perp y\)。正交是对称的；零向量与任意向量正交；若两个非零正交向量线性相关，则其中至少一个是零向量（故<strong>非零正交向量必无关</strong>）。</p>
+              </div>
+            </section>
+            <section class="card ex" id="exm-1-32">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.32</span><span class="card-tag">三角函数正交系</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">区间 \((-\pi,\pi)\) 上的三角函数组
+                  \[ 1,\cos t,\sin t,\cos 2t,\sin 2t,\ldots,\cos kt,\sin kt,\ldots \]
+                  任意两个不同函数在 \(\int_{-\pi}^{\pi}f(t)g(t)\,\mathrm dt=0\) 意义下互相正交。这是 Fourier 级数的基础。</p>
+              </div>
+            </section>
+            <p><strong>勾股弦定理（定理 1.31）：</strong>若 \(x\perp y\)，则
+              <div class="eq-scroll">\[ |x+y|^2=|x|^2+|y|^2. \tag{1.3.16} \]</div>
+              推广：若 \(x_1,\ldots,x_m\) 是正交向量组，则 \(|x_1+\cdots+x_m|^2=\sum|x_i|^2\)。</p>
+            <section class="card thm" id="thm-1-32">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.32</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">正交向量组必线性无关。</p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>设 \(\sum k_i x_i=\mathbf 0\)，两端与 \(x_i\) 作内积得 \(k_i(x_i,x_i)=0\)；因 \(x_i\ne\mathbf 0\)，\((x_i,x_i)&gt;0\)，故每个 \(k_i=0\)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0">因此 \(n\) 维欧氏空间中两两正交的非零向量不超过 \(n\) 个（平面上找不到三个、\(\R^3\) 中找不到四个两两垂直的非零向量）。</p>
+              </div>
+            </section>
+            <section class="card def" id="def-1-26-27">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.26–1.27</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">一组两两正交的非零向量称<strong>正交向量组</strong>；由 \(n\) 个非零正交向量组成的基称<strong>正交基</strong>；再若每个向量长度都是 1，则称<strong>标准正交基</strong>（法正交基），其基向量称<strong>单位坐标向量</strong>。式 (1.1.3) 中的 \(e_1,\ldots,e_n\) 就是 \(\R^n\) 的标准正交基。</p>
+              </div>
+            </section>
+            <p>一个基是标准正交基的充要条件是它的度量矩阵为单位矩阵：
+              <div class="eq-scroll">\[ (x_i,x_j)=\delta_{ij}=\begin{cases}1&(i=j)\\0&(i\ne j)\end{cases}, \]</div>
+              其中 \(\delta_{ij}\) 是 <strong>Kronecker 记号</strong>。取标准正交基后内积有最简单形式，且向量坐标可直接由内积读出（<strong>Fourier 展开</strong>）：
+              <div class="eq-scroll">\[ x=(x_1,x)x_1+(x_2,x)x_2+\cdots+(x_n,x)x_n,\qquad \xi_i=(x_i,x). \tag{1.3.17} \]</div></p>
+
+            <h3 class="sub-title" id="schmidt">4. Schmidt 正交化（定理 1.33、例 1.33）</h3>
+            <section class="card thm" id="thm-1-33">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.33</span><span class="card-tag">标准正交基总存在</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">欧氏空间 \(V^n\) 的任一基 \(x_1,\ldots,x_n\) 都可找到一个标准正交基 \(y_1,\ldots,y_n\)。换言之，任一非零欧氏空间都有正交基和标准正交基。证明由下面的 <strong>Schmidt 正交化方法</strong>构造性给出。</p>
+              </div>
+            </section>
+            <p>给定基 \(x_1,\ldots,x_n\)，先做<strong>正交化</strong>：令 \(y_1'=x_1\)；每加入一个新向量，就减去它在已有正交向量上的全部投影：
+              <div class="eq-scroll">\[
+              y_{m+1}'=x_{m+1}-\frac{(x_{m+1},y_m')}{(y_m',y_m')}y_m'-\cdots-\frac{(x_{m+1},y_1')}{(y_1',y_1')}y_1'.
+              \tag{1.3.18}
+              \]</div>
+              可逐一验证 \((y_{m+1}',y_i')=0\)。再做<strong>单位化</strong>：
+              <div class="eq-scroll">\[ y_i=\frac{1}{|y_i'|}y_i'\quad(i=1,\ldots,n). \]</div>
+              整个过程称把基<strong>正交单位化（正交规范化）</strong>。</p>
+            <section class="card ex" id="exm-1-33">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.33</span>
+              </header>
+              <div class="card-body">
+                <p>把 \(x_1=(1,1,0,0),x_2=(1,0,1,0),x_3=(-1,0,0,1),x_4=(1,-1,-1,1)\) 正交单位化，结果为
+                  \[ y_1=\Big(\tfrac1{\sqrt2},\tfrac1{\sqrt2},0,0\Big),\quad
+                     y_2=\Big(\tfrac1{\sqrt6},\tfrac{-1}{\sqrt6},\tfrac2{\sqrt6},0\Big), \]
+                  \[ y_3=\Big(\tfrac{-1}{\sqrt{12}},\tfrac1{\sqrt{12}},\tfrac1{\sqrt{12}},\tfrac3{\sqrt{12}}\Big),\quad
+                     y_4=\Big(\tfrac12,\tfrac{-1}2,\tfrac{-1}2,\tfrac12\Big). \]</p>
+              </div>
+            </section>
+            <h3 class="sub-title" id="gs-lab-title">动手实验：Schmidt 正交化分步演示（R³）</h3>
+            <section class="card lab" data-gs-lab></section>
+            <h3 class="sub-title" id="angle-lab-title">动手实验：内积、长度与夹角实验室</h3>
+            <p>改一改两个向量，观察内积、长度、夹角的联动；特别试试正交（内积 0）和平行（\(|\cos|=1\)）两种边界。</p>
+            <section class="card lab" data-angle-lab></section>
+          </section>
+          <!-- ================= 三、正交补 ================= -->
+          <section class="section" id="sec-orthocomplement">
+            <h2 class="sec-title"><span class="cn">三</span>正交补空间</h2>
+            <p><strong>性质 1：</strong>若 \(x_1,\ldots,x_m\) 每个都与 \(y\) 正交，则它们的任意线性组合也与 \(y\) 正交：\((\sum k_ix_i,y)=\sum k_i(x_i,y)=0\)。</p>
+            <p><strong>性质 2：</strong>向量 \(y\) 与子空间 \(V_1\) 正交（即与 \(V_1\) 中每个向量正交）的充要条件是 \(y\) 与 \(V_1\) 的每一基向量正交。</p>
+            <section class="card def" id="def-orth-complement">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">正交补</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">欧氏空间 \(V^n\) 中所有与子空间 \(V_1\) 正交的向量的集合记为 \(V_1^\perp\)。它是一个子空间（若 \(x,y\in V_1^\perp\)，则 \((x+y,z)=(kx,z)=0\) 对一切 \(z\in V_1\) 成立），称 \(V_1\) 的<strong>正交补空间</strong>（正交补）。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-1-34">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.34（正交分解）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">任一欧氏空间 \(V^n\) 都可直和分解为
+                  <div class="eq-scroll">\[ V^n=V_1\oplus V_1^\perp. \]</div></p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>取 \(V_1\) 的标准正交基 \(x_1,\ldots,x_m\)。任取 \(x\in V^n\)，令
+                      \[ y=\sum_{i=1}^m(x_i,x)x_i\in V_1,\qquad z=x-y. \]
+                      则 \((z,x_i)=(x,x_i)-(y,x_i)=0\)，故 \(z\in V_1^\perp\)，即 \(x=y+z\)，所以 \(V^n=V_1+V_1^\perp\)。又二者之交只有零向量，由定理 1.7 得直和。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p><strong>推论：</strong>\(\dim V_1^\perp=n-m\)，即
+                  <div class="eq-scroll">\[ \dim V_1+\dim V_1^\perp=n. \]</div></p>
+              </div>
+            </section>
+            <p>应用：秩为 \(r\) 的齐次线性方程组
+              <div class="eq-scroll">\[ a_{i1}\xi_1+\cdots+a_{in}\xi_n=0\quad(i=1,\ldots,m) \tag{1.3.19} \]</div>
+              的解空间，正是系数矩阵各行向量（生成 \(V_1=L(x_1,\ldots,x_r)\)）的正交补 \(V_1^\perp\)，故解空间维数为 \(n-r\)。</p>
+            <section class="card thm" id="thm-1-35">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.35（矩阵四个子空间的正交关系）</span><span class="card-tag">数值代数基石</span>
+              </header>
+              <div class="card-body">
+                <p>对任意 \(A=(a_{ij})_{m\times n}\in\R^{m\times n}\)：
+                  <div class="eq-scroll">\[
+                  R^\perp(A)=N(A^{\mathrm T}),\quad R(A)\oplus N(A^{\mathrm T})=\R^m, \tag{1.3.20}
+                  \]</div>
+                  <div class="eq-scroll">\[
+                  R^\perp(A^{\mathrm T})=N(A),\quad R(A^{\mathrm T})\oplus N(A)=\R^n. \tag{1.3.21}
+                  \]</div></p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>记 \(A\) 的列为 \(a_j\)，\(V_1=R(A)=L(a_1,\ldots,a_n)\subset\R^m\)。则
+                      \[ V_1^\perp=\{y:y\perp a_j,\ j=1,\ldots,n\}=\{y:a_j^{\mathrm T}y=0\}=\{y:A^{\mathrm T}y=0\}=N(A^{\mathrm T}). \]
+                      由定理 1.34 得直和分解；转置同理。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0">当 \(A\in\C^{m\times n}\) 时，把 \(A^{\mathrm T}\) 换成共轭转置 \(A^{\mathrm H}\) 结论仍成立。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 四、正交变换与正交矩阵 ================= -->
+          <section class="section" id="sec-orthogonal-transform">
+            <h2 class="sec-title"><span class="cn">四</span>正交变换与正交矩阵</h2>
+            <p>旋转保持向量长度不变。把这一性质抽象出来：</p>
+            <section class="card def" id="def-1-28">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.28</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">欧氏空间 \(V\) 的线性变换 \(T\) 若保持任意向量 \(x\) 的长度不变：
+                  <div class="eq-scroll">\[ (x,x)=(Tx,Tx), \tag{1.3.22} \]</div>
+                  则称 \(T\) 为<strong>正交变换</strong>。坐标平面的旋转就是正交变换。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-1-36">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.36</span><span class="card-tag">保长 ⇔ 保内积</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">\(T\) 是正交变换的充要条件是对任意 \(x,y\)
+                  <div class="eq-scroll">\[ (x,y)=(Tx,Ty). \]</div>
+                  即正交变换保持内积（因而保持长度、夹角与正交关系）。</p>
+                <details class="proof">
+                  <summary><span>证明（极化恒等式，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>充分性令 \(y=x\) 即得。必要性由
+                      \[ (x-y,x-y)=(T(x-y),T(x-y))=(Tx-Ty,Tx-Ty) \]
+                      两边展开并利用保长条件，比较即得 \((x,y)=(Tx,Ty)\)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <section class="card def" id="def-1-29">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.29</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">实方阵 \(Q\) 满足
+                  <div class="eq-scroll">\[ Q^{\mathrm T}Q=I\quad\text{或}\quad Q^{-1}=Q^{\mathrm T} \]</div>
+                  则称 \(Q\) 为<strong>正交矩阵</strong>。其充要条件是列（行）向量为两两正交的单位向量。</p>
+              </div>
+            </section>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>结论</th><th>内容</th></tr>
+                <tr><td><strong>定理 1.37</strong></td><td>欧氏空间线性变换 \(T\) 是正交变换 ⇔ 它在标准正交基下的矩阵 \(A\) 是正交矩阵。必要性：\((Tx_i,Tx_j)=(x_i,x_j)=\delta_{ij}\)，故 \(A\) 的列是标准正交组；充分性：标准正交基下 \((Tx,Tx)=\xi^{\mathrm T}A^{\mathrm T}A\xi=\xi^{\mathrm T}\xi=(x,x)\)。</td></tr>
+                <tr><td><strong>例 1.34</strong></td><td>两个标准正交基之间的过渡矩阵 \(A\) 必为正交矩阵（因为新基各列在旧标准正交基下两两单位正交）。</td></tr>
+                <tr><td>推论 1</td><td>正交矩阵非奇异，且 \(\det(Q^{\mathrm T}Q)=(\det Q)^2=1\)，故 \(\det Q=\pm1\)（\(+1\) 对应旋转，\(-1\) 含反射）。</td></tr>
+                <tr><td>推论 2、3</td><td>正交矩阵的逆仍是正交矩阵；两个正交矩阵之积仍是正交矩阵。故正交变换之积、逆变换都是正交变换。</td></tr>
+              </table>
+            </div>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意</span>
+              </header>
+              <div class="card-body"><p>正交变换在标准正交基下的矩阵才是正交矩阵；在别的基下可能不是。习题第 9 题的<strong>镜面反射</strong> \(Tx=x-2(y,x)y\)（\(|y|=1\)）也是正交变换，它是 QR 算法与 Householder 变换的原型。</p></div>
+            </aside>
+          </section>
+
+          <!-- ================= 五、对称变换与对称矩阵 ================= -->
+          <section class="section" id="sec-symmetric-transform">
+            <h2 class="sec-title"><span class="cn">五</span>对称变换与实对称矩阵</h2>
+            <section class="card def" id="def-1-30">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.30</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">欧氏空间 \(V\) 的线性变换 \(T\) 若对任意 \(x,y\) 满足
+                  <div class="eq-scroll">\[ (Tx,y)=(x,Ty), \tag{1.3.23} \]</div>
+                  则称 \(T\) 为<strong>对称变换</strong>。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-1-38">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.38</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">欧氏空间线性变换 \(T\) 是对称变换，充要条件是它在标准正交基下的矩阵为<strong>实对称矩阵</strong>（\(A^{\mathrm T}=A\)）。证明即在标准正交基下把 \((Tx,y)\) 与 \((x,Ty)\) 写成坐标矩阵形式比较。</p>
+              </div>
+            </section>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>实对称矩阵的性质</th><th>内容</th></tr>
+                <tr><td><strong>定理 1.39</strong></td><td>实对称矩阵的特征值都是实数。证明：由 \(Ax=\lambda x\) 取共轭转置得 \(\bar\lambda\,\bar x^{\mathrm T}x=\bar x^{\mathrm T}Ax=\lambda\bar x^{\mathrm T}x\)，而 \(\bar x^{\mathrm T}x=\sum|\xi_i|^2&gt;0\)，故 \(\bar\lambda=\lambda\)。</td></tr>
+                <tr><td><strong>定理 1.40</strong></td><td>实对称矩阵不同特征值对应的特征向量互相正交：\((\lambda_1-\lambda_2)x_1^{\mathrm T}x_2=0\) 且 \(\lambda_1\ne\lambda_2\)。同一特征值的无关特征向量可用 Schmidt 方法正交化。</td></tr>
+              </table>
+            </div>
+            <p>由这两条性质，实对称矩阵不仅可对角化，而且能用<strong>正交矩阵</strong>对角化（谱定理，见后文推论）：
+              \[ Q^{\mathrm T}AQ=Q^{-1}AQ=\diag(\lambda_1,\ldots,\lambda_n). \]
+              这是 PCA（主成分分析）、二次型化标准形的直接理论依据。</p>
+          </section>
+          <!-- ================= 六、酉空间介绍 ================= -->
+          <section class="section" id="sec-unitary">
+            <h2 class="sec-title"><span class="cn">六</span>酉空间介绍</h2>
+            <p>欧氏空间针对实数域。<strong>酉空间</strong>是复数域 \(\C\) 上与之平行的理论，本节只列举主要结论，证明思路与欧氏空间相同。</p>
+            <section class="card def" id="def-1-31">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.31</span><span class="card-tag">复内积</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(V\) 是复数域 \(\C\) 上的线性空间，对任二向量 \(x,y\) 规定一个复数 \((x,y)\)，满足：</p>
+                <ol class="axiom-list" style="list-style:none">
+                  <li><span class="n">1</span>共轭交换律：\((x,y)=\overline{(y,x)}\)（\(\overline{\ \cdot\ }\) 表示共轭复数）；</li>
+                  <li><span class="n">2</span>分配律：\((x,y+z)=(x,y)+(x,z)\)；</li>
+                  <li><span class="n">3</span>齐次性：\((kx,y)=k(x,y)\quad(\forall k\in\C)\)；</li>
+                  <li><span class="n">4</span>非负性：\((x,x)\ge 0\)（它必为<strong>实数</strong>），当且仅当 \(x=\mathbf 0\) 时为 0。</li>
+                </ol>
+                <p style="margin-bottom:0">称 \((x,y)\) 为复内积，\(V\) 为<strong>酉空间</strong>（复内积空间）。</p>
+              </div>
+            </section>
+            <section class="card ex" id="exm-1-35">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.35</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">在 \(\C^n\) 中对 \(x=(\xi_1,\ldots,\xi_n)\)、\(y=(\eta_1,\ldots,\eta_n)\) 规定
+                  <div class="eq-scroll">\[ (x,y)=\xi_1\overline{\eta_1}+\cdots+\xi_n\overline{\eta_n}=xy^{\mathrm H}, \tag{1.3.24} \]</div>
+                  其中 \(y^{\mathrm H}=\overline{y}^{\mathrm T}\)（共轭转置）。它满足四公理，故 \(\C^n\) 是酉空间，且
+                  <div class="eq-scroll">\[ (x,x)=\xi_1\overline{\xi_1}+\cdots+\xi_n\overline{\xi_n}=\sum_{i=1}^n|\xi_i|^2. \tag{1.3.25} \]</div></p>
+              </div>
+            </section>
+            <p>由定义直接可得：</p>
+            <div class="grid2">
+              <div class="mini-card"><div class="mc-title">第二变元共轭线性</div><p style="margin:0">\((x,ky)=\overline{k}(x,y)\)。注意这与欧氏空间不同：复数系数提到第二个位置要取共轭，提到第一个位置不用。</p></div>
+              <div class="mini-card"><div class="mc-title">长度与 Cauchy 不等式</div><p style="margin:0">长度仍为 \(|x|=\sqrt{(x,x)}\)；\((x,y)(y,x)\le(x,x)(y,y)\)，等号当且仅当线性相关。夹角用 \(\cos^2\langle x,y\rangle=\dfrac{(x,y)(y,x)}{(x,x)(y,y)}\) 定义；\((x,y)=0\) 即正交。</p></div>
+            </div>
+            <p>酉空间中同样有：Schmidt 正交化方法、标准正交基（任一非零酉空间都存在）、正交补直和分解 \(V^n=V_1\oplus V_1^\perp\)。结论 (9)–(13)：</p>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>对象</th><th>定义与判据</th></tr>
+                <tr><td><strong>酉变换</strong></td><td>保持长度 \((x,x)=(Tx,Tx)\) 的线性变换；充要条件是保持内积 \((x,y)=(Tx,Ty)\)。</td></tr>
+                <tr><td><strong>酉矩阵</strong></td><td>酉变换在标准正交基下的矩阵 \(A\) 满足
+                  <div class="eq-scroll" style="margin-top:4px">\[ A^{\mathrm H}A=AA^{\mathrm H}=I,\qquad A^{-1}=A^{\mathrm H}. \]</div>
+                  酉矩阵的逆与乘积仍是酉矩阵。</td></tr>
+                <tr><td><strong>Hermite 变换（酉对称变换）</strong></td><td>满足 \((Tx,y)=(x,Ty)\)；在标准正交基下的矩阵是 <strong>Hermite 矩阵</strong> \(A^{\mathrm H}=A\)。</td></tr>
+                <tr><td>Hermite 矩阵性质</td><td>特征值全是实数；属于不同特征值的特征向量必正交。</td></tr>
+              </table>
+            </div>
+
+            <h3 class="sub-title" id="schur-strong">1. Schur 定理的加强（定理 1.41）</h3>
+            <section class="card thm" id="thm-1-41">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.41</span>
+              </header>
+              <div class="card-body">
+                <p>（1）设 \(A\in\C^{n\times n}\) 的特征值为 \(\lambda_1,\ldots,\lambda_n\)，则存在<strong>酉矩阵</strong> \(P\) 使
+                  <div class="eq-scroll">\[
+                  P^{-1}AP=P^{\mathrm H}AP=
+                  \begin{pmatrix}
+                  \lambda_1&*&\cdots&*\\&\lambda_2&\ddots&\vdots\\&&\ddots&*\\&&&\lambda_n
+                  \end{pmatrix}.
+                  \tag{1.3.26}
+                  \]</div>
+                  （2）设 \(A\in\R^{n\times n}\) 且特征值 \(\lambda_i\in\R\) 全为实数，则存在<strong>正交矩阵</strong> \(Q\) 使
+                  <div class="eq-scroll">\[
+                  Q^{-1}AQ=Q^{\mathrm T}AQ=
+                  \begin{pmatrix}
+                  \lambda_1&*&\cdots&*\\&\lambda_2&\ddots&\vdots\\&&\ddots&*\\&&&\lambda_n
+                  \end{pmatrix}.
+                  \tag{1.3.27}
+                  \]</div>
+                  证明与定理 1.17 相仿，用数学归纳法，只是每一步把普通基向量换成标准正交基（酉矩阵）。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="normal-matrix">2. 正规矩阵与酉对角化（定义 1.32、定理 1.42）</h3>
+            <section class="card def" id="def-1-32">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.32</span><span class="card-tag">正规矩阵</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\C^{n\times n}\)，若
+                  <div class="eq-scroll">\[ A^{\mathrm H}A=AA^{\mathrm H}, \tag{1.3.28} \]</div>
+                  则称 \(A\) 为<strong>正规矩阵</strong>。正交矩阵、酉矩阵、对角矩阵、实对称矩阵、Hermite 矩阵都是正规矩阵。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-1-42">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.42（谱定理的一般形式）</span><span class="card-tag">酉相似对角 ⇔ 正规</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">（1）\(A\in\C^{n\times n}\) 能<strong>酉相似于对角矩阵</strong>的充要条件是 \(A\) 为正规矩阵；<br>
+                  （2）\(A\in\R^{n\times n}\) 且特征值全为实数时，能<strong>正交相似于对角矩阵</strong>的充要条件是 \(A\) 正规。</p>
+                <details class="proof">
+                  <summary><span>证明思路（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>必要性：若 \(P^{\mathrm H}AP=\Lambda\)（对角），则 \(A=P\Lambda P^{\mathrm H}\)，代入得 \(A^{\mathrm H}A=P\bar\Lambda\Lambda P^{\mathrm H}=P\Lambda\bar\Lambda P^{\mathrm H}=AA^{\mathrm H}\)。</p>
+                    <p>充分性：由定理 1.41 有 \(P^{\mathrm H}AP=B\)（上三角），正规性给出 \(B^{\mathrm H}B=BB^{\mathrm H}\)，逐次比较对角元可推出所有非对角元 \(b_{12}=b_{13}=\cdots=b_{n-1,n}=0\)，即 \(B\) 为对角阵。</p>
+                    <p><strong>推论 1：</strong>实对称矩阵正交相似于对角矩阵。<strong>推论 2：</strong>欧氏空间的对称变换存在标准正交基使其矩阵为对角阵（这就是"二次型主轴定理"的代数表述）。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意：相似对角 ≠ 酉（正交）相似对角</span>
+              </header>
+              <div class="card-body">
+                <p>若 \(A^{\mathrm H}A\ne AA^{\mathrm H}\)，则 \(A\) 不能酉（正交）相似于对角阵，但它仍可能<strong>普通相似</strong>于对角阵。例如 \(A=\begin{pmatrix}1&amp;1\\0&amp;2\end{pmatrix}\) 不正规，却因有两个互异特征值而可相似对角化，只是所用的 \(P\) 不是酉矩阵。</p>
+              </div>
+            </aside>
+
+            <h3 class="sub-title" id="spectral-decomp">3. Hermite 矩阵的谱分解</h3>
+            <p>对 \(n\) 阶 Hermite 矩阵 \(A\)，存在酉矩阵 \(P=(p_1,\ldots,p_n)\) 使
+              \[ P^{\mathrm H}AP=\Lambda=\diag(\lambda_1,\ldots,\lambda_n), \]
+              于是
+              <div class="eq-scroll">\[
+              A=P\Lambda P^{\mathrm H}
+              =\lambda_1(p_1p_1^{\mathrm H})+\lambda_2(p_2p_2^{\mathrm H})+\cdots+\lambda_n(p_np_n^{\mathrm H}).
+              \tag{1.3.29}
+              \]</div>
+              记
+              <div class="eq-scroll">\[ B_i=p_ip_i^{\mathrm H}\quad(i=1,\ldots,n), \tag{1.3.30} \]</div>
+              则 \(\rank B_i=1\)，且 \(B_1,\ldots,B_n\) 线性无关。式 (1.3.29) 称 Hermite 矩阵 \(A\) 的<strong>谱分解</strong>——它把矩阵拆成 \(n\) 个互相正交的一维投影的加权和，是谱聚类、PCA 等方法的核心代数语言。</p>
+          </section>
+          <!-- ================= 习题 1.3 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 1.3（共 15 题）</h2>
+            <div class="ex-toolbar">
+              <span data-fold-tools="details.solution">
+                <button type="button" data-fold="open">全部展开解答</button>
+                <button type="button" data-fold="close">全部收起</button>
+              </span>
+              <span class="ex-hint">证明题给出思路，计算题给出关键步骤</span>
+            </div>
+
+            <article class="card task" id="ex3-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">内积验证·度量矩阵</span></header>
+              <div class="card-body">
+                <p>设 \(x=(\xi_1,\ldots,\xi_n),y=(\eta_1,\ldots,\eta_n)\) 是 \(\R^n\) 任二向量，\(A=(a_{ij})_{n\times n}\) 正定，令 \((x,y)=xAy^{\mathrm T}\)。（1）证明在此定义下 \(\R^n\) 形成欧氏空间；（2）求 \(\R^n\) 对单位坐标向量基 \(e_1,\ldots,e_n\) 的度量矩阵；（3）写出 Cauchy 不等式。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>（1）交换律：\(xAy^{\mathrm T}\) 是数，等于其转置 \(yA^{\mathrm T}x^{\mathrm T}=yAx^{\mathrm T}\)（用了 \(A^{\mathrm T}=A\)）；分配、齐次显然；非负性 \((x,x)=xAx^{\mathrm T}\ge0\) 且仅当 \(x=\mathbf0\) 时为 0，这正是正定性定义。</p>
+                  <p>（2）\((e_i,e_j)=e_iAe_j^{\mathrm T}=a_{ij}\)，故度量矩阵就是 \(A\) 本身。（3）\(|xAy^{\mathrm T}|\le\sqrt{xAx^{\mathrm T}}\sqrt{yAy^{\mathrm T}}\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex3-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag">非内积反例</span></header>
+              <div class="card-body">
+                <p>设 \(x_1,\ldots,x_n\) 是实线性空间 \(V^n\) 的基，\(x=\sum\xi_ix_i,\ y=\sum\eta_ix_i\)，对应实数 \((x,y)=\sum_{i=1}^n\xi_i^2\eta_i\)，试问 \(V^n\) 是否欧氏空间？</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p><strong>不是</strong>。交换律不成立：\((x,y)=\sum\xi_i^2\eta_i\) 与 \((y,x)=\sum\eta_i^2\xi_i\) 一般不等（如 \(n=1,\xi_1=2,\eta_1=3\)，得 12 与 18）；齐次性对第二变元也不成立。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex3-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag tag-mid">求夹角</span></header>
+              <div class="card-body">
+                <p>在 \(\R^4\)（内积为数量积）中求 \(x,y\) 的夹角：（1）\(x=(2,1,3,2),y=(1,2,-2,1)\)；（2）\(x=(1,2,2,3),y=(3,1,5,1)\)。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>（1）\((x,y)=2+2-6+2=0\)，故夹角为 \(\pi/2\)（正交）。</p>
+                  <p>（2）\((x,y)=3+2+10+3=18\)，\(|x|=\sqrt{18}=3\sqrt2\)，\(|y|=\sqrt{36}=6\)，故 \(\cos\langle x,y\rangle=\dfrac{18}{18\sqrt2}=\dfrac1{\sqrt2}\)，夹角为 \(\pi/4\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex3-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag tag-mid">求公共正交向量</span></header>
+              <div class="card-body">
+                <p>在 \(\R^4\) 中求一单位向量与 \((1,1,-1,1),(1,-1,-1,1),(2,1,1,3)\) 均正交。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>设 \(z=(\xi_1,\xi_2,\xi_3,\xi_4)\)，解
+                  \[ \xi_1+\xi_2-\xi_3+\xi_4=0,\quad \xi_1-\xi_2-\xi_3+\xi_4=0,\quad 2\xi_1+\xi_2+\xi_3+3\xi_4=0, \]
+                  前两式加减得 \(\xi_1-\xi_3+\xi_4=0,\ \xi_2=0\)，代入第三式得 \(2\xi_1+\xi_3+3\xi_4=0\)，与 \(\xi_3=\xi_1+\xi_4\) 联立解得 \(3\xi_1+4\xi_4=0\)，即 \(z=t(4,0,1,-3)\)（取 \(t=-3\xi_4\)）。其长度为 \(|t|\sqrt{26}\)，单位化得 \(\boxed{\pm\dfrac1{\sqrt{26}}(4,0,1,-3)}\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex3-5">
+              <header class="card-head"><span class="card-label">第 5 题</span><span class="tag tag-mid">求子空间标准正交基</span></header>
+              <div class="card-body">
+                <p>\(x_1,\ldots,x_5\) 是欧氏空间 \(V^5\) 的标准正交基，\(V_1=L(y_1,y_2,y_3)\)，其中 \(y_1=x_1+x_5,\ y_2=x_1-x_2+x_4,\ y_3=2x_1+x_2+x_3\)，求 \(V_1\) 的一个标准正交基。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>在标准正交基下内积就是坐标数量积。三个 \(y\) 在 \(\R^5\) 中的坐标为 \((1,0,0,0,1),(1,-1,0,1,0),(2,1,1,0,0)\)，先 Schmidt 正交化：
+                  \[ z_1=y_1,\quad z_2=y_2-\tfrac12 z_1,\quad z_3=y_3-z_3\text{ 在 }z_1,z_2\text{ 上的投影}, \]
+                  再分别除以各自长度（\(|z_1|=\sqrt2\) 等），即得 \(V_1\) 的标准正交基。这是定理 1.33 推论保证存在的构造性求法。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex3-6">
+              <header class="card-head"><span class="card-label">第 6 题</span><span class="tag tag-hard">Legendre 多项式</span></header>
+              <div class="card-body">
+                <p>在 \(P_3\) 中定义内积 \((f(t),g(t))=\int_{-1}^1 f(t)g(t)\,\mathrm dt\)，求 \(P_3\) 的一个标准正交基（由基 \(1,t,t^2,t^3\) 出发正交单位化）。</p>
+                <details class="solution"><summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>Schmidt 正交化（利用奇偶性在 \([-1,1]\) 上的积分）：
+                  \[ g_0=1,\quad g_1=t,\quad g_2=t^2-\frac13,\quad g_3=t^3-\frac35t. \]
+                  各 \(g_k\) 的范数平方依次为（<strong>注意不是</strong> \(\frac2{2k+1}\)——那是单项式 \(t^k\) 的范数，正交化后数值已改变）：
+                  \[ \|g_0\|^2=2,\quad \|g_1\|^2=\frac23,\quad \|g_2\|^2=\frac8{45},\quad \|g_3\|^2=\frac8{175}, \]
+                  例如 \(\|g_2\|^2=\int_{-1}^1\big(t^2-\frac13\big)^2\mathrm dt=\frac25-\frac49+\frac29=\frac8{45}\)。单位化得到前四个 <strong>Legendre 多项式</strong>：
+                  \[ \frac1{\sqrt2},\quad \sqrt{\frac32}\,t,\quad \sqrt{\frac52}\cdot\frac{3t^2-1}{2},\quad \sqrt{\frac72}\cdot\frac{5t^3-3t}{2}. \]</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex3-7">
+              <header class="card-head"><span class="card-label">第 7 题</span><span class="tag">Gram 矩阵非奇异</span></header>
+              <div class="card-body">
+                <p>设 \(x_1,\ldots,x_m\) 是欧氏空间 \(V^m\) 中一组向量，\(B=\big((x_i,x_j)\big)_{m\times m}\) 为其 Gram 矩阵，证明 \(\det B\ne0\) 的充要条件是 \(x_1,\ldots,x_m\) 线性无关。</p>
+                <details class="solution"><summary><span>证明思路（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>设 \(X=(x_1,\ldots,x_m)\)（视为形式行），则 \(B\) 恰为该向量组在某基（度量矩阵为 \(A\)）下坐标矩阵 \(C\) 满足 \(B=C^{\mathrm T}AC\)。因 \(A\) 正定，\(\det B=0\Leftrightarrow\det C=0\Leftrightarrow C\) 的列相关 \(\Leftrightarrow x_1,\ldots,x_m\) 线性相关。这也是"用 Gram 行列式检验向量组无关"的依据。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex3-8">
+              <header class="card-head"><span class="card-label">第 8 题</span><span class="tag">复四子空间</span></header>
+              <div class="card-body">
+                <p>设 \(A=(a_{ij})_{m\times n}\in\C^{m\times n}\)，证明定理 1.35 仍旧成立（将 \(A^{\mathrm T}\) 改为 \(A^{\mathrm H}\)）。</p>
+                <details class="solution"><summary><span>证明思路（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>复内积下 \(y\perp R(A)\Leftrightarrow(a_j,y)=0\Leftrightarrow a_j^{\mathrm H}y=0\) 对所有列 \(a_j\) 成立，即 \(A^{\mathrm H}y=\mathbf0\)，故 \(R^\perp(A)=N(A^{\mathrm H})\)。其余直和分解由酉空间的正交补定理得到。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex3-9">
+              <header class="card-head"><span class="card-label">第 9 题</span><span class="tag">镜面反射</span></header>
+              <div class="card-body">
+                <p>设 \(y\) 是欧氏空间 \(V\) 中的单位向量，定义 \(Tx=x-2(y,x)y\)，证明 \(T\) 是正交变换（称镜面反射/Householder 变换）。</p>
+                <details class="solution"><summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(T\) 显然是线性变换。计算
+                  \[ (Tx,Tx)=(x-2(y,x)y,\ x-2(y,x)y)=(x,x)-4(y,x)^2+4(y,x)^2(y,y)=(x,x), \]
+                  用了 \((y,y)=1\)。故保长，是正交变换。几何意义：把 \(x\) 沿垂直于 \(y\) 的超平面对称翻转。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex3-10">
+              <header class="card-head"><span class="card-label">第 10 题</span><span class="tag">反对称变换</span></header>
+              <div class="card-body">
+                <p>若线性变换 \(T\) 满足 \((Tx,y)=-(x,Ty)\)，称反对称变换。证明 \(T\) 为反对称变换的充要条件是它在标准正交基下的矩阵 \(A\) 反对称（\(A^{\mathrm T}=-A\)）。</p>
+                <details class="solution"><summary><span>证明思路（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>标准正交基下 \((Tx_i,x_j)=a_{ji}\)、\((x_i,Tx_j)=a_{ij}\)（内积即坐标数量积）。条件 \((Tx_i,x_j)=-(x_i,Tx_j)\) 对一切 \(i,j\) 成立，等价于 \(a_{ji}=-a_{ij}\)，即 \(A^{\mathrm T}=-A\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex3-11">
+              <header class="card-head"><span class="card-label">第 11 题</span><span class="tag tag-hard">正交（酉）对角化</span></header>
+              <div class="card-body">
+                <p>对下列矩阵求正交（酉）矩阵 \(P\)，使 \(P^{-1}AP\) 为对角阵：
+                  （1）\(A=\begin{pmatrix}2&2&-2\\2&5&-4\\-2&-4&5\end{pmatrix}\)；
+                  （2）\(A=\begin{pmatrix}0&\mathrm j&1\\-\mathrm j&0&0\\1&0&0\end{pmatrix}\)。</p>
+                <details class="solution"><summary><span>解法步骤（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>（1）实对称：求特征值与特征向量，<strong>不同特征值的向量自动正交</strong>，同一特征值的多个向量用 Schmidt 正交化，最后全部单位化拼成正交阵 \(Q\)，则 \(Q^{\mathrm T}AQ=\diag(\lambda_1,\lambda_2,\lambda_3)\)。</p>
+                  <p>（2）Hermite（\(A^{\mathrm H}=A\)）：步骤相同，但内积用 \(x^{\mathrm H}y\)，得到的是酉矩阵 \(P\)（\(P^{\mathrm H}P=I\)），\(P^{-1}AP=P^{\mathrm H}AP=\diag(\lambda_1,\lambda_2,\lambda_3)\)，特征值全为实数。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex3-12">
+              <header class="card-head"><span class="card-label">第 12 题</span><span class="tag">反对称矩阵谱</span></header>
+              <div class="card-body">
+                <p>求证实反对称矩阵的特征值是零或纯虚数。</p>
+                <details class="solution"><summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>设 \(Ax=\lambda x\)（\(x\ne\mathbf0\)），\(A^{\mathrm T}=-A\) 为实矩阵。取共轭转置：\(\bar x^{\mathrm T}A^{\mathrm T}=\bar\lambda\bar x^{\mathrm T}\)，即 \(-\bar x^{\mathrm T}A=\bar\lambda\bar x^{\mathrm T}\)，右乘 \(x\) 得 \(-\bar x^{\mathrm T}Ax=\bar\lambda\bar x^{\mathrm T}x\)，而左边为 \(-\lambda\bar x^{\mathrm T}x\)。因 \(\bar x^{\mathrm T}x&gt;0\)，故 \(\bar\lambda=-\lambda\)，即 \(\lambda\) 实部为 0，是 0 或纯虚数。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex3-13">
+              <header class="card-head"><span class="card-label">第 13 题</span><span class="tag tag-mid">对称幂等矩阵</span></header>
+              <div class="card-body">
+                <p>设 \(A\) 是 \(n\) 阶实对称矩阵且 \(A^2=A\)（幂等），证明存在正交矩阵 \(Q\)，使 \(Q^{-1}AQ=\diag(\underbrace{1,\ldots,1}_{r},\underbrace{0,\ldots,0}_{n-r})\)。</p>
+                <details class="solution"><summary><span>证明思路（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由 \(Ax=\lambda x\) 得 \(A^2x=\lambda^2x\)，又 \(A^2x=Ax=\lambda x\)，故 \(\lambda^2=\lambda\)，特征值只能是 0 或 1。实对称矩阵可正交对角化（谱定理推论 1），故存在正交 \(Q\) 使 \(Q^{-1}AQ\) 为对角元全是 0、1 的对角阵；1 的个数 \(r=\rank A\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex3-14">
+              <header class="card-head"><span class="card-label">第 14 题</span><span class="tag">正交补的 De Morgan 律</span></header>
+              <div class="card-body">
+                <p>设 \(V_1,V_2\) 是欧氏空间的两个子空间，证明：
+                  \[ (V_1+V_2)^\perp=V_1^\perp\cap V_2^\perp,\qquad (V_1\cap V_2)^\perp=V_1^\perp+V_2^\perp. \]</p>
+                <details class="solution"><summary><span>证明思路（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>第一式按定义双向包含：与 \(V_1+V_2\) 中每个向量正交，等价于同时与 \(V_1\)、\(V_2\) 中每个向量正交。第二式对第一式两边取正交补（利用 \((W^\perp)^\perp=W\)，由定理 1.34 维数关系保证）并把 \(V_1,V_2\) 换成 \(V_1^\perp,V_2^\perp\) 即得。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex3-15">
+              <header class="card-head"><span class="card-label">第 15 题</span><span class="tag">Hermite 变换谱定理</span></header>
+              <div class="card-body">
+                <p>利用定理 1.42 之 (1) 证明：酉空间 \(V^n\) 的 Hermite 变换 \(T\) 在 \(V^n\) 的某个基下的矩阵为对角矩阵。</p>
+                <details class="solution"><summary><span>证明思路（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>Hermite 变换在标准正交基下的矩阵 \(A\) 是 Hermite 矩阵（\(A^{\mathrm H}=A\)），它满足 \(A^{\mathrm H}A=AA^{\mathrm H}\)，是正规矩阵。由定理 1.42(1) 存在酉矩阵 \(P\) 使 \(P^{\mathrm H}AP=\Lambda\) 为对角阵；\(P\) 的列是新的标准正交基（酉基变换），在该基下 \(T\) 的矩阵即为对角阵，对角元全为实特征值。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 本节小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结与自检</h2>
+            <div class="summary-block">
+              <p>本节在"线性运算"之外加上<strong>内积</strong>，从而获得全部度量工具。欧氏空间与酉空间是两套平行理论（实 ↔ 复、转置 ↔ 共轭转置、正交 ↔ 酉、对称 ↔ Hermite）：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>主题</th><th>欧氏空间（\(\R\)）</th><th>酉空间（\(\C\)）</th></tr>
+                  <tr><td>内积</td><td>\((x,y)\) 对称、实值</td><td>\((x,y)=\overline{(y,x)}\)，第二变元共轭线性</td></tr>
+                  <tr><td>标准内积</td><td>\(xy^{\mathrm T}\)</td><td>\(xy^{\mathrm H}=\sum\xi_i\bar\eta_i\)</td></tr>
+                  <tr><td>保长变换</td><td>正交变换 / 正交矩阵 \(Q^{\mathrm T}Q=I\)</td><td>酉变换 / 酉矩阵 \(A^{\mathrm H}A=I\)</td></tr>
+                  <tr><td>自伴变换</td><td>对称变换 / 实对称 \(A^{\mathrm T}=A\)</td><td>Hermite 变换 / \(A^{\mathrm H}=A\)</td></tr>
+                  <tr><td>对角化</td><td>实对称矩阵正交相似对角阵</td><td>正规矩阵酉相似对角阵</td></tr>
+                </table>
+              </div>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>核心结论</th><th>位置</th></tr>
+                  <tr><td>内积公理；度量矩阵对称正定，不同基合同 \(B=C^{\mathrm T}AC\)</td><td><a href="#def-1-22">定义 1.22</a>·<a href="#exm-1-31">例 1.31</a></td></tr>
+                  <tr><td>Cauchy–Schwarz 不等式；夹角；三角不等式</td><td><a href="#cauchy">定义 1.23–1.24</a></td></tr>
+                  <tr><td>非零正交向量必无关；标准正交基；坐标 \(x=\sum(x_i,x)x_i\)</td><td><a href="#orthogonal-basis">定义 1.25–1.27</a></td></tr>
+                  <tr><td>Schmidt 正交化（减投影再单位化）</td><td><a href="#schmidt">定理 1.33</a></td></tr>
+                  <tr><td>正交分解 \(V^n=V_1\oplus V_1^\perp\)；矩阵四子空间</td><td><a href="#thm-1-34">定理 1.34–1.35</a></td></tr>
+                  <tr><td>正交变换保内积；实对称矩阵特征值为实、不同特征值向量正交、可正交对角化</td><td><a href="#thm-1-36">定理 1.36–1.40</a></td></tr>
+                  <tr><td>Schur 加强；正规矩阵 \(A^{\mathrm H}A=AA^{\mathrm H}\) 酉对角化；谱分解</td><td><a href="#thm-1-41">定理 1.41–1.42</a></td></tr>
+                </table>
+              </div>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>不看书写出 Schmidt 正交化公式，并说明为什么"减掉投影"后新向量恰好与已有向量都正交。</li>
+                  <li>度量矩阵为什么必须对称正定？换基时它按 \(C^{\mathrm T}AC\)（合同）而非 \(C^{-1}AC\)（相似）变化，这两种变换有什么区别？</li>
+                  <li>"可相似对角化"与"可酉（正交）相似对角化"哪个要求更强？为什么 \(\begin{pmatrix}1&amp;1\\0&amp;2\end{pmatrix}\) 属于前者而不属于后者？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="1.2-linear-transformations.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§1.2 线性变换及其矩阵</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="../ch2/2.1-vector-norms.html"><span class="ln-dir">下一章</span><span class="ln-ttl">第 2 章 §2.1 向量范数及其性质</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

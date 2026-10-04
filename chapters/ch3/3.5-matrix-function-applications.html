@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§3.5 矩阵函数的一些应用 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §3.5：用 e^{tA} 解一阶线性常系数齐次微分方程组 x′=Ax（定理 3.10）、基础解系、积分矩阵与 Jacobi 恒等式、非齐次方程组 x′=Ax+b(t) 的常数变易法与通解">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§3.5 矩阵函数的一些应用</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="3.5" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 3 章 矩阵分析及其应用</a><span class="sep" aria-hidden="true">/</span>
+            <span>§3.5 矩阵函数的一些应用</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 3 章 · 矩阵分析及其应用（收官）</div>
+            <h1>§3.5 矩阵函数的一些应用</h1>
+            <p class="lede">矩阵函数最直接、最重要的应用是<strong>解一阶线性常系数微分方程组</strong>：无论是齐次的 \(x'=Ax\) 还是带强迫项的 \(x'=Ax+b(t)\)，统一解都由矩阵指数 \(e^{tA}\) 给出——它把 \(n\) 个耦合方程的求解压缩成一次矩阵乘法与一次卷积积分。这也是控制系统状态空间方程 \(\dot x=Ax+Bu\)、电路瞬态分析、马尔可夫过程的标准工具。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.171–177</strong></span>
+              <span class="chip">建议 <strong>3 学时</strong></span>
+              <span class="chip">定理 <strong>1 个</strong></span>
+              <span class="chip">例题 <strong>2 道</strong></span>
+            </div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>把一阶线性常系数齐次方程组写成矩阵方程 \(x'=Ax\)；</li>
+                  <li>陈述并推导初值问题的唯一解 \(x(t)=e^{tA}c\)（定理 3.10）；</li>
+                  <li>用 \(e^{tA}\) 的列向量写出基础解系，理解积分矩阵与 Jacobi 恒等式；</li>
+                  <li>用<strong>常数变易法</strong>推出非齐次解（Duhamel/卷积公式）；</li>
+                  <li>对给定 \(A,b(t),x_0\) 写出并计算解 \(x(t)\)。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>\(x=e^{tA}c\) 的 Maclaurin 推导；</li>
+                      <li>非齐次通解 (3.5.12)；</li>
+                      <li>初值问题解 (3.5.13)。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>为什么猜测特解 \(e^{tA}c(t)\)；</li>
+                      <li>\(e^{-sA}b(s)\) 的积分；</li>
+                      <li>例 3.17 的完整计算。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 3 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>齐次方程组、定理 3.10、例 3.16</td><td class="num">p.171–174</td></tr>
+                    <tr><td class="num">2</td><td>积分矩阵、Jacobi 恒等式</td><td class="num">p.173–174</td></tr>
+                    <tr><td class="num">3</td><td>非齐次常数变易法、例 3.17、习题</td><td class="num">p.174–177</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 200" role="img" aria-label="矩阵函数应用脉络图">
+                    <defs><marker id="m35" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="40" y="30" width="200" height="50"/><rect x="320" y="30" width="200" height="50"/><rect x="600" y="30" width="200" height="50"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="140" y="52">n 个耦合方程</text><text x="140" y="69" font-size="11" fill="#666">dξᵢ/dt = Σaᵢⱼξⱼ</text>
+                      <text x="420" y="52">矩阵方程 x′=Ax</text><text x="420" y="69" font-size="11" fill="#666">e^{tA} 是基本解矩阵</text>
+                      <text x="700" y="52">齐次解 x=e^{tA}c</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m35)"><line x1="240" y1="55" x2="318" y2="55"/><line x1="520" y1="55" x2="598" y2="55"/></g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="250" y="120" width="340" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13.5" text-anchor="middle">
+                      <text x="420" y="143">非齐次 x′=Ax+b(t)</text>
+                      <text x="420" y="162" font-size="11.5" fill="#666">常数变易：x=e^{tA}c + e^{tA}∫e^{−sA}b(s)ds（Duhamel）</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m35)"><path d="M700 82 C650 112 550 118 500 120" stroke-dasharray="4 4"/></g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、齐次方程组 ================= -->
+          <section class="section" id="sec-homogeneous">
+            <h2 class="sec-title"><span class="cn">一</span>一阶线性常系数齐次微分方程组</h2>
+            <p>考虑方程组
+              <div class="eq-scroll">\[
+              \left.
+              \begin{aligned}
+              \dot\xi_1&amp;=a_{11}\xi_1+a_{12}\xi_2+\cdots+a_{1n}\xi_n\\
+              \dot\xi_2&amp;=a_{21}\xi_1+a_{22}\xi_2+\cdots+a_{2n}\xi_n\\
+              &amp;\ \vdots\\
+              \dot\xi_n&amp;=a_{n1}\xi_1+a_{n2}\xi_2+\cdots+a_{nn}\xi_n
+              \end{aligned}
+              \right\}\tag{3.5.1}
+              \]</div>
+              令 \(x=x(t)=(\xi_1,\ldots,\xi_n)^{\mathrm T}\)，\(A=(a_{ij})_{n\times n}\)，则写成矩阵方程
+              <div class="eq-scroll">\[ x'=\frac{\mathrm dx}{\mathrm dt}=Ax. \tag{3.5.2} \]</div>
+            </p>
+
+            <section class="card thm" id="thm-3-10">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 3.10（初值问题有且仅有唯一解）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">满足初始条件 \(\xi_i(0)=\gamma_i\)，即 \(x(0)=c=(\gamma_1,\ldots,\gamma_n)^{\mathrm T}\) 的一阶线性常系数齐次方程组 (3.5.2)，<strong>有且仅有唯一解</strong>
+                  <div class="eq-scroll">\[ \boxed{\ x(t)=e^{tA}c\ } \tag{3.5.4} \]</div></p>
+                <details class="proof">
+                  <summary><span>证明（Maclaurin 级数 + 逐项验证，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p><strong>必要性（解必为此形式）：</strong>把每个 \(\xi_i(t)\) 在 \(t=0\) 展开为 Maclaurin 级数：
+                      \[ x=c+tx'(0)+\frac{t^2}{2!}x''(0)+\cdots. \]
+                      由方程反复求导：\(x'(0)=Ac,\ x''(0)=A^2c,\ x'''(0)=A^3c,\ldots\)，代入得
+                      \[ x=c+tAc+\frac{t^2}{2!}A^2c+\cdots=e^{tA}c. \]</p>
+                    <p><strong>充分性（它确实是解）：</strong>\(c\) 与 \(t\) 无关，由定理 3.9 \(\frac{\mathrm d}{\mathrm dt}e^{tA}=Ae^{tA}\)：
+                      \[ x'=\left(\frac{\mathrm d}{\mathrm dt}e^{tA}\right)c=Ae^{tA}c=Ax, \]
+                      且 \(x(0)=e^Oc=Ic=c\)。标量情形 \(\dot x=ax\) 的解 \(ce^{at}\) 正是 \(n=1\) 的特例。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="solution-space">解空间与基础解系</h3>
+            <p>所有满足 \(x'(t)=Ax(t)\) 的向量函数集合
+              <div class="eq-scroll">\[ S=\{x(t)\mid x'(t)=Ax(t)\} \tag{3.5.5} \]</div>
+              按向量加法与数乘构成一个 <strong>\(n\) 维向量空间</strong>（解空间）。任取 \(n\) 个线性无关的向量 \(c\)（如标准基 \(e_1,\ldots,e_n\)），对应的
+              <div class="eq-scroll">\[ x(t)=e^{tA}c=\gamma_1x_1(t)+\cdots+\gamma_nx_n(t) \tag{3.5.6} \]</div>
+              给出 \(n\) 个线性无关的解向量 \(x_i(t)\)，它们构成 <strong>基础解系</strong>，式 (3.5.6) 即<strong>通解</strong>。</p>
+            <section class="card ex" id="exm-3-16">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 3.16</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A=\begin{pmatrix}2&0&0\\1&1&1\\1&-1&3\end{pmatrix}\)，求 \(x'=Ax\) 的基础解系及满足 \(x(0)=(1,1,1)^{\mathrm T}\) 的解。</p>
+                <details class="proof">
+                  <summary><span>解（复用例 3.5 的 e^{tA}，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>例 3.5 已用待定系数法求得
+                      \[ e^{tA}=e^{2t}\begin{pmatrix}1&0&0\\ t&1-t&t\\ t&-t&1+t\end{pmatrix}. \]</p>
+                    <p>三个列向量即基础解系：
+                      \[ x_1(t)=\begin{pmatrix}e^{2t}\\ te^{2t}\\ te^{2t}\end{pmatrix},\quad
+                         x_2(t)=\begin{pmatrix}0\\(1-t)e^{2t}\\ -te^{2t}\end{pmatrix},\quad
+                         x_3(t)=\begin{pmatrix}0\\ te^{2t}\\(1+t)e^{2t}\end{pmatrix}. \]</p>
+                    <p>取 \(c=(1,1,1)^{\mathrm T}\)：
+                      \[ x(t)=e^{tA}x(0)=\big(e^{2t},(1+t)e^{2t},(1+t)e^{2t}\big)^{\mathrm T}. \]</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="integral-matrix">积分矩阵与 Jacobi 恒等式</h3>
+            <p>把 \(n\) 个线性无关解按列排成矩阵 \(X=(\xi_{ij}(t))_{n\times n}\)（每个解向量是一列），称为方程 (3.5.2) 的<strong>积分矩阵</strong>（基本解矩阵）。由逐列满足方程：
+              <div class="eq-scroll">\[ \frac{\mathrm dX}{\mathrm dt}=AX. \tag{3.5.7} \]</div>
+              特别地 \(X=e^{tA}\) 是满足 \(X(0)=I\) 的积分矩阵。其行列式满足 <strong>Jacobi 恒等式（Liouville 公式）</strong>：
+              <div class="eq-scroll">\[ \det X(t)=\det X(t_0)\,e^{\int_{t_0}^{t}\tr A(s)\,\mathrm ds}. \tag{3.5.8} \]</div>
+              常系数时为 \(\det X=\det X(0)\,e^{t\,\tr A}\)。它说明：解的体积膨胀率恰为向量场的散度 \(\tr A\)；\(X\) 要么恒可逆（\(\det X(0)\ne0\)），要么恒奇异。该式对变系数 \(A=A(t)\) 也成立。</p>
+          </section>
+
+          <!-- ================= 二、非齐次方程组 ================= -->
+          <section class="section" id="sec-nonhomogeneous">
+            <h2 class="sec-title"><span class="cn">二</span>一阶线性常系数非齐次微分方程组</h2>
+            <p>考虑
+              <div class="eq-scroll">\[
+              \left.
+              \begin{aligned}
+              \dot\xi_1&amp;=a_{11}\xi_1+\cdots+a_{1n}\xi_n+\beta_1(t)\\
+              &amp;\ \vdots\\
+              \dot\xi_n&amp;=a_{n1}\xi_1+\cdots+a_{nn}\xi_n+\beta_n(t)
+              \end{aligned}
+              \right\}\tag{3.5.9}
+              \]</div>
+              写成矩阵方程
+              <div class="eq-scroll">\[ \frac{\mathrm dx}{\mathrm dt}=Ax+b(t), \tag{3.5.10} \]</div>
+              其中 \(b(t)=(\beta_1(t),\ldots,\beta_n(t))^{\mathrm T}\) 是已知强迫项。</p>
+
+            <h3 class="sub-title" id="variation">常数变易法</h3>
+            <p>设 \(\tilde x=\tilde x(t)\) 是一个特解，\(x=x(t)\) 是通解，则
+              \[ \frac{\mathrm d}{\mathrm dt}(x-\tilde x)=A(x-\tilde x), \]
+              即差为齐次方程的解，由式 (3.5.6)：\(x-\tilde x=e^{tA}c\)，故
+              <div class="eq-scroll">\[ x=e^{tA}c+\tilde x. \tag{3.5.11} \]</div>
+              类比标量的常数变易，<strong>把常数向量 \(c\) 换成待定的向量函数 \(c(t)\)</strong>，设
+              \[ \tilde x=e^{tA}c(t). \]
+              代入 (3.5.10)：
+              \[ \tilde x'=Ae^{tA}c(t)+e^{tA}c'(t)=A\tilde x+b(t), \]
+              前一项 \(A\tilde x\) 与 \(Ae^{tA}c(t)\) 抵消，得
+              <div class="eq-scroll">\[ e^{tA}c'(t)=b(t)\quad\Longrightarrow\quad c'(t)=e^{-tA}b(t), \]
+              \[ c(t)=\int_{t_0}^{t}e^{-sA}b(s)\,\mathrm ds. \]</div>
+            </p>
+            <p>于是<strong>通解</strong>为
+              <div class="eq-scroll">\[
+              x(t)=e^{tA}c+e^{tA}\int_{t_0}^{t}e^{-sA}b(s)\,\mathrm ds. \tag{3.5.12}
+              \]</div>
+              满足初始条件 \(x(t_0)=x_0\) 的特解（<strong>Duhamel 原理 / 卷积公式</strong>）：
+              <div class="eq-scroll">\[
+              \boxed{\ x(t)=e^{(t-t_0)A}x_0+e^{tA}\int_{t_0}^{t}e^{-sA}b(s)\,\mathrm ds\ } \tag{3.5.13}
+              \]</div>
+              当 \(t_0=0\) 时简化为
+              \[ x(t)=e^{tA}\left(x_0+\int_0^t e^{-sA}b(s)\,\mathrm ds\right). \]</p>
+
+            <section class="card ex" id="exm-3-17">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 3.17</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A=\begin{pmatrix}2&0&0\\1&1&1\\1&-1&3\end{pmatrix}\)，\(b(t)=\begin{pmatrix}e^{2t}\\e^{2t}\\0\end{pmatrix}\)，\(x(0)=(-1,1,0)^{\mathrm T}\)，求 \(x'=Ax+b(t)\) 满足初值的解。</p>
+                <details class="proof">
+                  <summary><span>解（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>例 3.5 已求得
+                      \[ e^{tA}=e^{2t}\begin{pmatrix}1&0&0\\t&1-t&t\\t&-t&1+t\end{pmatrix},\quad
+                         e^{-sA}b(s)=e^{-2s}\begin{pmatrix}1&0&0\\-s&1+s&-s\\-s&s&1-s\end{pmatrix}
+                         e^{2s}\begin{pmatrix}1\\1\\0\end{pmatrix}=\begin{pmatrix}1\\1\\0\end{pmatrix}. \]</p>
+                    <p>强迫项被矩阵化简成常向量，积分很轻松：
+                      \[ \int_0^t e^{-sA}b(s)\,\mathrm ds=\int_0^t\begin{pmatrix}1\\1\\0\end{pmatrix}\mathrm ds=\begin{pmatrix}t\\t\\0\end{pmatrix}. \]</p>
+                    <p>代入式 (3.5.13)（\(t_0=0\)）：
+                      \[ x(t)=e^{tA}\left\{\begin{pmatrix}-1\\1\\0\end{pmatrix}+\begin{pmatrix}t\\t\\0\end{pmatrix}\right\}
+                         =e^{2t}\begin{pmatrix}1&0&0\\t&1-t&t\\t&-t&1+t\end{pmatrix}\begin{pmatrix}t-1\\t+1\\0\end{pmatrix}
+                         =\begin{pmatrix}(t-1)e^{2t}\\(1-t)e^{2t}\\-2te^{2t}\end{pmatrix}. \]</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">承上启下：稳定性的语言</span>
+              </header>
+              <div class="card-body">
+                <p>齐次解 \(e^{tA}c\) 的长期行为完全由 \(A\) 的特征值决定：所有特征值实部 &lt; 0 时 \(e^{tA}\to O\)（系统<strong>渐近稳定</strong>，解衰减）；有正实部时发散；纯虚特征值<strong>半单</strong>时对应等幅振荡（若对应非平凡 Jordan 块则含 \(t^m\) 因子而增长）。结合 §2.3 的谱半径与 §1.2 的 Jordan 形，这就是线性系统稳定性理论的核心，也是控制工程判稳的出发点。</p>
+              </div>
+            </aside>
+
+            <h3 class="sub-title" id="ode-lab-title">动手实验：2×2 线性 ODE 求解器</h3>
+            <p>改 \(A,c,t\)，工具用幂级数实时计算 \(e^{tA}\)（即数值矩阵指数）与解 \(x(t)=e^{tA}c\)，并给出 \(Ax\) 供回代验证。切换"旋转/振荡"预设可看到 \(A=\begin{pmatrix}0&1\\-1&0\end{pmatrix}\) 时 \(e^{tA}\) 就是旋转矩阵。</p>
+            <section class="card lab" data-ode-lab></section>
+          </section>
+
+          <!-- ================= 习题 3.5 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 3.5（共 4 题）</h2>
+            <div class="ex-toolbar">
+              <span data-fold-tools="details.solution">
+                <button type="button" data-fold="open">全部展开解答</button>
+                <button type="button" data-fold="close">全部收起</button>
+              </span>
+            </div>
+
+            <article class="card task" id="ex35-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">Jacobi 恒等式</span></header>
+              <div class="card-body">
+                <p>证明 Jacobi 恒等式 (3.5.8)：\(\det X=ce^{\int_{t_0}^t\tr A\,\mathrm ds}\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>设 \(X=(x_{ij})\) 满足 \(X'=AX\)。对 \(\det X=\sum_{\sigma}\operatorname{sgn}(\sigma)\prod_i x_{i,\sigma(i)}\) 求导（行列式对每行的多线性）：
+                    \[ \frac{\mathrm d}{\mathrm dt}\det X=\sum_{k=1}^n\det X_k, \]</p>
+                    <p>其中 \(X_k\) 表示把 \(X\) 的第 \(k\) 行换成其导数行。第 \(k\) 行导数为 \(\sum_j a_{kj}x_{j\cdot}\)，由行列式对行的线性，\(\det X_k=\sum_j a_{kj}\det X_{kj}\)，而 \(X_{kj}\) 在 \(j\ne k\) 时有两行相同（值为 0），只留 \(j=k\) 一项 \(a_{kk}\det X\)。求和得
+                    \[ \frac{\mathrm d}{\mathrm dt}\det X=\Big(\sum_k a_{kk}\Big)\det X=\tr A\cdot\det X. \]
+                    这是关于标量 \(u(t)=\det X(t)\) 的可分离方程 \(u'=\tr A\,u\)，积分即
+                    \[ \det X(t)=\det X(t_0)\,e^{\int_{t_0}^t\tr A(s)\,\mathrm ds}. \]</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex35-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag tag-mid">齐次数值求解</span></header>
+              <div class="card-body">
+                <p>求微分方程组
+                  \[ \begin{cases}\dot\xi_1=3\xi_1+8\xi_3\\ \dot\xi_2=3\xi_1-\xi_2+6\xi_3\\ \dot\xi_3=-2\xi_1-5\xi_3\end{cases} \]
+                  满足 \(\xi_1(0)=\xi_2(0)=\xi_3(0)=1\) 的解。</p>
+                <details class="solution"><summary><span>解法提示（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>写成 \(x'=Ax\)，先求 \(A\) 的特征值与 \(e^{tA}\)（可用 Jordan 标准形法或待定系数法），再由定理 3.10
+                    \[ x(t)=e^{tA}(1,1,1)^{\mathrm T}. \]
+                    该矩阵的特征值为 \(-1\)（三重根，特征多项式 \((\lambda+1)^3\)），且 \(A\) 亏损（\(\operatorname{rank}(A+I)=1\)），\(e^{tA}\) 中含 \(t e^{-t}\) 项，须按 Jordan 公式 (3.3.16)（参例 3.6 Jordan 标准形法）计算超对角元。</p>
+                  <p>答案：\(x(t)=e^{-t}\big(1+12t,\ 1+9t,\ 1-6t\big)^{\mathrm T}\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex35-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag tag-hard">非齐次数值求解</span></header>
+              <div class="card-body">
+                <p>求微分方程组
+                  \[ \begin{cases}\dot\xi_1=-2\xi_1+\xi_2+1\\ \dot\xi_2=-4\xi_1+2\xi_2+2\\ \dot\xi_3=\xi_1+\xi_3+e^t-1\end{cases} \]
+                  满足 \(\xi_1(0)=1,\ \xi_2(0)=1,\ \xi_3(0)=-1\) 的解。</p>
+                <details class="solution"><summary><span>解法提示（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>写成 \(x'=Ax+b(t)\)，其中 \(b(t)=(1,2,e^t-1)^{\mathrm T}\)。步骤：① 求 \(e^{tA}\)（前两维子块 \(M=\begin{pmatrix}-2&1\\-4&2\end{pmatrix}\) 幂零：\(M^2=O\Rightarrow e^{tM}=I+tM\)；全矩阵还须叠加 \(A^2=A^3=\cdots\) 的贡献，\(e^{tA}=I+tA+(e^t-1-t)A^2\)）；② 计算积分 \(\int_0^t e^{-sA}b(s)\,\mathrm ds\)；③ 代入式 (3.5.13)
+                    \[ x(t)=e^{tA}\Big(x(0)+\int_0^t e^{-sA}b(s)\,\mathrm ds\Big). \]</p>
+                  <p>答案：\(x(t)=\big(1,\ 1,\ (t-1)e^t\big)^{\mathrm T}\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex35-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag tag-mid">Cauchy 微分方程组</span></header>
+              <div class="card-body">
+                <p>设 \(A=(a_{ij})_{n\times n}\) 为常数矩阵，\(X=(\xi_{ij}(t))_{n\times n}\)，\(a\) 为常数，证明 Cauchy 微分方程组
+                  \[ \frac{\mathrm dX}{\mathrm dt}=\frac{A}{t-a}X \]
+                  可简化为 \(\dfrac{\mathrm dX}{\mathrm du}=AX\)（其中 \(u=\ln(t-a)\)），进而其通解为
+                  \[ X=(t-a)^A C, \]
+                  其中 \(C\) 为任意 \(n\) 阶常数矩阵。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>令 \(u=\ln(t-a)\)，则 \(\dfrac{\mathrm du}{\mathrm dt}=\dfrac1{t-a}\)，由链式法则
+                    \[ \frac{\mathrm dX}{\mathrm du}=\frac{\mathrm dX}{\mathrm dt}\Big/\frac{\mathrm du}{\mathrm dt}
+                       =\frac{A}{t-a}X\cdot(t-a)=AX. \]</p>
+                    <p>这是关于自变量 \(u\) 的常系数齐次矩阵方程，由定理 3.10 的矩阵版本（积分矩阵满足 \(X'=AX\)），其通解为
+                    \[ X(u)=e^{uA}C. \]
+                    代回 \(u=\ln(t-a)\)，注意到 \(e^{A\ln(t-a)}\) 定义为 \((t-a)^A\)（矩阵幂函数，见广义定义 3.8）：
+                    \[ X=e^{A\ln(t-a)}C=(t-a)^A C. \]
+                    直接验证：\(\dfrac{\mathrm d}{\mathrm dt}(t-a)^A=A(t-a)^{A-I}=\dfrac{A}{t-a}(t-a)^A\)，故满足原 Cauchy 方程。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 本节小结 / 第3章总结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结（兼第 3 章回顾）</h2>
+            <div class="summary-block">
+              <p>矩阵函数把"数列→级数→函数"的微积分链条搬到矩阵上，最终落在一个干净的 ODE 求解公式上：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>问题</th><th>解</th></tr>
+                  <tr><td>齐次 \(x'=Ax,\ x(0)=c\)</td><td>\(x(t)=e^{tA}c\)（定理 3.10，唯一解）</td></tr>
+                  <tr><td>通解</td><td>\(e^{tA}\) 的列向量构成基础解系，\(x=e^{tA}c\)，\(c\) 任意</td></tr>
+                  <tr><td>积分矩阵</td><td>\(X'=AX\)；\(\det X(t)=\det X(t_0)e^{\int\tr A}\)（Jacobi 恒等式）</td></tr>
+                  <tr><td>非齐次 \(x'=Ax+b(t)\)</td><td>\(x=e^{tA}c+e^{tA}\int e^{-sA}b(s)\,\mathrm ds\)（常数变易/Duhamel）</td></tr>
+                  <tr><td>初值 \(x(t_0)=x_0\)</td><td>\(x=e^{(t-t_0)A}x_0+e^{tA}\int_{t_0}^t e^{-sA}b(s)\,\mathrm ds\)</td></tr>
+                </table>
+              </div>
+              <p style="margin-top:14px"><strong>第 3 章主线回顾：</strong>矩阵序列（按元素/范数收敛）→ 矩阵级数（绝对收敛、Neumann 级数 \(\sum A^k=(I-A)^{-1}\)）→ 矩阵函数（\(e^A,\sin A,\cos A\) 与 Jordan 广义定义）→ 矩阵微积分（\(\frac{d}{dt}e^{tA}=Ae^{tA}\)、梯度/Jacobi）→ <strong>应用：统一求解线性常系数微分方程组</strong>。</p>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>不用翻书，从 Maclaurin 展开出发自己推出 \(x(t)=e^{tA}c\)，并说明它为什么同时满足方程和初值。</li>
+                  <li>常数变易法中为什么要设 \(\tilde x=e^{tA}c(t)\) 而不是直接猜一个？代入后哪两项抵消，剩下的方程如何解出 \(c(t)\)？</li>
+                  <li>已知 \(e^{tA}\) 由 \(A\) 的特征值决定，如何仅凭 \(\lambda_i\) 的实部符号判断零解的渐近稳定性？Jordan 块在临界情形（实部为 0）会带来什么额外增长？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="3.4-differentiation-integration.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§3.4 矩阵的微分和积分</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="../ch4/4.1-lu-decomposition.html"><span class="ln-dir">下一章</span><span class="ln-ttl">第 4 章 §4.1 Gauss 消去法与矩阵的三角分解</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

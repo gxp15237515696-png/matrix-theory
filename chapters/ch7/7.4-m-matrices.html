@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§7.4 M 矩阵与广义 M 矩阵（选学） · 矩阵论</title>
+  <meta name="description" content="矩阵论 §7.4（选学）：Z-型矩阵、M 矩阵定义 a_ij≤0(i≠j) 且 A⁻¹≥O、Plemmons 的 40 个充要条件（A–N 十四类）、判别法则、sI−B 表示、三角分解、S(Stieltjes) 矩阵、正稳定与 A+αI 非奇异、广义 M 矩阵与半收敛">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§7.4 M 矩阵与广义 M 矩阵（选学）</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="7.4" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 7 章 若干特殊矩阵类介绍</a><span class="sep" aria-hidden="true">/</span>
+            <span>§7.4 M 矩阵与广义 M 矩阵（选学）</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 7 章 · 应用最广的矩阵类</div>
+            <h1>§7.4 M 矩阵与广义 M 矩阵</h1>
+            <p class="lede">M 矩阵（非奇异 M 矩阵）在<strong>偏微分方程有限差分/有限元、投入产出、运筹学线性余问题、Markov 过程</strong>中反复出现：它的形式很简单——主对角线外元素非正（Z-型）而逆非负；内容却极丰富——Plemmons(1977) 列举了 <strong>40 个等价条件</strong>。本节先给出这 40 个充要条件的全貌，再聚焦定义、判别与三角分解，最后介绍减弱非奇异要求得到的<strong>广义 M 矩阵</strong>。它把本章前三节（正定/正稳定、对角占优、非负/单调/正则分裂）全部串成一个等价网络。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.394–407</strong></span>
+              <span class="chip">建议 <strong>3 学时</strong></span>
+              <span class="chip">充要条件 <strong>40 个 / 14 类</strong></span>
+              <span class="chip">核心定义 <strong>Z-型 + A⁻¹≥O</strong></span>
+              <span class="chip">习题 <strong>18 题</strong></span>
+
+              <span class="chip">定义 <strong>1 个</strong></span>
+              <span class="chip">例题 <strong>2 道</strong></span></div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>准确判断 Z-型矩阵，掌握 M 矩阵定义 (7.4.1) 与 \(sI-B\) 表示 (7.4.4)；</li>
+                  <li>熟悉 40 个充要条件的十四类分组，重点掌握逆非负、半正、顺序主子式、\(\rho(B)&lt;1\)、正稳定五条；</li>
+                  <li>会用判别法则 \(a_{ii}&gt;0,\ \rho(I-D^{-1}A)&lt;1\) 与三角判别识别 M 矩阵；</li>
+                  <li>知道 S（Stieltjes）矩阵 = 对称 M 矩阵；</li>
+                  <li>了解广义 M 矩阵的减弱条件与半收敛概念。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>定义与五条实用判据；</li>
+                      <li>与对角占优的关系；</li>
+                      <li>顺序主子式判别。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>40 条件的等价网络；</li>
+                      <li>Z-型与单调的区别；</li>
+                      <li>广义 M 的半收敛。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 3 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>40 个充要条件全貌（A–N 十四类）</td><td class="num">p.394–399</td></tr>
+                    <tr><td class="num">2</td><td>M 矩阵定义、判别法则、\(sI-B\) 与三角分解、与占优类关系、S 矩阵</td><td class="num">p.399–404</td></tr>
+                    <tr><td class="num">3</td><td>广义 M 矩阵、实验与习题</td><td class="num">p.404–407</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 210" role="img" aria-label="M 矩阵脉络图">
+                    <defs><marker id="m74" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#f4f0e2" stroke="#a06a17"><rect x="30" y="20" width="150" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="105" y="42">Z-型矩阵</text><text x="105" y="60" font-size="11" fill="#666">aᵢⱼ≤0 (i≠j)</text>
+                    </g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="230" y="20" width="190" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="325" y="42">M 矩阵</text><text x="325" y="60" font-size="11" fill="#666">Z-型 + A⁻¹≥O（40 等价）</text>
+                    </g>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b"><rect x="470" y="20" width="160" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="550" y="42">五条实用判据</text><text x="550" y="60" font-size="11" fill="#666">半正/主子式/谱/占优</text>
+                    </g>
+                    <g class="fm-node" fill="#eef7f0" stroke="#3d7a4e"><rect x="680" y="20" width="130" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="745" y="42">S 矩阵</text><text x="745" y="60" font-size="11" fill="#666">对称 M（Stieltjes）</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m74)"><line x1="180" y1="46" x2="228" y2="46"/><line x1="420" y1="46" x2="468" y2="46"/><line x1="630" y1="46" x2="678" y2="46"/></g>
+                    <g class="fm-node" fill="#f3eef7" stroke="#6b4e9e"><rect x="250" y="126" width="340" height="54"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="420" y="148">广义 M 矩阵：减弱非奇异条件</text><text x="420" y="166" font-size="11" fill="#666">半收敛分裂、特征值实部非负、A+αI 为 M</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m74)"><line x1="325" y1="72" x2="325" y2="124"/></g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、40 个充要条件 ================= -->
+          <section class="section" id="sec-40">
+            <h2 class="sec-title"><span class="cn">一</span>M 矩阵的 40 个充要条件</h2>
+            <p>对主对角线外元素非正的矩阵（<strong>Z-型矩阵</strong>），下列 40 个条件<strong>互相等价</strong>，满足其一即为（非奇异）M 矩阵。Plemmons(1977) 把它们归为 14 类（A–N）。不必逐条背诵，重点是看出它们分别从哪条旧路径到达同一结论。</p>
+
+            <h3 class="sub-title" id="groups-ade">主子式与分解类（A–E，14 条）</h3>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>类（条数）</th><th>条件</th></tr>
+                <tr><td><strong>A₁–A₇</strong>（7）</td><td>A₁ 全部主子式为正（含顺序主子式）；A₂ 任意主子矩阵（包括顺序主子矩阵）的实特征值都是正值；A₃ \(A+D\) 对任意非负对角矩阵 \(D\) 均为非奇异矩阵；A₄ 对任意向量 \(x\ne0\) 都存在正对角矩阵 \(D\)，满足 \(x^{\mathrm T}ADx&gt;0\)；A₅ 对任意向量 \(x\ne0\) 都存在非负对角矩阵 \(D\)，满足 \(x^{\mathrm T}ADx&gt;0\)；A₆ \(A\) 不改变任意向量 \(x=(\xi_1,\xi_2,\cdots,\xi_n)^{\mathrm T}\ne0\) 的符号：至少有一个下标 \(i\)，使 \(\xi_i\) 与 \(Ax\) 的第 \(i\) 个分量同号，亦即 \(\xi_i\sum_{j=1}^{n}a_{ij}\xi_j&gt;0\)；A₇ 对任意主对角元为 \(1\) 或 \(-1\) 的对角矩阵 \(S\)，都存在向量 \(x&gt;0\)，使 \(SASx&gt;0\)（即 \(SASx\) 是正向量）</td></tr>
+                <tr><td><strong>B₈</strong>（1）</td><td>矩阵 A 的全部 \(k\)（\(k=1,\cdots,n\)）阶主子式之和都为正</td></tr>
+                <tr><td><strong>C₉–C₁₀</strong>（2）</td><td>C₉ 实特征值都为正；C₁₀ \(A+\alpha I\) 对任意 \(\alpha\ge0\) 都非奇异</td></tr>
+                <tr><td><strong>D₁₁–D₁₂</strong>（2）</td><td>D₁₁ <em>n</em> 个顺序主子式都为正；D₁₂ 可作三角分解 \(A=LU\)，且 L、U 的主对角元都为正（一个主对角元为 1 时分解唯一）</td></tr>
+                <tr><td><strong>E₁₃–E₁₄</strong>（2）</td><td>E₁₃ 存在置换阵 P 使 \(PAP^{\mathrm T}\) 的顺序主子式都为正；E₁₄ 存在置换阵 P 使 \(PAP^{\mathrm T}\) 可作 D₁₂ 型正对角三角分解</td></tr>
+              </table>
+            </div>
+
+            <h3 class="sub-title" id="groups-fh">逆、单调与分裂类（F–H，10 条）</h3>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>类（条数）</th><th>条件</th></tr>
+                <tr><td><strong>F₁₅–F₂₂</strong>（8）</td><td>F₁₅ 逆非负：\(A^{-1}\) 存在且 \(A^{-1}\ge O\)；F₁₆ 单调：可由 \(Ax\ge0\) 推出 \(x\ge0\)；F₁₇ 有收敛的正则分裂；F₁₈ 有收敛的弱正则分裂；F₁₉ 有弱正则分裂且存在 \(x&gt;0\) 使 \(Ax&gt;0\)；F₂₀ 存在 \(M_1^{-1},M_2^{-1}\ge O\) 使 \(M_1\le A\le M_2\)；F₂₁ 存在 \(M^{-1}\ge O,\ M\ge A\)，且 \(M^{-1}A\) 为 M 矩阵；F₂₂ 存在 \(M^{-1}\ge O\) 使 \(M^{-1}A\) 为 M 矩阵</td></tr>
+                <tr><td><strong>G₂₃</strong>（1）</td><td>A 的任意弱正则分裂都是收敛的</td></tr>
+                <tr><td><strong>H₂₄</strong>（1）</td><td>A 的任意正则分裂都是收敛的</td></tr>
+              </table>
+            </div>
+
+            <h3 class="sub-title" id="groups-in">稳定性与占优类（I–N，16 条）</h3>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>类（条数）</th><th>条件</th></tr>
+                <tr><td><strong>I₂₅–I₂₈</strong>（4）</td><td>I₂₅ 存在正对角 D 使 \(AD+DA^{\mathrm T}\) 对称正定（即 A 为 <strong>V.L. 稳定</strong>）；I₂₆ 存在正对角 D 使 \(B+B^{\mathrm T}\) 正定，\(B=D^{-1}AD\)；I₂₇ 对任意非零半正定 P，PA 都有正主对角元；I₂₈ A 的任意主子矩阵都满足 I₂₅</td></tr>
+                <tr><td><strong>J₂₉–J₃₂</strong>（4）</td><td>J₂₉ <strong>正稳定</strong>：任意特征值实部为正；J₃₀ 存在对称正定 W 使 \(AW+WA^{\mathrm T}\) 对称正定（Lyapunov）；J₃₁ \(A+I\) 非奇异且 Cayley 变换 \(G=(A+I)^{-1}(A-I)\) 收敛；J₃₂ \(A+I\) 非奇异且存在对称正定 W 使 \(W-G^{\mathrm T}WG\) 正定</td></tr>
+                <tr><td><strong>K₃₃–K₃₅</strong>（3）</td><td>K₃₃ <strong>半正</strong>：存在 \(x&gt;0\) 使 \(Ax&gt;0\)；K₃₄ 存在 \(x\ge0\) 使 \(Ax&gt;0\)；K₃₅ 存在正对角 D 使 AD 的全部行和都为正</td></tr>
+                <tr><td><strong>L₃₆</strong>（1）</td><td>存在 \(x&gt;0\) 使 \(Ax\ge0\)，且 Ax 的每个零分量都由非零元素链与正分量相连（链条件）</td></tr>
+                <tr><td><strong>M₃₇</strong>（1）</td><td>存在 \(x&gt;0\) 使 \(Ax\ge0\) 且 \(\sum_{j=1}^{i}a_{ij}\xi_j&gt;0\)（\(i=1,\cdots,n\)）（逐行累积和正）</td></tr>
+                <tr><td><strong>N₃₈–N₄₀</strong>（3）</td><td>N₃₈ 存在 \(x&gt;0\)，对任意主对角元为 ±1 的对角阵 S 都有 \(SASx&gt;0\)；N₃₉ 主对角元为正且<strong>拟对角占优</strong>；N₄₀ 主对角元为正且 A 与强对角占优阵正对角相似（\(\exists D&gt;0:\ D^{-1}AD\) 强占优）</td></tr>
+              </table>
+            </div>
+            <p>40 个条件的包含关系见教材图 7.2（Plemmons 的综述未涉及条件 M，1979 年 Neumann 补入）：<strong>M 矩阵</strong>分别通向 <strong>N、F</strong> 两大支——N 支先到 <strong>M</strong>（M→M′→L），再到 <strong>I</strong>；I 通向 J→C 与 A，A 又分出 B、D→E、K→L；F 支通向 K→L 与 G→H。其中 <strong>M′</strong> 表示存在置换 P 使 \(PAP^{\mathrm T}\) 满足 M₃₇。各类条件互相等价的证明以及 40 个充要条件的证明原文都相当冗长，教材此处略去，本节只引用不推导。</p>
+          </section>
+
+          <!-- ================= 二、M 矩阵 ================= -->
+          <section class="section" id="sec-matrix">
+            <h2 class="sec-title"><span class="cn">二</span>M 矩阵</h2>
+            <p>M 矩阵有多种等价定义，本书采用逆非负这一种：</p>
+            <section class="card def" id="def-m">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义：Z-型矩阵与 M 矩阵</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">若 \(A=(a_{ij})_{n\times n}\) 满足</p>
+                <div class="eq-scroll">\[ a_{ij}\le0\quad(i\ne j;\ i,j=1,\cdots,n), \tag{7.4.3} \]</div>
+                <p style="margin-bottom:0">称 <strong>A 为 Z-型矩阵</strong>。若 Z-型矩阵 A 进一步满足</p>
+                <div class="eq-scroll">\[ a_{ij}\le0\ (i\ne j),\qquad A^{-1}\ge O, \tag{7.4.1} \]</div>
+                <p style="margin-bottom:0">则称 <strong>A 为（非奇异）M 矩阵</strong>。</p>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-m3">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例：三阶 M 矩阵</span>
+              </header>
+              <div class="card-body">
+                <div class="eq-scroll">\[ A=\begin{pmatrix}1&-\tfrac12&0\\0&1&-\tfrac12\\0&0&1\end{pmatrix},\qquad
+                A^{-1}=\begin{pmatrix}1&\tfrac12&\tfrac14\\0&1&\tfrac12\\0&0&1\end{pmatrix}\ge O. \]</div>
+                <p style="margin-bottom:0">非对角元非正、逆非负，故是 M 矩阵；但它不对称——<strong>M 矩阵不必对称</strong>。§7.3 方程组 (7.3.3) 的系数矩阵也是 M 矩阵（对称的例子）。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="m-basic">基本性质</h3>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>性质</th><th>依据（40 条件编号）</th></tr>
+                <tr><td>主对角元 \(a_{ii}&gt;0\)</td><td>由 \(A^{-1}\ge O\) 与 Z-型推出（K₃₃ 半正性的直接推论）</td></tr>
+                <tr><td>非奇异；\(\det A&gt;0\)</td><td>定义；C₁₀/D₁₁（顺序主子式正）</td></tr>
+                <tr><td>拟对角占优</td><td>N₃₉；对角元正 + 存在正权重（§7.2 最大占优类）</td></tr>
+                <tr><td>转置 \(A^{\mathrm T}\) 仍是 M 矩阵</td><td>\((A^{\mathrm T})^{-1}=(A^{-1})^{\mathrm T}\ge O\)，Z-型在转置下保持</td></tr>
+                <tr><td>正稳定：\(\mathrm{Re}\,\lambda_i(A)&gt;0\)</td><td>J₂₉；任意主子矩阵也正稳定（M 矩阵的主子矩阵仍为 M 矩阵，见第 3 题，再对主子矩阵用 J₂₉；教材 p.403 的推论）</td></tr>
+                <tr><td>单调（\(Ax\ge0\Rightarrow x\ge0\)）</td><td>F₁₆；但<strong>单调矩阵不一定是 M 矩阵</strong>（单调不要求非对角元非正），如 (7.3.1) 的矩阵（教材 p.399 原文作"(7.3.2)"，对照 §7.3 原文应为笔误）</td></tr>
+              </table>
+            </div>
+
+            <h3 class="sub-title" id="m-tests">实用判别法则</h3>
+            <section class="card thm" id="thm-m-test">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">四条常用充要判据</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A=(a_{ij})\) 是 Z-型矩阵（\(a_{ij}\le0,\ i\ne j\)），则下列每条都是 A 为 M 矩阵的充要条件：</p>
+                <div class="table-wrap">
+                  <table class="book">
+                    <tr><th class="num" scope="row">① 谱半径判据</th><td>\(a_{ii}&gt;0\) 且 \(\rho(B)&lt;1\)，其中 \(B=I-D^{-1}A,\ D=\operatorname{diag}(a_{11},\cdots,a_{nn})\)</td></tr>
+                    <tr><th class="num" scope="row">② 半正判据</th><td>存在 \(x&gt;0\) 使 \(Ax&gt;0\)（K₃₃；验证最方便的一条）</td></tr>
+                    <tr><th class="num" scope="row">③ 顺序主子式判据</th><td>\(n\) 个顺序主子式均为正（D₁₁）；等价地所有主子式为正（A₁）</td></tr>
+                    <tr><th class="num" scope="row">④ 正对角占优判据</th><td>\(a_{ii}&gt;0\) 且 A 为强（或不可约）对角占优的 Z-型矩阵；或 A 拟对角占优（N₃₉/N₄₀）</td></tr>
+                  </table>
+                </div>
+                <p style="margin-bottom:0"><strong>三角特例：</strong>三角 Z-型矩阵为 M 矩阵 \(\Leftrightarrow a_{ii}&gt;0\)（三角阵的特征值即对角元，逆的上三角元为非正元素乘积的非负组合）。一般三角阵 \(a_{ii}&gt;0,\ a_{ij}\le0\ (i\ne j)\) 即为 M 矩阵。</p>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-upper">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例：上三角 M 矩阵及其逆</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">对角元为 1、上三角非对角元全为 \(-\tfrac12\) 的 \(n\) 阶上三角阵是 M 矩阵，其逆为（\(n=4\) 验证）</p>
+                <div class="eq-scroll">\[
+                A^{-1}=\begin{pmatrix}1&\tfrac12&\tfrac12(\tfrac32)&\tfrac12(\tfrac32)^2\\&1&\tfrac12&\tfrac12(\tfrac32)\\&&1&\tfrac12\\&&&1\end{pmatrix}\ge O,
+                \]</div>
+                <p style="margin-bottom:0">一般元为 \((A^{-1})_{ij}=\tfrac12(\tfrac32)^{j-i-1}\)（\(j&gt;i\)）。元素随离对角线距离按 \((3/2)\) 的幂增长，这正是椭圆型差分矩阵逆的典型形态。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="sib">sI − B 表示与三角分解</h3>
+            <p>一个不包含在 40 条件中的常用等价定义：</p>
+            <div class="eq-scroll">\[ A=sI-B,\qquad B\ge O,\qquad \rho(B)&lt;s. \tag{7.4.4} \]</div>
+            <p>这就是说 A 具有<strong>收敛的正则分裂</strong>（\(Q=sI,\ S=B\)，对照 F₁₇ 与 §7.3 式 (7.3.4)）；其逆直接由 Neumann 级数给出且非负：</p>
+            <div class="eq-scroll">\[ A^{-1}=(sI-B)^{-1}=\frac1s\sum_{k=0}^{\infty}\Big(\frac{B}{s}\Big)^k\ge O. \]</div>
+            <p><strong>三角分解定理：</strong>Z-型矩阵 A 的 \(n\) 个顺序主子式均为正时，A 有三角分解 \(A=LU\)，其中 L 为下三角 M 矩阵、U 为单位上三角 M 矩阵（D₁₂）。反之 M 矩阵的顺序主子矩阵也都是 M 矩阵，故该分解总存在。</p>
+
+            <h3 class="sub-title" id="m-dom">与各对角占优类的关系</h3>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>前提（Z-型且 \(a_{ii}&gt;0\)）</th><th>结论</th></tr>
+                <tr><td>强对角占优 或 不可约对角占优</td><td>A 为 M 矩阵</td></tr>
+                <tr><td>具非零元素链对角占优</td><td>A 为 M 矩阵</td></tr>
+                <tr><td>主对角元正、其余元素非正（仅此而已）</td><td><strong>不足以</strong>判定（还需占优/半正等条件之一）</td></tr>
+                <tr><td>拟对角占优，且 \(B=A+A^{\mathrm T}\) 拟占优</td><td>A 为 M 矩阵</td></tr>
+                <tr><td>对角占优 Z-型</td><td>A 为 M 矩阵 \(\Leftrightarrow\) A 半强对角占优</td></tr>
+              </table>
+            </div>
+
+            <h3 class="sub-title" id="m-eigen">谱性质与 \(A+\alpha I\)</h3>
+            <p>设 \(A=\alpha I-C\) 且 \(\alpha&gt;0,\ \rho(C)&lt;\alpha\)，则不仅实特征值为正，<strong>复特征值的实部也为正</strong>（A 正稳定）：这是 M 矩阵作为差分算子（如五点差分 Laplace 矩阵）的核心性质。等价地：</p>
+            <div class="eq-scroll">\[ \text{设 }A\text{ 为 }n\text{ 阶 Z-型矩阵，则：}A\text{ 为 M 矩阵}\ \Longleftrightarrow\ A+\alpha I\text{ 对任意 }\alpha\ge0\text{ 都非奇异（C}_{10}\text{）}. \]</div>
+            <p>任意主子矩阵的实特征值同为正值（A₂）；同阶主子式之和为正（B₈）。教材 1.74 例：\(A=\begin{pmatrix}1.74&-1&1\\-3&1.74&-1\\-2&1&1.74\end{pmatrix}\)，由 \(1.74^3\approx5.27\ge5,\ 1.74^2\approx3.03\ge3\) 可展开证明对任意非负对角 \(D=\operatorname{diag}(d_1,d_2,d_3)\) 都有 \(\det(A+D)&gt;0\)（A₃/A₂ 型判据：\(A+D\) 对任意非负对角 \(D\) 非奇异 \(\Leftrightarrow\) 任意主子矩阵的实特征值为正；数值验证 2000 个随机 D 全部成立，特征值实部约为 \(0.03,\ 2.60,\ 2.60\)）。</p>
+
+            <h3 class="sub-title" id="s-matrix">S 矩阵（Stieltjes 矩阵）</h3>
+            <p>M 矩阵不必对称；<strong>对称的 M 矩阵称为 S 矩阵</strong>（Stieltjes 矩阵）。即：</p>
+            <div class="eq-scroll">\[ A\text{ 为 Z-型}\ \Longrightarrow\ A\text{ 为 S 矩阵}\ \Leftrightarrow\ A\text{ 对称正定}. \]</div>
+            <p>历史注记：Stieltjes(1880 年代) 指出对称正定且 \(a_{ij}&lt;0\ (i\ne j)\) 的矩阵逆为正（逆正定）；Frobenius(1910 年代) 在 \(B&gt;O,\ \rho(B)&lt;s\) 下得到 \(A=sI-B\) 的逆正性；Ostrowski(1930 年代) 后有系统结果。方程组 (7.3.3) 的对称系数矩阵就是 S 矩阵。</p>
+
+            <h3 class="sub-title" id="m-lab-title">动手实验：M 矩阵判定台</h3>
+            <p>输入 3×3 矩阵，工具同时点亮多条充要条件：Z-型检验、\(a_{ii}&gt;0\)、三个顺序主子式、逆非负 \(A^{-1}\ge O\)、\(\rho(I-D^{-1}A)&lt;1\)、特征值实部、半正性（搜索 \(x&gt;0\) 使 \(Ax&gt;0\)）、拟对角占优；对称时额外判定 S 矩阵。各条一致时报告"A 为 M 矩阵"。</p>
+            <section class="card lab" data-m-lab></section>
+          </section>
+
+          <!-- ================= 三、广义 M 矩阵 ================= -->
+          <section class="section" id="sec-generalized">
+            <h2 class="sec-title"><span class="cn">三</span>广义 M 矩阵</h2>
+            <p>把非奇异 M 矩阵的条件向<strong>奇异情形</strong>减弱，得到广义 M 矩阵。对 Z-型矩阵，把 40 条件中相应条目减弱，例如：</p>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>原条件</th><th>减弱形式</th></tr>
+                <tr><td>Ã₁（A₁）</td><td>全部主子式<strong>非负</strong></td></tr>
+                <tr><td>Ã₂（A₂）</td><td>任意主子矩阵的实特征值<strong>非负</strong></td></tr>
+                <tr><td>Ã₃（A₃）</td><td>对每个正对角阵 D，\(A+D\) 非奇异（注意是正 D 而非 \(\alpha I\)）</td></tr>
+                <tr><td>D̃₁₂（D₁₂）</td><td>有三角分解 \(A=LU\)，L、U 主对角元<strong>非负</strong></td></tr>
+                <tr><td>F̃₁₇（F₁₇）</td><td>A 具有<strong>半收敛</strong>的正则分裂——\(\lim_{k\to\infty}A^k\) 存在（不要求极限为零矩阵）</td></tr>
+                <tr><td>F̃₁₈</td><td>A 具有半收敛的弱正则分裂</td></tr>
+                <tr><td>Ĩ₂₅（I₂₅）</td><td>存在正对角 D 使 \(AD+DA^{\mathrm T}\) 对称<strong>半</strong>正定</td></tr>
+              </table>
+            </div>
+            <p>对应地谱条件减弱为：每个非零特征值实部为正（或全部特征值实部非负）；\(A=sI-B,\ B\ge O,\ \rho(B)\le s\)；A 是主对角元为正的对角占优矩阵等。</p>
+            <p><strong>注意：</strong>由"广义逆非负"推广与直接减弱 M 矩阵条件推广得到的两类广义 M 矩阵<strong>不尽相同</strong>，两方面都还有待系统研究；近年的综合方向包括单调型正稳定矩阵（Olesky 与 Driessche, 1982）等。</p>
+          </section>
+
+          <!-- ================= 习题 7.4 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 7.4（教材 p.405–407）</h2>
+            <div class="fold-bar no-print" data-fold-tools=".card.task">
+              <button type="button" data-fold="open">全部展开</button>
+              <button type="button" data-fold="close">全部收起</button>
+            </div>
+
+            <article class="card task" id="ex74-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">A 与 A⁻¹ 都是 M</span></header>
+              <div class="card-body">
+                <p>设 A 和它的逆矩阵 \(A^{-1}\) 都是 M 矩阵，问 A 是怎样的矩阵？</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>A 是 M ⇒ \(a_{ij}\le0\ (i\ne j)\) 且 \(A^{-1}\ge O\)；\(A^{-1}\) 也是 M ⇒ \(A^{-1}\) 的非对角元 \(\le0\)。合起来 \(A^{-1}\) 的非对角元既 \(\ge0\) 又 \(\le0\)，故全为 0，即 \(A^{-1}=D\) 为<strong>非负对角阵</strong>；非奇异给出对角元全正，故 A 也是正对角阵 \(A=D^{-1}\)。结论：<strong>A 为正对角矩阵</strong>。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex74-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag">判据辨析</span></header>
+              <div class="card-body">
+                <p>"A 为 M 矩阵的充要条件是 \(a_{ii}&gt;0,\ a_{ij}\le0\ (i\ne j)\) 以及 \(\rho(B)&lt;1\)，\(B=I-D^{-1}A\)"这个结论是否正确？</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p><strong>正确</strong>，这正是判据①（教材判别法则）。要点：Z-型保证 B 的非对角元非负（\(B_{ij}=-a_{ij}/a_{ii}\ge0\)）；\(\rho(B)&lt;1\) 时 \(D^{-1}A=I-B\) 为 M（Neumann 级数逆非负），左乘正对角 D 不改变 Z-型与逆非负性，故 A 为 M。反之 M 矩阵的 N₃₉/F₁₅ 各条件蕴含该谱半径不等式。注意三个条件缺一不可：仅有 \(a_{ii}&gt;0,\ a_{ij}\le0\) 而无 \(\rho(B)&lt;1\) 不充分。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex74-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag">主子矩阵遗传性</span></header>
+              <div class="card-body">
+                <p>证明 M 矩阵的任意主子矩阵仍为 M 矩阵。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>Z-型在取主子矩阵时显然保持。用条件 A₁：M 矩阵的所有主子式为正；主子矩阵 \(A[I,I]\) 的任一主子式也是 A 的主子式，故全正，再由 A₁（对 \(A[I,I]\) 自身）知其为 M 矩阵。也可用逆的 Schur 补公式直接证主子矩阵的逆非负。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex74-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag">单调→S 的条件</span></header>
+              <div class="card-body">
+                <p>单调矩阵 A 为 S 矩阵的条件是什么？</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>S 矩阵是对称的 M 矩阵。单调矩阵已有 \(A^{-1}\ge O\)，故充要补充条件是：<strong>A 为对称 Z-型矩阵</strong>（\(A=A^{\mathrm T}\) 且 \(a_{ij}\le0\ (i\ne j)\)）。此时对称 + 逆非负 + Z-型蕴含正定（特征值为正：对称阵特征值为实数，逆非负保证无负特征值，非奇异排除零），即对称正定的 Z-型矩阵。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex74-5">
+              <header class="card-head"><span class="card-label">第 5 题</span><span class="tag tag-mid">加法不一定封闭</span></header>
+              <div class="card-body">
+                <p>设 A 和 B 都是 M 矩阵，问 \(A+B\) 是否为 M 矩阵？</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p><strong>不一定。</strong>Z-型对加法保持，但 M 性不保持。反例（按定义 (7.4.1) 验证）：\(A=\begin{pmatrix}2.5&-2\\-3&2.5\end{pmatrix},\ A^{-1}=\begin{pmatrix}10&8\\12&10\end{pmatrix}\ge O\)；\(B=\begin{pmatrix}0.1&-1\\0&0.1\end{pmatrix},\ B^{-1}=\begin{pmatrix}10&100\\0&10\end{pmatrix}\ge O\)；二者都是 M 矩阵。但 \(A+B=\begin{pmatrix}2.6&-3\\-3&2.6\end{pmatrix}\) 虽是 Z-型，\(\det(A+B)=2.6^2-3^2=-2.24&lt;0\)，而 M 矩阵必有 \(\det&gt;0\)（D₁₁），故 \(A+B\) 不是 M 矩阵。</p>
+                  <p>和仍为 M 的特例确实存在：两个对称 M 矩阵之和仍为 M（对称 M 即对称正定的 Z-型，加法保持对称正定与 Z-型）；M 矩阵加任何非负对角阵仍为 M（Z-型保持，且半正性 \(Ax&gt;0\Rightarrow(A+D)x\ge Ax&gt;0\)）。注意谱半径并不次可加（\(\rho(P+Q)\le\rho(P)+\rho(Q)\) 一般不成立，如 \(P=\begin{pmatrix}0&2\\3&0\end{pmatrix},\ Q=\begin{pmatrix}1&1\\0&1\end{pmatrix}\) 时 \(\rho(P+Q)=4&gt;\sqrt6+1=\rho(P)+\rho(Q)\)），故不能沿 (7.4.4) 表示论证封闭性。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex74-6">
+              <header class="card-head"><span class="card-label">第 6 题</span><span class="tag">占优即 M</span></header>
+              <div class="card-body">
+                <p>设 \(a_{ii}&gt;0,\ a_{ij}\le0\ (i\ne j)\)，且 A 是强对角占优或不可约对角占优的，问 A 是否为 M 矩阵？</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p><strong>是。</strong>\(B=I-D^{-1}A\) 非负，其第 \(i\) 行行和为 \(\sum_{j\ne i}|a_{ij}|/a_{ii}&lt;1\)（强占优）；由无穷范数 \(\|B\|_\infty&lt;1\) 得 \(\rho(B)\le\|B\|_\infty&lt;1\)，判据①成立。不可约情形用行和的不可约版本（\(\rho(B)&lt;1\) 的不可约强化）。这正是 §7.2"对角元为正的强/不可约占优阵正稳定"在 Z-型上的具体化。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex74-7">
+              <header class="card-head"><span class="card-label">第 7 题</span><span class="tag">三角判别</span></header>
+              <div class="card-body">
+                <p>三角阵 A 满足 \(a_{ii}&gt;0,\ a_{ij}\le0\ (i\ne j)\)，证明 A 为 M 矩阵。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>三角阵的行列式与所有顺序主子式都等于相应对角元之积，因 \(a_{ii}&gt;0\) 全为正，由判据③（D₁₁）A 为 M 矩阵。直接看逆：三角逆的元素是 A 非正元素乘积的交错组合，上（下）三角求逆公式中每项恰为非负数之和，故 \(A^{-1}\ge O\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex74-8">
+              <header class="card-head"><span class="card-label">第 8 题</span><span class="tag tag-mid">分解因子的遗传性</span></header>
+              <div class="card-body">
+                <p>Z-型矩阵 A 有三角分解 \(A=LU\)（L 非奇异下三角、U 对角元为 1 的上三角），若 L、U 中有一个是 M 矩阵，问另一个是否必为 M 矩阵？</p>
+                <details class="solution"><summary><span>查看提示</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>在 A 本身是 M 矩阵（顺序主子式全正，D₁₂ 保证分解存在且对角正）的前提下，<strong>两个因子都是 M 矩阵</strong>：L、U 的主对角元为正且由 Z-型 A 的分解结构知非对角元非正，用第 7 题三角判据即得。若不假设 A 为 M 而仅假设一个因子为 M，另一个一般不能保证——需要 A 的顺序主子式条件配合。教材结论的标准表述是：M 矩阵的 Doolittle 型 LU 分解中 L 与 U 都是 M 矩阵。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex74-9">
+              <header class="card-head"><span class="card-label">第 9 题</span><span class="tag tag-mid">符号反转的三对角阵</span></header>
+              <div class="card-body">
+                <p>设非负三对角阵 \(J_n=(b_{i-1},a_i,c_i)_1^n\) 的顺序主子式都为正，取 \(\widetilde J_n=(-b_{i-1},a_i,-c_i)_1^n\)，问 \(\widetilde J_n\) 是否为 M 矩阵？</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p><strong>是。</strong>\(\widetilde J_n\) 是 Z-型矩阵（次对角元 \(-b,-c\le0\)，主对角 \(a_i\ge0\)）；顺序主子式只含偶数个次对角乘积项（\(b_ic_i\) 成对出现，两个负号相乘为正），故与 \(J_n\) 的顺序主子式<strong>逐项相等</strong>，全为正；又 \(\widetilde J_n\) 的对角元 \(a_i\) 在顺序主子式为正的链中必为正（一阶主子式）。由判据③，\(\widetilde J_n\) 为 M 矩阵。这是离散二阶差分算子（如 \(-u''\) 的差分矩阵）为 M 的标准来源。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex74-10">
+              <header class="card-head"><span class="card-label">第 10 题</span><span class="tag">不对称正定</span></header>
+              <div class="card-body">
+                <p>当对任意非零向量 x 都有 \(x^{\mathrm T}Ax&gt;0\) 时称 A 为正定矩阵（不要求对称），证明它的每个<strong>实</strong>特征值都是正的。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>写 \(A=H+K\)，其中 \(H=(A+A^{\mathrm T})/2\) 对称、\(K=(A-A^{\mathrm T})/2\) 反对称。反对称部分满足 \(x^{\mathrm T}Kx=0\)，故 \(x^{\mathrm T}Ax=x^{\mathrm T}Hx&gt;0\)，H 对称正定。若 \(Ax=\lambda x\) 为实特征值（可取实特征向量 x≠0），则 \(\lambda=x^{\mathrm T}Ax/x^{\mathrm T}x&gt;0\)。</p>
+                  <p><strong>补充（教材未要求，供习题 11 参考）：</strong>复特征值 \(\lambda=\alpha+\mathrm i\beta\) 的实部同样为正。取共轭特征向量 \(x=u+\mathrm iv\)，由 \(Au=\alpha u-\beta v,\ Av=\beta u+\alpha v\) 得 \(u^{\mathrm T}Au+v^{\mathrm T}Av=\alpha(\|u\|^2+\|v\|^2)&gt;0\)，故 \(\alpha&gt;0\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex74-11">
+              <header class="card-head"><span class="card-label">第 11 题</span><span class="tag">正定 Z-型</span></header>
+              <div class="card-body">
+                <p>设 A 是正定的 Z-型矩阵（不要求对称），A 是否为 M 矩阵？</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p><strong>是。</strong>用 M 矩阵的等价刻画「\(A=sI-B\)，\(B\ge O\)，且 \(\rho(B)&lt;s\)」：取 \(s=\max_i a_{ii}&gt;0\)（正定取 \(x=e_i\) 即知每个 \(a_{ii}&gt;0\)），令 \(B=sI-A\)，则 \(B\ge O\)。由 Perron–Frobenius，存在 \(v\ge0,\ v\ne0\) 使 \(Bv=\rho(B)v\)，于是
+                    \[ \rho(B)\|v\|^2=v^{\mathrm T}Bv=v^{\mathrm T}(sI-A)v=s\|v\|^2-v^{\mathrm T}Av&lt;s\|v\|^2, \]
+                    其中末步用了 \(A\) 正定。故 \(\rho(B)&lt;s\)，即 \(A\) 是非奇异 M 矩阵（判据①）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex74-12">
+              <header class="card-head"><span class="card-label">第 12 题</span><span class="tag">主子式正但非 Z-型</span></header>
+              <div class="card-body">
+                <p>A 的顺序主子式都为正，但未假设它是 Z-型矩阵，这时 A 有怎样的三角分解？</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>顺序主子式全正保证 Doolittle 型三角分解 \(A=LU\) 存在且 L、U 的主对角元全为正（U 对角元为相邻顺序主子式之比 \(\Delta_k/\Delta_{k-1}&gt;0\)）。但没有 Z-型前提，L、U 的非对角元不再有符号保证，故<strong>不必是 M 矩阵</strong>，只是正对角三角分解。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex74-13">
+              <header class="card-head"><span class="card-label">第 13 题</span><span class="tag tag-mid">整体稳定 vs 主子矩阵稳定</span></header>
+              <div class="card-body">
+                <p>分析两个条件的关系：(1) A 的特征值实部都为正；(2) A 的顺序主子矩阵的特征值实部都为正。</p>
+                <details class="solution"><summary><span>查看分析</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>(2)\(\Rightarrow\)(1) 显然（A 自身是其主子矩阵之一）。(1)\(\Rightarrow\)(2) <strong>一般不成立</strong>：正稳定矩阵的主子矩阵可以不稳定（正稳定性没有遗传性，对照 §7.1 习题 2 对强对角占优成立、对一般正稳定不成立）。但对 <strong>M 矩阵成立等价</strong>：条件 (1) 即 40 条件中的正稳定 J₂₉，而 M 矩阵的任意主子矩阵仍为 M 矩阵（第 3 题），故也满足 J₂₉，所以 (1)(2) 对 Z-型 M 矩阵等价。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex74-14">
+              <header class="card-head"><span class="card-label">第 14 题</span><span class="tag">主子式正推不出实特征值正？</span></header>
+              <div class="card-body">
+                <p>A 的顺序主子式都为正，是否能推得 A 的实特征值为正？</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>对<strong>一般矩阵不能</strong>：顺序主子式正只控制顺序主子矩阵的行列式，不控制全部特征值符号（非对称时特征值可成共轭对或为负而行列式仍正，例如存在 2 阶矩阵 \(\det&gt;0,\ a_{11}&gt;0\) 但两特征值为负实数之外的复杂情形；3 阶反例可构造）。对 <strong>Z-型矩阵则可以</strong>——顺序主子式全正是 M 矩阵的 D₁₁ 条件，由 C₉ 实特征值全正。Z-型假设是关键。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex74-15">
+              <header class="card-head"><span class="card-label">第 15 题</span><span class="tag tag-mid">不对称正定的遗传性</span></header>
+              <div class="card-body">
+                <p>A 为正定矩阵（不要求对称），能否推得 A 的任意主子矩阵的特征值实部为正？</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p><strong>能。</strong>第 10 题的论证对任意主子矩阵 \(A[I,I]\) 同样适用：对支集在 I 上的向量 x，\(x^{\mathrm T}Ax=x^{\mathrm T}A[I,I]x&gt;0\)，即每个主子矩阵（在第 10 题的不对称正定意义下）也正定；再用第 10 题结论得其特征值实部为正。注意这与第 13 题的"正稳定"不同：正稳定只要求特征值条件，而"\(x^{\mathrm T}Ax&gt;0\) 对一切 x"是更强的二次型条件，故有遗传性。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex74-16">
+              <header class="card-head"><span class="card-label">第 16 题</span><span class="tag tag-hard">比较矩阵 M(A)</span></header>
+              <div class="card-body">
+                <p>作矩阵 M(A)：\(m_{ii}=|a_{ii}|,\ m_{ij}=-|a_{ij}|\ (i\ne j)\)，称 A 的<strong>比较矩阵</strong>。(1) 证明半强对角占优矩阵 A 的比较矩阵 M(A) 必为 M 矩阵；(2) 对称正定阵 A 的比较矩阵是否为 S 矩阵？</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>(1) M(A) 是 Z-型矩阵，对角元 \(|a_{ii}|\)；A 半强（= 链占优）对角占优意味着 M(A) 本身是<strong>强对角占优或链对角占优且对角元为正</strong>（比较矩阵的行余量即 \(\sum_{j\ne i}|a_{ij}|\)），由第 6 题路线（\(\rho(I-D^{-1}M(A))&lt;1\) 或链条件）知 M(A) 为 M 矩阵。</p>
+                  <p>(2) <strong>不一定。</strong>M(A) 当然对称 Z-型，但 A 的对称正定并不保证 M(A) 正稳定。反例：取 \(c=0.9\)，\(A=(1-c)I+c\,ee^{\mathrm T}\)（3 阶，对角元 \(1\)、非对角元 \(0.9\)），特征值 \(0.1,\,0.1,\,2.8\)，对称正定；其比较矩阵 \(M(A)=(1+c)I-c\,ee^{\mathrm T}=1.9I-0.9\,ee^{\mathrm T}\) 的特征值为 \(1.9,\,1.9,\,1-2c=-0.8\)，有负特征值、非正稳定，故非 M 亦非 S（亦可由 \(\det M(A)=1.9^2\times(-0.8)=-2.888&lt;0\) 佐证）。正确的充分条件是 A 另为 H-矩阵（如对角占优）：此时 M(A) 为 M 矩阵，对称时即 S 矩阵。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex74-17">
+              <header class="card-head"><span class="card-label">第 17 题</span><span class="tag tag-hard">行列式单调性（Fiedler–Ptak）</span></header>
+              <div class="card-body">
+                <p>设 A 为 M 矩阵，B 为 Z-型矩阵且 \(B\ge A\)，证明 \(\det B\ge\det A\)。</p>
+                <details class="solution"><summary><span>查看提示</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(B\ge A\) 且同为 Z-型 ⇒ B 也是 M 矩阵（M 矩阵在元素增大、保持 Z-型时封闭：用半正判据，A 有 \(x&gt;0,\ Ax&gt;0\)，则 \(Bx\ge Ax&gt;0\)）。令 \(C=B-A\ge O\)，作 homotopy \(A(t)=A+tC\)（\(0\le t\le1\)）：每个 \(t\) 处 \(A(t)\) 的非对角元满足 \(a_{ij}+tc_{ij}\le a_{ij}+c_{ij}=b_{ij}\le0\)（Z-型），且 \(A(t)x\ge Ax&gt;0\)（半正），故均为 M 矩阵、\(\det A(t)&gt;0\)。由 \(\frac{\mathrm d}{\mathrm dt}\ln\det A(t)=\operatorname{tr}\!\big(A(t)^{-1}C\big)\ge0\)（\(A(t)^{-1}\ge O,\ C\ge O\)，两个非负矩阵之积的迹非负），\(\det A(t)\) 在 \([0,1]\) 上单调不减，故 \(\det B=\det A(1)\ge\det A(0)=\det A\)。（注：不能改用"\(T\ge O\Rightarrow\det(I+T)\ge1\)"：如 \(T=\begin{pmatrix}0&1\\1&0\end{pmatrix}\ge O\) 而 \(\det(I+T)=0\)。）</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex74-18">
+              <header class="card-head"><span class="card-label">第 18 题</span><span class="tag tag-hard">中心对称矩阵（Fiedler–Ptak, 1962）</span></header>
+              <div class="card-body">
+                <p>若 A 满足 \(a_{n+1-i,n+1-j}=a_{ij}\)，称 A 为<strong>中心对称矩阵</strong>。讨论这类矩阵为 M 矩阵的条件。</p>
+                <details class="solution"><summary><span>查看讨论</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>中心对称矩阵在反序置换 \(J\)（\(J_{i,n+1-i}=1\)）下满足 \(JAJ=A\)，即与 J 交换，故可经正交置换同步块对角化为两个半阶矩阵（对称/反对称向量不变子空间）：\(Q^{\mathrm T}AQ=\operatorname{diag}(A_1,A_2)\)。因此 A 为 M 矩阵的充要条件化为：A 为 Z-型（中心对称保持）<strong>且两个半阶块 \(A_1,A_2\) 都是 M 矩阵</strong>（块对角阵为 M ⇔ 各块为 M；逆非负、主子式正均可分块验证）。偶数阶时两块同阶；奇数阶时阶数相差 1，中间行/列归入其中一块。该题选 自 Fiedler 与 Ptak 1962 年的经典论文。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结</h2>
+            <div class="summary-block">
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>对象</th><th>结论</th></tr>
+                  <tr><td>Z-型矩阵</td><td>\(a_{ij}\le0\ (i\ne j)\)（7.4.3）</td></tr>
+                  <tr><td>M 矩阵定义</td><td>Z-型且 \(A^{-1}\ge O\)（7.4.1）；等价 \(A=sI-B,\ B\ge O,\ \rho(B)&lt;s\)（7.4.4）</td></tr>
+                  <tr><td>五条实用判据</td><td>\(a_{ii}&gt;0\) 且 \(\rho(I-D^{-1}A)&lt;1\)；∃x&gt;0: Ax&gt;0；顺序主子式全正；强/不可约/链占优 Z-型；拟占优 Z-型</td></tr>
+                  <tr><td>性质</td><td>对角正、非奇异、\(\det&gt;0\)、拟占优、转置 M、正稳定、\(A+\alpha I\) 非奇异、主子矩阵遗传</td></tr>
+                  <tr><td>分解</td><td>顺序主子式正 ⇒ LU，L、U 皆 M 矩阵；逆由 Neumann 级数 \(\sum(B/s)^k/s\) 非负</td></tr>
+                  <tr><td>S 矩阵</td><td>对称 M 矩阵 = 对称正定的 Z-型矩阵（Stieltjes）</td></tr>
+                  <tr><td>广义 M</td><td>主子式非负、半收敛分裂、\(\rho(B)\le s\)、特征值实部非负、\(A+D\) 对正对角 D 非奇异</td></tr>
+                  <tr><td>封闭性</td><td>M 矩阵对加法<strong>不一定</strong>封闭（习题 5 反例；对称 M 之和、M 加非负对角阵等特例成立）；Z-型下元素增大（保持 Z-型）仍为 M，且 \(\det B\ge\det A\)</td></tr>
+                </table>
+              </div>
+              <p style="margin-top:12px">M 矩阵是第 7 章的枢纽：定义来自 §7.3 的逆非负（单调），判据复用 §7.2 的各类对角占优，稳定性对接 §7.1 的正稳定与 Lyapunov/Cayley，计算回到 §7.3 的正则分裂与 Neumann 级数。下一节 §7.5 转向<strong>沿对角线取常值</strong>的 Toeplitz 矩阵及其近亲 Hankel 矩阵、循环矩阵。</p>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>为什么"单调矩阵"与"M 矩阵"只差一个 Z-型假设？试举一个单调但不是 M 的矩阵。</li>
+                  <li>40 个充要条件中，哪些最适合手算验证（低阶），哪些适合理论推导，哪些对应迭代计算？</li>
+                  <li>为什么差分 Laplace 矩阵（对称、对角占优、Z-型、正定）同时满足 S 矩阵的全部刻画？它的逆非负在概率上对应什么（Green 函数）？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="7.3-nonnegative-matrices.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§7.3 非负矩阵（选学）</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="7.5-toeplitz.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§7.5 Toeplitz 矩阵及其有关矩阵（选学）</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>矩阵论精讲 · 程云鹏《矩阵论》第 3 版</title>
+  <meta name="description" content="《矩阵论》研究生课程配套精讲网页，按程云鹏、张凯院、徐仲《矩阵论》第3版教材逐小节制作，离线可用。">
+  <link rel="stylesheet" href="vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+
+  <main class="home" id="main" tabindex="-1">
+    <header class="home-hero">
+      <div class="seal-lg">矩</div>
+      <h1>矩阵论精讲</h1>
+      <p class="sub">程云鹏 · 张凯院 · 徐仲《矩阵论》（第 3 版）逐小节教学课件</p>
+      <div class="meta">
+        <span class="chip">教材 <strong>西北工业大学出版社</strong></span>
+        <span class="chip">全书 <strong>7 章 · 31 节</strong></span>
+        <span class="chip">交互组件 <strong>36 个</strong></span>
+        <span class="chip">全部章节 <strong>已上线</strong></span>
+      </div>
+    </header>
+
+    <div id="home-progress"></div>
+
+    <div class="offline-note">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#a06a17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span><strong>离线使用说明：</strong>本课件的公式字体、样式、脚本全部内置在本文件夹中，无需联网。把整个 <code>matrix-theory</code> 文件夹拷贝到任意位置，双击课时网页即可学习；也可用浏览器「打印 → 另存为 PDF」存档（打印时证明与解答会自动展开）。<strong>分发提醒：</strong><code>textbook\</code> 内是受版权保护的教材原件，仅供本人对照查阅；对外拷贝或打包分享前，请先删除该目录（只保留网页与 <code>assets</code>、<code>vendor</code>、<code>chapters</code>）。</span>
+    </div>
+
+    <div id="home-chapters"><!-- common.js 依据 COURSE_TOC 渲染 --></div>
+
+    <footer>
+      <p>昆明理工大学 · 研究生课程《矩阵论》自学课件 ｜ 内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+    </footer>
+  </main>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="vendor/katex/katex.min.js"></script>
+  <script defer src="vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="assets/js/common.js"></script>
+  <!-- 首页没有任何实验台，故不加载 interactives.js（218KB 只在课时页需要）；结构门禁 tools/qa/template-drift.js 保证课时页仍全部加载它 -->
+</body>
+</html>

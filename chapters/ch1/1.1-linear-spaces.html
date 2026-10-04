@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§1.1 线性空间 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §1.1 线性空间：集合与映射、线性空间公理、基与坐标、基变换与坐标变换、线性子空间、子空间的交与和（含维数公式与直和）">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§1.1 线性空间</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="1.1" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 1 章 线性空间与线性变换</a><span class="sep" aria-hidden="true">/</span>
+            <span>§1.1 线性空间</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 1 章 · 线性空间与线性变换</div>
+            <h1>§1.1 线性空间</h1>
+            <p class="lede">线性空间（向量空间）是线性代数最基本的概念，也是学习现代矩阵论的重要基础。本节从集合与映射讲起，抽象出线性空间的八条公理，进而研究维数、基、坐标、基变换，并把研究对象推广到线性子空间及其交、和与直和——这些语言将贯穿全书。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.1–26</strong></span>
+              <span class="chip">建议 <strong>7 学时</strong></span>
+              <span class="chip">定义 <strong>9 个</strong></span>
+              <span class="chip">定理 <strong>7 个</strong></span>
+              <span class="chip">例题 <strong>9 道</strong></span>
+
+              <span class="chip">推论 <strong>2 个</strong></span></div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标（学完本节你将能够）</h3>
+                <ul>
+                  <li>说清数域、映射、变换、和集等预备概念，区分和集与并集；</li>
+                  <li>陈述线性空间的 <strong>8 条公理</strong>，并能对具体集合与自定义运算逐条验证（如例 1.5）；</li>
+                  <li>判断向量组的线性相关与无关，求常见线性空间的维数与一个基；</li>
+                  <li>熟练求向量在给定基下的坐标、两组基之间的<strong>过渡矩阵</strong>，使用坐标变换公式；</li>
+                  <li>判定子空间，写出矩阵的值域 \(R(A)\) 与核空间 \(N(A)\)，运用秩—零度公式；</li>
+                  <li>求子空间交与和的基，运用<strong>维数公式</strong>，判别并使用直和分解。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>本节重点</h4>
+                    <ul>
+                      <li>线性空间的公理化定义与例 1.5 的验证；</li>
+                      <li>基、维数、坐标；过渡矩阵与坐标变换；</li>
+                      <li>生成子空间、\(R(A)\)、\(N(A)\)；</li>
+                      <li>维数公式与直和。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>学习难点</h4>
+                    <ul>
+                      <li>"加法/数乘可以被重新定义"的抽象思想；</li>
+                      <li>和集 \(S_1+S_2\) 与并集的区别；</li>
+                      <li>形式写法 \((y)=(x)C\) 中系数在 <strong>C 的列</strong>；</li>
+                      <li>维数公式证明中基的扩充；直和充要条件。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 7 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>集合、映射与数域</td><td class="num">p.1–5</td></tr>
+                    <tr><td class="num">2</td><td>线性空间定义 1.1 + 例 1.5</td><td class="num">p.5–8</td></tr>
+                    <tr><td class="num">3</td><td>零元负元、相关性、维数</td><td class="num">p.7–9</td></tr>
+                    <tr><td class="num">4</td><td>基、坐标、例 1.6</td><td class="num">p.9–11</td></tr>
+                    <tr><td class="num">5</td><td>基变换与坐标变换（例 1.7–1.8 + 实验）</td><td class="num">p.11–16</td></tr>
+                    <tr><td class="num">6</td><td>线性子空间、值域/核、秩零度、基扩充</td><td class="num">p.16–20</td></tr>
+                    <tr><td class="num">7</td><td>交与和、维数公式、直和（+习题）</td><td class="num">p.20–26</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图（先有全局，再钻细节）</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 302" role="img" aria-label="线性空间知识脉络图">
+                    <defs>
+                      <marker id="fmarrow" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto">
+                        <path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/>
+                      </marker>
+                    </defs>
+                    <!-- 第一行：公理化主线 -->
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="0"   y="24" width="128" height="44"/><rect x="152" y="24" width="128" height="44"/>
+                      <rect x="304" y="24" width="112" height="44"/><rect x="440" y="24" width="104" height="44"/>
+                      <rect x="568" y="24" width="104" height="44"/><rect x="696" y="24" width="144" height="44"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="64"  y="52">集合·映射·数域</text>
+                      <text x="216" y="52">线性空间（8公理）</text>
+                      <text x="360" y="52">线性相关 / 无关</text>
+                      <text x="492" y="52">维数 dim V</text>
+                      <text x="620" y="52">基与坐标</text>
+                      <text x="768" y="52">基变换·坐标变换</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#fmarrow)">
+                      <line x1="128" y1="46" x2="150" y2="46"/><line x1="280" y1="46" x2="302" y2="46"/>
+                      <line x1="416" y1="46" x2="438" y2="46"/><line x1="544" y1="46" x2="566" y2="46"/>
+                      <line x1="672" y1="46" x2="694" y2="46"/>
+                    </g>
+                    <!-- 第二行：子空间支线 -->
+                    <g class="fm-node" fill="#eff2f7" stroke="#46536c">
+                      <rect x="0"   y="128" width="120" height="44"/><rect x="144" y="128" width="128" height="44"/>
+                      <rect x="296" y="128" width="140" height="44"/><rect x="460" y="128" width="120" height="44"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="60"  y="156">线性子空间</text>
+                      <text x="208" y="156">生成子空间 L(…)</text>
+                      <text x="366" y="156">值域 R(A)·核 N(A)</text>
+                      <text x="520" y="156">秩—零度公式</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#fmarrow)">
+                      <line x1="120" y1="150" x2="142" y2="150"/><line x1="272" y1="150" x2="294" y2="150"/>
+                      <line x1="436" y1="150" x2="458" y2="150"/>
+                    </g>
+                    <path class="fm-edge" stroke-dasharray="4 4" d="M216 68 L216 126"/>
+                    <!-- 第三行：交和直和 -->
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46">
+                      <rect x="240" y="232" width="170" height="44"/><rect x="436" y="232" width="110" height="44"/>
+                      <rect x="572" y="232" width="120" height="44"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="325" y="151" dy="0" fill="none"></text>
+                      <text x="325" y="260">交 V₁∩V₂ 与和 V₁+V₂</text>
+                      <text x="491" y="260">维数公式</text>
+                      <text x="632" y="260">直和 V₁⊕V₂</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#fmarrow)">
+                      <line x1="410" y1="254" x2="434" y2="254"/><line x1="546" y1="254" x2="570" y2="254"/>
+                    </g>
+                    <path class="fm-edge" stroke-dasharray="4 4" d="M520 172 C480 200 400 205 350 230"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、集合与映射 ================= -->
+          <section class="section" id="sec-set-map">
+            <h2 class="sec-title"><span class="cn">一</span>集合与映射</h2>
+
+            <h3 class="sub-title" id="set-basics">1. 集合的概念与表示</h3>
+            <p>集合是数学中最基本的概念之一（它不加定义，只作描述）。所谓<strong>集合</strong>，是指作为整体看的一堆东西。例如：由一些数（有限个或无限个）组成的集合称为<strong>数集合</strong>或<strong>数集</strong>；一个线性代数方程组的全部解组成<strong>解集合</strong>；已知半径和圆心的开圆内所有点组成<strong>点集合</strong>（点集）。组成集合的事物称为该集合的<strong>元素</strong>。</p>
+            <p>用 \(S\) 表示集合，\(a\) 表示 \(S\) 的元素，记作
+              \(a\in S\)，读作"\(a\) 属于 \(S\)"；记号 \(a\notin S\) 表示 \(a\) 不属于 \(S\)。</p>
+            <p>给出一个集合，不外乎两种方式：</p>
+            <ul>
+              <li><strong>列举法</strong>：列举出全部元素。如由数 \(1,2,3\) 组成的集合
+                \[ N=\{1,\,2,\,3\}. \]</li>
+              <li><strong>特征性质法</strong>：给出元素满足的特征性质。例如适合椭圆方程 \(\dfrac{x^2}{a^2}+\dfrac{y^2}{b^2}=1\) 的点有无穷多个，无法全列举，记为
+                <div class="eq-scroll">
+                \[ P=\left\{(x,y)\;\middle|\;\frac{x^2}{a^2}+\frac{y^2}{b^2}=1\right\}. \]
+                </div>
+                一般地，\(M\) 是具有某些性质的全部元素 \(a\) 组成的集合时，可记为
+                \[ M=\{\,a\mid a\text{ 具有的性质}\,\}. \]</li>
+            </ul>
+            <p>一切正整数的集合称为<strong>正整数集</strong>，常记为
+              \[ \N_0=\{\,n\mid n\text{ 是正整数}\,\}. \]
+              不包含任何元素的集合称为<strong>空集</strong>，常记为 \(\varnothing\)。例如一个无解的线性代数方程组的解集就是空集。空集在集合运算中的作用，类似于数零在数运算中的作用。</p>
+
+            <h3 class="sub-title" id="subset-equality">2. 子集、当然子集与集合相等</h3>
+            <p>如果集合 \(S_1\) 的元素全是集合 \(S_2\) 的元素（由 \(a\in S_1\) 可以推出 \(a\in S_2\)），就称 \(S_1\) 为 \(S_2\) 的<strong>子集</strong>，记为
+              \[ S_1\subset S_2\quad\text{或}\quad S_2\supset S_1. \]
+              例如全体偶数组成的集合是全体整数组成的集合——整数集——的子集。<strong>规定空集是任一集合的子集</strong>；按定义每个集合都是它自身的子集。</p>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意：本书"当然子集"的特殊叫法</span>
+              </header>
+              <div class="card-body">
+                <p>本书把空集 \(\varnothing\) 与集合自身这两个"天然就有"的特殊子集统称为<strong>当然子集合（或假子集合）</strong>，把其余子集统称为<strong>非当然子集合（或真子集合）</strong>。这与今天多数教材用"\(\subset\)"表示真子集的习惯<strong>不同</strong>：本书的 \(\subset\) 允许两边相等（相当于现代记号 \(\subseteq\)）。阅读原书时请按本书约定理解；本课件 \(\subset\) 沿用教材，需要强调真包含时会另行说明。</p>
+              </div>
+            </aside>
+            <p>如果两个集合 \(S_1\) 与 \(S_2\) 含完全相同的元素（\(a\in S_1\) 当且仅当 \(a\in S_2\)），称它们<strong>相等</strong>，记 \(S_1=S_2\)。因此
+              \[ S_1\subset S_2\ \text{且}\ S_2\subset S_1\quad\Longleftrightarrow\quad S_1=S_2. \]
+              即：证明两个集合相等，就是证双向包含——这一手法本节将反复使用。</p>
+
+            <h3 class="sub-title" id="intersection-union">3. 集合的交与并</h3>
+            <p>把既属于 \(S_1\) 又属于 \(S_2\) 的全体元素组成的集合称为 \(S_1\) 与 \(S_2\) 的<strong>交</strong>，记为
+              \[ S_1\cap S_2=\{\,x\mid x\in S_1\text{ 且 }x\in S_2\,\}. \]
+              例如，圆 \((x-1)^2+y^2=1\) 的点集与圆 \((x-2)^2+y^2=1\) 的点集的交，就是两个圆公共部分（两个交点）组成的点集。显然
+              \[ S_1\cap S_2\subset S_1,\qquad S_1\cap S_2\subset S_2. \]
+              属于 \(S_1\)，或属于 \(S_2\) 的全体元素组成的集合，称为 \(S_1\) 与 \(S_2\) 的<strong>并</strong>，记为
+              \[ S_1\cup S_2=\{\,x\mid x\in S_1\text{ 或 }x\in S_2\,\}, \]
+              且有 \(S_1\cup S_2\supset S_1\)，\(S_1\cup S_2\supset S_2\)。</p>
+
+            <h3 class="sub-title" id="sum-set">4. 和集 —— 它和并集不是一回事</h3>
+            <p>对<strong>数集</strong>（元素之间定义了加法的集合）还可以定义"和"。集合 \(S_1\) 与集合 \(S_2\) 的<strong>和集</strong>是指如下集合
+              \[ \{\,x+y\mid x\in S_1,\ y\in S_2\,\}, \]
+              用记号 \(S_1+S_2\) 表示，于是
+              \[ S_1+S_2=\{\,x+y\mid x\in S_1,\ y\in S_2\,\}. \]
+            </p>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意：和集 ≠ 并集</span>
+              </header>
+              <div class="card-body">
+                <p>并集只是把两个集合的元素"收拢"，元素本身不变；和集则是对元素两两<strong>作加法</strong>得到新元素：</p>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>运算</th><th>举例（\(S_1=\{1,2,3\}\)，\(S_2=\{2,3,4\}\)）</th></tr>
+                    <tr><td>并集</td><td>\(\{1,2,3\}\cup\{2,3,4\}=\{1,2,3,4\}\)</td></tr>
+                    <tr><td>和集</td><td>\(\{1,2,3\}+\{2,3,4\}=\{3,4,5,6,7\}\)</td></tr>
+                  </table>
+                </div>
+                <p>其中 \(3=1+2\)，\(4=1+3=2+2\)，\(5=1+4=2+3=3+2\)，\(6=2+4=3+3\)，\(7=3+4\)。本节后面的"<strong>子空间的和</strong>"正是这一概念在线性空间中的版本。</p>
+              </div>
+            </aside>
+
+            <h3 class="sub-title" id="number-field">5. 数域</h3>
+            <p>某些<strong>数集</strong>（含非零的数），如果其中任意两个数的和、差、积、商（除数不为零）仍在该数集中（即对四则运算封闭），那么称该数集为一个<strong>数域</strong>。</p>
+            <p>实数集关于四则运算封闭，形成<strong>实数域</strong>，记为 \(\R\)；复数集形成<strong>复数域</strong>，记为 \(\C\)；读者可自行验证有理数集形成<strong>有理数域</strong> \(\Q\)。但<strong>奇数集、偶数集都不能形成数域</strong>：奇数作和 \(1+1=2\) 已不是奇数；偶数作商 \(2\div 2=1\) 已不是偶数（对除法不封闭）。</p>
+            <p>数域是线性空间的"系数来源"：下面总设 \(K\) 为一般数域（可以是 \(\R\)、\(\C\) 或其他数域）。</p>
+
+            <h3 class="sub-title" id="mapping">6. 映射、象与原象、变换</h3>
+            <p>设 \(S\) 与 \(S'\) 是两个集合。所谓集合 \(S\) 到集合 \(S'\) 的一个<strong>映射</strong>（或<strong>映照</strong>），是指一个法则（规则）\(\sigma\)：\(S\to S'\)，它使 \(S\) 中<strong>每一个</strong>元素 \(a\)，都有 \(S'\) 中<strong>唯一确定</strong>的元素 \(a'\) 与之对应，记为
+              \[ \sigma(a)=a'\quad\text{或}\quad a\to a'(=\sigma(a)). \]
+              \(a'\) 称为 \(a\) 在映射 \(\sigma\) 下的<strong>象</strong>，\(a\) 称为 \(a'\) 在映射 \(\sigma\) 下的一个<strong>原象</strong>（或<strong>象源</strong>）。</p>
+            <p>\(S\) 到 \(S\) 自身的映射，也称为 \(S\) 到自身的一个<strong>变换</strong>。这是矩阵论中经常出现的特殊映射。</p>
+            <p>教材给出四个典型例子（先混个眼熟，§1.2 还会系统研究）：</p>
+            <div class="grid2">
+              <div class="mini-card">
+                <div class="mc-title">例：行列式是矩阵到数的映射</div>
+                <p style="margin:0">\(S\) 为数域 \(K\) 上全体 \(n\) 阶矩阵的集合，定义 \(\sigma_1(A)=\det A\)（\(A\in S\)），则 \(\sigma_1:S\to K\) 把每个矩阵映为一个数。</p>
+              </div>
+              <div class="mini-card">
+                <div class="mc-title">例：数到纯量矩阵的映射</div>
+                <p style="margin:0">\(\sigma_2(a)=aI\)（\(a\in K\)），其中 \(I\) 为 \(n\) 阶单位阵，则 \(\sigma_2:K\to S\) 把每个数映为一个纯量矩阵。</p>
+              </div>
+              <div class="mini-card">
+                <div class="mc-title">例：求导是多项式空间上的变换</div>
+                <p style="margin:0">\(P_n\) 为次数不超过 \(n\) 的实系数多项式集合，\(\sigma(f(t))=f'(t)\)（\(f(t)\in P_n\)）把多项式映为它的导数，是 \(P_n\) 到自身的变换。</p>
+              </div>
+              <div class="mini-card">
+                <div class="mc-title">例：函数即实数集上的映射</div>
+                <p style="margin:0">指数函数 \(y=e^x\) 可视为 \(\R\to\R\) 的映射；一般地，定义在 \(\R\) 上的实函数 \(y=f(x)\) 都是 \(\R\) 到自身的映射。</p>
+              </div>
+            </div>
+
+            <h3 class="sub-title" id="map-operations">7. 映射相等与映射的乘积（复合）</h3>
+            <p>设 \(\sigma_1,\sigma_2\) 都是集合 \(S\to S'\) 的映射，如果对每个 \(a\in S\) 都有 \(\sigma_1(a)=\sigma_2(a)\)，则称两映射<strong>相等</strong>，记 \(\sigma_1=\sigma_2\)。</p>
+            <p>设 \(\sigma,\tau\) 依次是 \(S\to S_1\)、\(S_1\to S_2\) 的映射，定义映射的<strong>乘积</strong>（即复合）\(\tau\sigma\) 如下：
+              \[ (\tau\sigma)(a)=\tau(\sigma(a))\qquad(a\in S). \]
+              也就是"先施行 \(\sigma\)，再施行 \(\tau\)"，其结果 \(\tau\sigma\) 是 \(S\to S_2\) 的一个映射。</p>
+            <p>设 \(\sigma,\tau,\mu\) 依次为 \(S\to S_1\)、\(S_1\to S_2\)、\(S_2\to S_3\) 的映射，可以证明映射乘积满足<strong>结合律</strong>，但<strong>不满足交换律</strong>：
+              \[ (\mu\tau)\sigma=\mu(\tau\sigma),\qquad \tau\sigma\ne\sigma\tau. \]
+              结合律成立是因为两边作用在任意 \(a\) 上都是 \(\mu(\tau(\sigma(a)))\)。</p>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意：交换律不成立的简单反例（补充）</span>
+              </header>
+              <div class="card-body">
+                <p>取 \(S=\R\)，\(\sigma(x)=x+1\)，\(\tau(x)=x^2\)，则
+                  \[ (\tau\sigma)(x)=\tau(x+1)=(x+1)^2,\qquad (\sigma\tau)(x)=\sigma(x^2)=x^2+1, \]
+                  取 \(x=1\) 得 \(4\ne 2\)，故 \(\tau\sigma\ne\sigma\tau\)。做复合时务必认准"<strong>谁先谁后</strong>"。</p>
+              </div>
+            </aside>
+          </section>
+          <!-- ================= 二、线性空间及其性质 ================= -->
+          <section class="section" id="sec-linear-space">
+            <h2 class="sec-title"><span class="cn">二</span>线性空间及其性质</h2>
+            <p>线性空间是某类事物从"量"的方面的一个抽象。为便于理解，先看四个熟知的例子——它们对象不同，却有完全相同的代数骨架。</p>
+
+            <h3 class="sub-title" id="four-examples">1. 四个引例（例 1.1–1.4）</h3>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>引例</th><th>集合 \(V\) 的元素</th><th>加法</th><th>数乘</th><th>共同之处</th></tr>
+                <tr>
+                  <td><strong>例 1.1</strong></td>
+                  <td>所有实（复）\(n\) 维向量 \(\R^n\)（\(\C^n\)）</td>
+                  <td>向量加法</td>
+                  <td>数乘 \(n\) 维向量</td>
+                  <td rowspan="4">两种运算都<strong>封闭</strong>，且都满足下面将列出的 8 条运算律</td>
+                </tr>
+                <tr>
+                  <td><strong>例 1.2</strong></td>
+                  <td>次数不超过 \(n\) 的实系数多项式 \(P_n\)</td>
+                  <td>多项式加法：\(f(t),g(t)\in P_n\Rightarrow f(t)+g(t)\in P_n\)</td>
+                  <td>\(k\in\R\Rightarrow kf(t)\in P_n\)</td>
+                </tr>
+                <tr>
+                  <td><strong>例 1.3</strong></td>
+                  <td>常系数二阶齐次方程 \(y''-3y'+2y=0\) 的解集 \(D\)</td>
+                  <td>\(y_1,y_2\in D\Rightarrow y_1+y_2\in D\)</td>
+                  <td>\(k\in\R\Rightarrow ky_1\in D\)</td>
+                </tr>
+                <tr>
+                  <td><strong>例 1.4</strong></td>
+                  <td>所有 \(n\) 阶实（复）矩阵 \(\R^{n\times n}\)（\(\C^{n\times n}\)）</td>
+                  <td>\(A,B\Rightarrow A+B\)</td>
+                  <td>\(k\in\R\)（\(\C\)）\(\Rightarrow kA\)</td>
+                </tr>
+              </table>
+            </div>
+            <p>数学、力学及其他学科中还有大量这样的集合。因此有必要<strong>不考虑集合对象的具体含义，抽去具体内容，研究这类集合的公共性质</strong>，并引进一个概括性名词——这就是线性空间。</p>
+
+            <h3 class="sub-title" id="definition-1-1">2. 定义 1.1：八条公理</h3>
+            <section class="card def" id="def-1-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.1</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(V\) 是一个<strong>非空集合</strong>，元素用 \(x,y,z\) 等表示，称之为<strong>向量</strong>；\(K\) 是一个数域，元素用 \(k,l,m\) 等表示。若 \(V\) 满足下列两组条件，则称 \(V\) 为数域 \(K\) 上的<strong>线性空间</strong>（或<strong>向量空间</strong>）。</p>
+                <p><strong>（1）加法运算：</strong>当 \(x,y\in V\) 时，有唯一的和 \(x+y\in V\)（<strong>封闭</strong>），且加法满足：</p>
+                <ol class="axiom-list axiom-grid" style="list-style:none">
+                  <li><span class="n">1</span>结合律：\(x+(y+z)=(x+y)+z\)；</li>
+                  <li><span class="n">2</span>交换律：\(x+y=y+x\)；</li>
+                  <li><span class="n">3</span>存在<strong>零元素</strong> \(\mathbf 0\)，使 \(x+\mathbf 0=x\)；</li>
+                  <li><span class="n">4</span>存在<strong>负元素</strong>：对任一 \(x\in V\)，存在 \(y\in V\) 使 \(x+y=\mathbf 0\)，称 \(y\) 为 \(x\) 的负元素，记为 \(-x\)，即 \(x+(-x)=\mathbf 0\)。</li>
+                </ol>
+                <p><strong>（2）数乘运算（数与向量的乘法）：</strong>当 \(x\in V,\ k\in K\) 时，有唯一的 \(kx\in V\)（<strong>封闭</strong>），且数乘满足：</p>
+                <ol class="axiom-list axiom-grid" style="list-style:none">
+                  <li><span class="n">5</span>数因子分配律：\(k(x+y)=kx+ky\)；</li>
+                  <li><span class="n">6</span>分配律：\((k+l)x=kx+lx\)；</li>
+                  <li><span class="n">7</span>结合律：\(k(lx)=(kl)x\)；</li>
+                  <li><span class="n">8</span>单位律：\(1\,x=x\)。</li>
+                </ol>
+                <p style="margin-bottom:0">\(V\) 中所定义的加法及数乘运算统称为 \(V\) 的<strong>线性运算</strong>。不致混淆时，将数域 \(K\) 上的线性空间简称为线性空间。当 \(K=\R\) 时称 <strong style="color:var(--c-def)">实线性空间</strong>；当 \(K=\C\) 时称 <strong style="color:var(--c-def)">复线性空间</strong>。例 1.4 的线性空间特别称为<strong>矩阵空间</strong>。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="example-1-5">3. 例 1.5：运算竟然可以"重新定义"</h3>
+            <p>这是本节最重要的例题。初看你会觉得"\(m\oplus n=mn\)"很奇怪——这正是公理化思想的精髓：<strong>"加法"与"数乘"只是两种满足公理的运算的代号，不必是普通的 \(+\) 与 \(\times\)</strong>。</p>
+            <section class="card ex" id="exm-1-5">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.5</span>
+                <span class="card-tag">八条公理逐条验证</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(\R^+\) 为所有正实数组成的数集，其"加法"与"数乘"分别定义为
+                  \[ m\oplus n=mn,\qquad k\circ m=m^k. \]
+                  证明 \(\R^+\) 是 \(\R\) 上的线性空间。</p>
+                <p><strong>先查封闭性：</strong>正实数之积仍为正实数 \(m\oplus n=mn\in\R^+\)；正数的实数次幂仍为正数 \(k\circ m=m^k\in\R^+\)。故两种运算封闭。下面逐条验证 8 条性质（点击圆点逐步看）：</p>
+
+                <div class="axiom-stepper" data-axiom-stepper>
+                  <div class="as-panel active" data-step="0">
+                    <div class="as-law">性质 1 · 加法结合律　\((m\oplus n)\oplus p=m\oplus(n\oplus p)\)</div>
+                    <div class="eq-scroll">\[ (m\oplus n)\oplus p=(mn)p=mnp=m(np)=m\oplus(n\oplus p). \]</div>
+                    <div class="as-check">✓ 数的乘法本来就有结合律，成立。</div>
+                  </div>
+                  <div class="as-panel" data-step="1">
+                    <div class="as-law">性质 2 · 加法交换律　\(m\oplus n=n\oplus m\)</div>
+                    <div class="eq-scroll">\[ m\oplus n=mn=nm=n\oplus m. \]</div>
+                    <div class="as-check">✓ 数的乘法交换，成立。</div>
+                  </div>
+                  <div class="as-panel" data-step="2">
+                    <div class="as-law">性质 3 · 零元素　存在 \(\theta\in\R^+\) 使 \(m\oplus\theta=m\)</div>
+                    <div class="eq-scroll">\[ m\oplus 1=m\times 1=m. \]</div>
+                    <div class="as-check">✓ 零元素是正实数 <strong>1</strong>（不是通常的 0！因为普通 0 不在 \(\R^+\) 中，且 \(m\cdot 0=0\ne m\)）。</div>
+                  </div>
+                  <div class="as-panel" data-step="3">
+                    <div class="as-law">性质 4 · 负元素　存在 \(m'\in\R^+\) 使 \(m\oplus m'=\) 零元 \(1\)</div>
+                    <div class="eq-scroll">\[ m\oplus\frac{1}{m}=m\cdot\frac{1}{m}=1. \]</div>
+                    <div class="as-check">✓ \(m\) 的负元素是 <strong>\(\dfrac1m\)</strong>（它仍是正实数，属于 \(\R^+\)），而不是 \(-m\)。</div>
+                  </div>
+                  <div class="as-panel" data-step="4">
+                    <div class="as-law">性质 5 · 数因子分配律　\(k\circ(m\oplus n)=(k\circ m)\oplus(k\circ n)\)</div>
+                    <div class="eq-scroll">\[ k\circ(m\oplus n)=k\circ(mn)=(mn)^k=m^k n^k=(k\circ m)\oplus(k\circ n). \]</div>
+                    <div class="as-check">✓ 用幂的运算法则 \((mn)^k=m^k n^k\)，成立。</div>
+                  </div>
+                  <div class="as-panel" data-step="5">
+                    <div class="as-law">性质 6 · 分配律　\((k+l)\circ m=(k\circ m)\oplus(l\circ m)\)</div>
+                    <div class="eq-scroll">\[ (k+l)\circ m=m^{k+l}=m^k m^l=(k\circ m)\oplus(l\circ m). \]</div>
+                    <div class="as-check">✓ 用 \(m^{k+l}=m^k m^l\)，成立。</div>
+                  </div>
+                  <div class="as-panel" data-step="6">
+                    <div class="as-law">性质 7 · 数乘结合律　\(k\circ(l\circ m)=(kl)\circ m\)</div>
+                    <div class="eq-scroll">\[ k\circ(l\circ m)=k\circ m^l=(m^l)^k=m^{lk}=m^{kl}=(kl)\circ m. \]</div>
+                    <div class="as-check">✓ 用幂的乘方 \((m^l)^k=m^{lk}\)，成立。</div>
+                  </div>
+                  <div class="as-panel" data-step="7">
+                    <div class="as-law">性质 8 · 单位律　\(1\circ m=m\)</div>
+                    <div class="eq-scroll">\[ 1\circ m=m^1=m. \]</div>
+                    <div class="as-check">✓ 成立。8 条全部验证完毕，故 \(\R^+\) 是实线性空间。</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意：这个例子颠覆了什么</span>
+              </header>
+              <div class="card-body">
+                <p>在 \((\R^+,\oplus,\circ)\) 里，<strong>"零向量"是 1，"\(-x\)"是 \(1/x\)</strong>。所以"零元""负元"是满足公理的<strong>角色</strong>，不长得像 0 或负号。验证一个集合是不是线性空间，<strong>必须逐一核对"封闭 + 8 条"</strong>，不能凭"元素是数"想当然（例如正实数按<strong>普通加法</strong>就不是线性空间：没有负元）。</p>
+              </div>
+            </aside>
+
+            <h3 class="sub-title" id="theorem-1-1">4. 定理 1.1：零元素与负元素唯一</h3>
+            <section class="card thm" id="thm-1-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.1</span>
+              </header>
+              <div class="card-body">
+                <p>线性空间 \(V\) 有唯一的零元素，任一元素也有唯一的负元素。</p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span>
+                    <svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg>
+                  </summary>
+                  <div class="proof-body">
+                    <p><strong>零元唯一：</strong>设 \(\mathbf 0_1,\mathbf 0_2\) 是 \(V\) 的两个零元素，考虑和 \(\mathbf 0_1+\mathbf 0_2\)。由于 \(\mathbf 0_1\) 是零元素，
+                      \[ \mathbf 0_1+\mathbf 0_2=\mathbf 0_2+\mathbf 0_1=\mathbf 0_2; \]
+                      又由于 \(\mathbf 0_2\) 也是零元素，
+                      \[ \mathbf 0_1+\mathbf 0_2=\mathbf 0_1. \]
+                      从而 \(\mathbf 0_1=\mathbf 0_1+\mathbf 0_2=\mathbf 0_2\)。</p>
+                    <p><strong>负元唯一：</strong>设元素 \(x\) 有两个负元素 \(x_1,x_2\)，即 \(x+x_1=\mathbf 0,\ x+x_2=\mathbf 0\)，于是
+                      <div class="eq-scroll">\[ x_1=x_1+\mathbf 0=x_1+(x+x_2)=(x_1+x)+x_2=\mathbf 0+x_2=x_2. \]</div></p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-top:10px">利用负元素定义向量减法：\(\quad x-y=x+(-y).\)</p>
+                <details class="proof">
+                  <summary><span>补充：由公理推出三个常用等式（点击展开）</span>
+                    <svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg>
+                  </summary>
+                  <div class="proof-body">
+                    <p>若 \(x\in V,\ k\in K\)，则 \(\;0x=\mathbf 0,\quad k\mathbf 0=\mathbf 0,\quad(-1)x=-x.\)</p>
+                    <p>① \(0x=(0+0)x=0x+0x\)，两边同加 \(-(0x)\) 得 \(\mathbf 0=0x\)。</p>
+                    <p>② \(k\mathbf 0=k(\mathbf 0+\mathbf 0)=k\mathbf 0+k\mathbf 0\)，两边同加 \(-(k\mathbf 0)\) 得 \(k\mathbf 0=\mathbf 0\)。</p>
+                    <p>③ \(x+(-1)x=1x+(-1)x=(1-1)x=0x=\mathbf 0\)，故 \((-1)x\) 正是 \(x\) 的负元素，即 \((-1)x=-x\)。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="linear-dependence">5. 线性组合、线性相关与线性无关</h3>
+            <p>这套语言与 \(\R^n\) 中完全平行。若 \(x_1,x_2,\ldots,x_m\) 为线性空间 \(V\) 中 \(m\) 个向量，\(x\in V\)，且在数域 \(K\) 中存在一组数 \(c_1,c_2,\ldots,c_m\) 使
+              <div class="eq-scroll">\[ x=c_1x_1+c_2x_2+\cdots+c_mx_m, \tag{1.1.1} \]</div>
+              则称 \(x\) 为向量组 \(x_1,x_2,\ldots,x_m\) 的<strong>线性组合</strong>，也称 \(x\) 可由该向量组<strong>线性表示</strong>。</p>
+            <p>如果式
+              <div class="eq-scroll">\[ c_1x_1+c_2x_2+\cdots+c_mx_m=\mathbf 0 \tag{1.1.2} \]</div>
+              中的 \(c_1,c_2,\ldots,c_m\) <strong>不全为零</strong>，则称向量组<strong>线性相关</strong>；否则称其<strong>线性无关</strong>（即式 (1.1.2) 仅当 \(c_1,\ldots,c_m\) 全为零时才成立）。</p>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意</span>
+              </header>
+              <div class="card-body">
+                <p>上述概念只涉及加法与数乘，与向量本身是什么（数组、多项式、函数、矩阵……）无直接关系。因此 \(\R^n\) 中关于线性组合、线性相关/无关的相应结论，可以<strong>原样照搬</strong>到一般线性空间。</p>
+              </div>
+            </aside>
+
+            <h3 class="sub-title" id="dimension">6. 定义 1.2：维数</h3>
+            <section class="card def" id="def-1-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.2</span>
+              </header>
+              <div class="card-body">
+                <p>线性空间 \(V\) 中线性无关向量组所含向量的<strong>最大个数</strong>，称为 \(V\) 的<strong>维数</strong>。若这个最大个数为正整数 \(n\)，则称 \(V\) 的维数是 \(n\)，记为
+                  \[ \dim V=n, \]
+                  并称 \(V\) 为数域 \(K\) 上的 <strong>\(n\) 维线性空间</strong>，记为 \(V^n\)。当 \(n=+\infty\) 时称 \(V\) 为<strong>无限维线性空间</strong>。</p>
+              </div>
+            </section>
+            <p>三个标准例子，请记住维数结论：</p>
+            <div class="grid3">
+              <div class="mini-card">
+                <div class="mc-title">例 1.3 的解集 \(D\)：2 维</div>
+                <p style="margin:0">\(y_1=e^x,\ y_2=e^{2x}\) 线性无关，且 \(D\) 中任一向量都可由二者线性表示 \(y=c_1e^x+c_2e^{2x}\)，故 \(\dim D=2\)，即 \(D\) 是 \(\R\) 上的 2 维线性空间。</p>
+              </div>
+              <div class="mini-card">
+                <div class="mc-title">矩阵空间 \(\R^{n\times n}\)：\(n^2\) 维</div>
+                <p style="margin:0">任一矩阵 \(A=(a_{ij})_{n\times n}=\displaystyle\sum_{i,j=1}^{n}a_{ij}E_{ij}\)，其中 \(E_{ij}\) 是第 \(i\) 行第 \(j\) 列为 1、其余为 0 的矩阵；\(E_{ij}\) 线性无关，故 \(\dim\R^{n\times n}=n^2\)。</p>
+              </div>
+              <div class="mini-card">
+                <div class="mc-title">多项式空间 \(P_n\)：\(n+1\) 维</div>
+                <p style="margin:0">\(1,t,t^2,\ldots,t^n\) 是 \(P_n\) 的一个最大线性无关组，故 \(\dim P_n=n+1\)。</p>
+              </div>
+            </div>
+            <p>而<strong>所有</strong>实系数多项式（不限制次数）组成的空间是<strong>无限维</strong>的：对任意正整数 \(N\)，向量 \(1,t,t^2,\ldots,t^{N-1}\) 都线性无关，找不到最大个数。无限维空间与有限维空间有较大差别，本书主要讨论有限维线性空间。</p>
+          </section>
+          <!-- ================= 三、线性空间的基与坐标 ================= -->
+          <section class="section" id="sec-basis-coord">
+            <h2 class="sec-title"><span class="cn">三</span>线性空间的基与坐标</h2>
+            <p>在解析几何中，为了借助数量运算实现向量运算，引进了向量的坐标。对有限维线性空间，坐标同样是一个强有力的工具。</p>
+
+            <h3 class="sub-title" id="definition-1-3">1. 定义 1.3：基（基底）</h3>
+            <section class="card def" id="def-1-3">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.3</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(V\) 是数域 \(K\) 上的线性空间，\(x_1,x_2,\ldots,x_r\)（\(r\ge 1\)）是属于 \(V\) 的 \(r\) 个向量，如果满足：</p>
+                <ol class="axiom-list" style="list-style:none">
+                  <li><span class="n">1</span>\(x_1,x_2,\ldots,x_r\) <strong>线性无关</strong>；</li>
+                  <li><span class="n">2</span>\(V\) 中任一向量 \(x\) 都是 \(x_1,x_2,\ldots,x_r\) 的线性组合，</li>
+                </ol>
+                <p style="margin-bottom:0">则称 \(x_1,x_2,\ldots,x_r\) 为 \(V\) 的一个<strong>基</strong>（或<strong>基底</strong>），\(x_i\,(i=1,2,\ldots,r)\) 称为<strong>基向量</strong>。由定义 1.3 可见：线性空间的维数就是其基中所含向量的个数。</p>
+              </div>
+            </section>
+            <p>前面的例子现在有了统一说法：\(e^x\) 与 \(e^{2x}\) 就是解空间 \(D\) 的一个基；\(E_{ij}\,(i,j=1,\ldots,n)\) 就是 \(\R^{n\times n}\) 的一个基。<strong>齐次线性方程组 \(A\mathbf x=\mathbf 0\) 的基础解系中所含的向量，就是其解空间的一个基。</strong></p>
+
+            <h3 class="sub-title" id="basis-not-unique">2. 基不唯一</h3>
+            <p>一个线性空间的基不是唯一的。例如 \(\R^n\) 中下面两组向量都是基：
+              <div class="eq-scroll">
+              \[
+              \left.\begin{aligned}
+              e_1&=(1,0,\ldots,0),\\
+              e_2&=(0,1,\ldots,0),\\
+              &\ \vdots\\
+              e_n&=(0,0,\ldots,1)
+              \end{aligned}\right\}\quad\text{及}\quad
+              \left.\begin{aligned}
+              y_1&=(1,1,\ldots,1,1),\\
+              y_2&=(0,1,\ldots,1,1),\\
+              &\ \vdots\\
+              y_n&=(0,0,\ldots,0,1)
+              \end{aligned}\right\}
+              \tag{1.1.3}
+              \]
+              </div>
+              这是因为它们排成的矩阵分别为单位阵与对角元全为 1 的下三角阵，行列式均不为 0，故各自线性无关；而对任一向量 \(\mathbf x=(\xi_1,\ldots,\xi_n)\in\R^n\)，分别有
+              \[
+              \mathbf x=\xi_1e_1+\xi_2e_2+\cdots+\xi_ne_n,
+              \]
+              \[
+              \mathbf x=\xi_1y_1+(\xi_2-\xi_1)y_2+\cdots+(\xi_n-\xi_{n-1})y_n,
+              \]
+              任一向量都能被线性表示，由定义 1.3，它们都是 \(\R^n\) 的基。</p>
+
+            <h3 class="sub-title" id="definition-1-4">3. 定义 1.4：坐标</h3>
+            <section class="card def" id="def-1-4">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.4</span>
+              </header>
+              <div class="card-body">
+                <p>称线性空间 \(V^n\) 的一个基 \(x_1,x_2,\ldots,x_n\) 为 \(V^n\) 的一个<strong>坐标系</strong>。设向量 \(x\in V^n\)，它在该基下的线性表示式为
+                  <div class="eq-scroll">\[ x=\xi_1x_1+\xi_2x_2+\cdots+\xi_nx_n, \tag{1.1.4} \]</div>
+                  则称 \(\xi_1,\xi_2,\ldots,\xi_n\) 为 \(x\) 在该坐标系中的<strong>坐标</strong>或<strong>分量</strong>，记为
+                  <div class="eq-scroll">\[ (\xi_1,\xi_2,\ldots,\xi_n)^{\mathrm T}. \tag{1.1.5} \]</div></p>
+              </div>
+            </section>
+            <p>必须指出：在不同的坐标系（基）中，同一向量的坐标一般不同。例如 \(\R^n\) 中向量 \((\xi_1,\ldots,\xi_n)\) 在式 (1.1.3) 第一基中的坐标是 \((\xi_1,\ldots,\xi_n)^{\mathrm T}\)，在第二基中的坐标却是 \((\xi_1,\xi_2-\xi_1,\ldots,\xi_n-\xi_{n-1})^{\mathrm T}\)。然而有下面的定理。</p>
+
+            <section class="card thm" id="thm-1-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.2</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(x_1,\ldots,x_n\) 是 \(V^n\) 的一个基，\(x\in V^n\)，则 \(x\) 可<strong>唯一</strong>地表示成 \(x_1,\ldots,x_n\) 的线性组合。</p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span>
+                    <svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg>
+                  </summary>
+                  <div class="proof-body">
+                    <p>设 \(x\) 经由该基的线性表示式有两个：
+                      <div class="eq-scroll">\[
+                      x=\xi_1x_1+\cdots+\xi_nx_n=\xi'_1x_1+\cdots+\xi'_nx_n,
+                      \]</div>
+                      相减得
+                      <div class="eq-scroll">\[
+                      (\xi'_1-\xi_1)x_1+(\xi'_2-\xi_2)x_2+\cdots+(\xi'_n-\xi_n)x_n=\mathbf 0.
+                      \]</div>
+                      由于 \(x_1,\ldots,x_n\) 是基，从而线性无关，故
+                      \[ \xi'_i=\xi_i\quad(i=1,2,\ldots,n). \]
+                      坐标唯一。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-top:8px">在这个坐标系中，基向量 \(x_i\) 自己的表示式为
+                  \[ x_i=0x_1+\cdots+0x_{i-1}+1\,x_i+0x_{i+1}+\cdots+0x_n, \]
+                  它的坐标恰为第 \(i\) 个标准单位向量
+                  \[ e_i=(0,\ldots,0,1,0,\ldots,0)^{\mathrm T}. \]
+                  由此可见公理 8（\(1x=x\)）的重要性：若没有 \(1x=x\) 的规定，就无法把 \(x_i\) 写成基向量的线性组合，基、维数等概念便无从谈起。</p>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-1-6">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.6</span>
+                <span class="card-tag">维数依赖于数域</span>
+              </header>
+              <div class="card-body">
+                <p>可以验证，复数域 \(\C\) 是其自身上的线性空间，且 \(\dim\C=1\)，数 \(1\) 就是它的基；但如果把 \(\C\) 看做实数域 \(\R\) 上的线性空间，则 \(\dim\C=2\)，数 \(1\) 与 \(\mathrm j\)（虚数单位，即 \(\mathrm j^2=-1\)）构成一个基。</p>
+                <div class="grid2">
+                  <div class="mini-card"><div class="mc-title">\(\C\) 作为 \(\C\) 上空间</div><p style="margin:0">任一复数 \(z=a+b\mathrm j=z\cdot 1\)，系数 \(z\in\C\) 即可，故一个基向量 \(1\) 就够：\(\dim\C=1\)。</p></div>
+                  <div class="mini-card"><div class="mc-title">\(\C\) 作为 \(\R\) 上空间</div><p style="margin:0">系数只准取实数，必须写成 \(z=a\cdot 1+b\cdot\mathrm j\)（\(a,b\in\R\)），需要两个基向量：\(\dim\C=2\)。</p></div>
+                </div>
+                <p style="margin-bottom:0"><strong>例 1.6 说明：维数与所考虑的数域有关。</strong>以后谈维数、基、坐标时，数域 \(K\) 已在语境中确定。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 四、基变换与坐标变换 ================= -->
+          <section class="section" id="sec-change-basis">
+            <h2 class="sec-title"><span class="cn">四</span>基变换与坐标变换</h2>
+            <p>在 \(V^n\) 中，任意 \(n\) 个线性无关的向量都可取作基。对不同的基，同一向量的坐标一般不同。现在讨论：当基改变时，向量的坐标如何变化。首先引进过渡矩阵。</p>
+
+            <h3 class="sub-title" id="transition-matrix">1. 过渡矩阵与基变换公式</h3>
+            <p>设 \(x_1,x_2,\ldots,x_n\) 是 \(V^n\) 的<strong>旧基</strong>，\(y_1,y_2,\ldots,y_n\) 为<strong>新基</strong>。由基的定义，每个新基向量都可由旧基线性表示：
+              <div class="eq-scroll">
+              \[
+              \begin{cases}
+              y_1=c_{11}x_1+c_{21}x_2+\cdots+c_{n1}x_n,\\
+              y_2=c_{12}x_1+c_{22}x_2+\cdots+c_{n2}x_n,\\
+              \quad\vdots\\
+              y_n=c_{1n}x_1+c_{2n}x_2+\cdots+c_{nn}x_n.
+              \end{cases}
+              \]
+              </div>
+              形式地写成
+              <div class="eq-scroll">\[ (y_1,y_2,\ldots,y_n)=(x_1,x_2,\ldots,x_n)\,C, \tag{1.1.6} \]</div>
+              其中矩阵
+              <div class="eq-scroll">\[
+              C=\begin{pmatrix}
+              c_{11}&c_{12}&\cdots&c_{1n}\\
+              c_{21}&c_{22}&\cdots&c_{2n}\\
+              \vdots&\vdots&&\vdots\\
+              c_{n1}&c_{n2}&\cdots&c_{nn}
+              \end{pmatrix}
+              \]</div>
+              称为由旧基改变为新基的<strong>过渡矩阵</strong>，式 (1.1.6) 称为<strong>基变换公式</strong>。</p>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意：形式写法怎么读（最容易出错处）</span>
+              </header>
+              <div class="card-body">
+                <p>① 式 (1.1.6) 只是<strong>形式写法</strong>：作矩阵乘法之前，只能把 \(x_i\) 当作一个"量"看待，无论它本身是数组、多项式还是矩阵，都<strong>不能直接代入元素</strong>进行运算；按乘法规则展开后，比较等号两端对应"分量"时，也把 \(y_i\) 当"量"看待。</p>
+                <p>② 过渡矩阵 \(C\) 的<strong>第 \(j\) 列</strong> \((c_{1j},c_{2j},\ldots,c_{nj})^{\mathrm T}\)，正是新基向量 \(y_j\) 在<strong>旧基</strong>下的坐标——<strong>是列，不是行</strong>。</p>
+                <p>③ 可以证明过渡矩阵是<strong>非奇异（可逆）矩阵</strong>：它的 \(n\) 列就是 \(n\) 个新基向量的坐标，新基线性无关当且仅当这 \(n\) 个列向量无关，即 \(|C|\ne 0\)。</p>
+              </div>
+            </aside>
+
+            <h3 class="sub-title" id="coord-transform">2. 坐标变换公式</h3>
+            <p>设 \(x\in V^n\) 在旧、新两基下的坐标依次为 \((\xi_1,\ldots,\xi_n)^{\mathrm T}\) 与 \((\eta_1,\ldots,\eta_n)^{\mathrm T}\)，即
+              <div class="eq-scroll">\[
+              x=\xi_1x_1+\cdots+\xi_nx_n=\eta_1y_1+\cdots+\eta_ny_n.
+              \]</div>
+              采用形式写法并代入 (1.1.6)：
+              <div class="eq-scroll">\[
+              x=(x_1,\ldots,x_n)\begin{pmatrix}\xi_1\\\vdots\\\xi_n\end{pmatrix}
+              =(y_1,\ldots,y_n)\begin{pmatrix}\eta_1\\\vdots\\\eta_n\end{pmatrix}
+              =(x_1,\ldots,x_n)\,C\begin{pmatrix}\eta_1\\\vdots\\\eta_n\end{pmatrix}.
+              \]</div>
+              由于基向量线性无关（由定理 1.2 坐标唯一），比较两端坐标得
+              <div class="eq-scroll">\[
+              \begin{pmatrix}\xi_1\\\xi_2\\\vdots\\\xi_n\end{pmatrix}
+              =C\begin{pmatrix}\eta_1\\\eta_2\\\vdots\\\eta_n\end{pmatrix},
+              \tag{1.1.7}
+              \]</div>
+              或（因 \(C\) 可逆）
+              <div class="eq-scroll">\[
+              \begin{pmatrix}\eta_1\\\eta_2\\\vdots\\\eta_n\end{pmatrix}
+              =C^{-1}\begin{pmatrix}\xi_1\\\xi_2\\\vdots\\\xi_n\end{pmatrix}.
+              \tag{1.1.8}
+              \]</div>
+              式 (1.1.7)、(1.1.8) 就是基变换 (1.1.6) 下向量坐标的<strong>变换公式</strong>：<strong>旧坐标 = \(C\) × 新坐标，新坐标 = \(C^{-1}\) × 旧坐标。</strong></p>
+
+            <h3 class="sub-title" id="example-1-7">3. 例 1.7</h3>
+            <section class="card ex" id="exm-1-7">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.7</span>
+              </header>
+              <div class="card-body">
+                <p>在 \(\R^n\) 中，已知向量 \(\mathbf x\) 在标准基 \(e_1,\ldots,e_n\) 下的坐标为 \((\xi_1,\ldots,\xi_n)^{\mathrm T}\)，求基改为式 (1.1.3) 中第二组基 \(y_1,\ldots,y_n\) 后，\(\mathbf x\) 的新坐标。</p>
+                <details class="proof">
+                  <summary><span>解（点击展开完整演算）</span>
+                    <svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg>
+                  </summary>
+                  <div class="proof-body">
+                    <p>由式 (1.1.3) 直接读出过渡矩阵（\(y_j\) 的坐标排在第 \(j\) 列）：
+                      <div class="eq-scroll">\[
+                      C=\begin{pmatrix}
+                      1&0&\cdots&0\\
+                      1&1&\cdots&0\\
+                      \vdots&\vdots&&\vdots\\
+                      1&1&\cdots&1
+                      \end{pmatrix},
+                      \quad
+                      C^{-1}=\begin{pmatrix}
+                      1&0&0&\cdots&0&0\\
+                      -1&1&0&\cdots&0&0\\
+                      0&-1&1&\cdots&0&0\\
+                      \vdots&\vdots&\vdots&&\vdots&\vdots\\
+                      0&0&0&\cdots&-1&1
+                      \end{pmatrix}.
+                      \]</div>
+                      由式 (1.1.8)，新坐标为 \(\eta=C^{-1}\xi\)，即
+                      \[ \eta_1=\xi_1,\qquad \eta_i=\xi_i-\xi_{i-1}\quad(i=2,3,\ldots,n), \]
+                      这与第 2 目直接配凑出的结果完全一致。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="example-1-8">4. 例 1.8：矩阵空间中借助"中介基"求过渡矩阵</h3>
+            <section class="card ex" id="exm-1-8">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.8</span>
+                <span class="card-tag">中介基法</span>
+              </header>
+              <div class="card-body">
+                <p>已知矩阵空间 \(\R^{2\times 2}\) 的两个基
+                  <div class="eq-scroll">\[
+                  (\mathrm I)\
+                  A_1=\begin{pmatrix}1&0\\0&1\end{pmatrix},\
+                  A_2=\begin{pmatrix}1&0\\0&-1\end{pmatrix},\
+                  A_3=\begin{pmatrix}0&1\\1&0\end{pmatrix},\
+                  A_4=\begin{pmatrix}0&1\\-1&0\end{pmatrix};
+                  \]</div>
+                  <div class="eq-scroll">\[
+                  (\mathrm{II})\
+                  B_1=\begin{pmatrix}1&1\\1&1\end{pmatrix},\
+                  B_2=\begin{pmatrix}1&1\\1&0\end{pmatrix},\
+                  B_3=\begin{pmatrix}1&1\\0&0\end{pmatrix},\
+                  B_4=\begin{pmatrix}1&0\\0&0\end{pmatrix}.
+                  \]</div>
+                  求由基 (I) 改变为基 (II) 的过渡矩阵。</p>
+                <details class="proof">
+                  <summary><span>解（点击展开，含完整矩阵乘法）</span>
+                    <svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg>
+                  </summary>
+                  <div class="proof-body">
+                    <p><strong>思路：</strong>直接把每个 \(B_j\) 表成 \(A_i\) 的组合较繁。引进 \(\R^{2\times 2}\) 的<strong>简单基</strong>作中介：
+                      <div class="eq-scroll">\[
+                      (\mathrm{III})\
+                      E_{11}=\begin{pmatrix}1&0\\0&0\end{pmatrix},\
+                      E_{12}=\begin{pmatrix}0&1\\0&0\end{pmatrix},\
+                      E_{21}=\begin{pmatrix}0&0\\1&0\end{pmatrix},\
+                      E_{22}=\begin{pmatrix}0&0\\0&1\end{pmatrix}.
+                      \]</div></p>
+                    <p>由基 (III) 改变为基 (I) 的过渡矩阵为
+                      <div class="eq-scroll">\[
+                      (A_1,A_2,A_3,A_4)=(E_{11},E_{12},E_{21},E_{22})\,C_1,
+                      \]</div>
+                      把各 \(A_i\) 在简单基下的坐标依次排成列，得
+                      <div class="eq-scroll">\[
+                      C_1=\begin{pmatrix}
+                      1&1&0&0\\
+                      0&0&1&1\\
+                      0&0&1&-1\\
+                      1&-1&0&0
+                      \end{pmatrix}.
+                      \]</div></p>
+                    <p>同理由基 (III) 改变为基 (II)：
+                      <div class="eq-scroll">\[
+                      (B_1,B_2,B_3,B_4)=(E_{11},E_{12},E_{21},E_{22})\,C_2,
+                      \quad
+                      C_2=\begin{pmatrix}
+                      1&1&1&1\\
+                      1&1&1&0\\
+                      1&1&0&0\\
+                      1&0&0&0
+                      \end{pmatrix}.
+                      \]</div></p>
+                    <p>于是
+                      \[ (B_1,B_2,B_3,B_4)=(A_1,A_2,A_3,A_4)\,C_1^{-1}C_2, \]
+                      所求过渡矩阵为 \(C=C_1^{-1}C_2\)。其中
+                      <div class="eq-scroll">\[
+                      C_1^{-1}=\frac12\begin{pmatrix}
+                      1&0&0&1\\
+                      1&0&0&-1\\
+                      0&1&1&0\\
+                      0&1&-1&0
+                      \end{pmatrix},
+                      \]</div>
+                      <div class="eq-scroll">\[
+                      C=C_1^{-1}C_2
+                      =\frac12\begin{pmatrix}
+                      1&0&0&1\\
+                      1&0&0&-1\\
+                      0&1&1&0\\
+                      0&1&-1&0
+                      \end{pmatrix}
+                      \begin{pmatrix}
+                      1&1&1&1\\
+                      1&1&1&0\\
+                      1&1&0&0\\
+                      1&0&0&0
+                      \end{pmatrix}
+                      =\frac12\begin{pmatrix}
+                      2&1&1&1\\
+                      0&1&1&1\\
+                      2&2&1&0\\
+                      0&0&1&0
+                      \end{pmatrix}.
+                      \]</div></p>
+                    <p><strong>方法提炼：</strong>求任意两组基之间的过渡矩阵，可借助一组坐标易写的<strong>简单基（标准基）</strong>作中转：若简单基 \(\to\) 旧基为 \(C_1\)、简单基 \(\to\) 新基为 \(C_2\)，则旧基 \(\to\) 新基为 \(C=C_1^{-1}C_2\)。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="coord-lab-title">5. 动手实验：基变换坐标实验室</h3>
+            <section class="card lab" data-coord-lab>
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span>
+                <span class="card-label">坐标实验室（\(n=2\)）</span>
+                <span class="card-tag">改数字即时观察 ξ=Cη</span>
+              </header>
+              <div class="card-body">
+                <p>修改 \(C\) 与 \(\eta\) 中的数字（可用小数、负数），右侧实时给出旧坐标 \(\xi=C\eta\)、行列式与逆矩阵。试试预设里的<strong>奇异矩阵</strong>，观察为何它不能当过渡矩阵。</p>
+                <script type="application/json" data-widget-config>
+                {
+                  "n": 2,
+                  "C": [[1, 0], [1, 1]],
+                  "eta": [1, 2],
+                  "presets": [
+                    { "name": "例1.7 下三角阵", "C": [[1, 0], [1, 1]] },
+                    { "name": "单位阵（坐标不变）", "C": [[1, 0], [0, 1]] },
+                    { "name": "交换两基向量", "C": [[0, 1], [1, 0]] },
+                    { "name": "奇异矩阵（反例）", "C": [[1, 2], [2, 4]] }
+                  ]
+                }
+                </script>
+              </div>
+            </section>
+          </section>
+          <!-- ================= 五、线性子空间 ================= -->
+          <section class="section" id="sec-subspace">
+            <h2 class="sec-title"><span class="cn">五</span>线性子空间</h2>
+
+            <h3 class="sub-title" id="subspace-motivation">1. 动机：三维空间里过原点的直线与平面</h3>
+            <p>在通常的三维几何空间中，考虑过原点的一条直线或一个平面。不难验证：这条直线或这个平面上的所有向量对于向量加法及数乘运算，分别形成一个一维和二维的线性空间。也就是说，它们一方面是三维几何空间的一个部分，同时其自身对于原来的运算也构成一个线性空间。针对这种现象，引入下面的定义。</p>
+
+            <h3 class="sub-title" id="definition-1-5">2. 定义 1.5</h3>
+            <section class="card def" id="def-1-5">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.5</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(V_1\) 是数域 \(K\) 上线性空间 \(V\) 的一个<strong>非空</strong>子集合，且对 \(V\) 已有的线性运算满足以下条件：</p>
+                <ol class="axiom-list" style="list-style:none">
+                  <li><span class="n">1</span>如果 \(x,y\in V_1\)，则 \(x+y\in V_1\)（<strong>加法封闭</strong>）；</li>
+                  <li><span class="n">2</span>如果 \(x\in V_1,\ k\in K\)，则 \(kx\in V_1\)（<strong>数乘封闭</strong>）。</li>
+                </ol>
+                <p style="margin-bottom:0">则称 \(V_1\) 为 \(V\) 的<strong>线性子空间</strong>或<strong>子空间</strong>。例如，\(n\) 阶齐次线性方程组的解空间是 \(\R^n\) 的子空间。</p>
+              </div>
+            </section>
+            <p>值得指出：线性子空间 \(V_1\) <strong>本身也是线性空间</strong>。因为它是 \(V\) 的子集合，其中向量不仅对线性运算封闭，而且自动满足相应的 8 条运算律（这些运算律在整个 \(V\) 中成立，在 \(V_1\) 中当然也成立）。</p>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意：为什么必须"过原点"</span>
+              </header>
+              <div class="card-body">
+                <p>不过原点的直线或平面<strong>不是</strong>子空间：它们不含零向量，数乘 \(0\cdot x=\mathbf 0\) 后立刻"跑出"集合，不满足封闭性。判定子空间时，先看 \(\mathbf 0\) 在不在其中，是最快的初步排除法。</p>
+              </div>
+            </aside>
+
+            <h3 class="sub-title" id="trivial-subspace">3. 平凡子空间与维数不等式</h3>
+            <p>每个非零线性空间至少有两个子空间：一个是它<strong>自身</strong>；另一个是仅由零向量构成的子集合，称<strong>零子空间</strong>。二者统称<strong>平凡子空间</strong>。零子空间不含线性无关的向量，因此它没有基，规定其维数为零。</p>
+            <p>由于子空间中不可能比整个空间中有更多数目的线性无关向量，故
+              <div class="eq-scroll">\[ \dim V_1\le \dim V. \tag{1.1.9} \]</div>
+              例如，\(n\) 元齐次线性方程组当其系数矩阵的秩为 \(r\)（其中 \(1\le r&lt;n\)）时，其解空间的维数小于 \(\R^n\) 的维数。</p>
+
+            <h3 class="sub-title" id="span-subspace">4. 生成子空间 \(L(x_1,\ldots,x_m)\)</h3>
+            <p>设 \(x_1,x_2,\ldots,x_m\) 是数域 \(K\) 上线性空间 \(V\) 的一组向量，其所有可能的线性组合的集合
+              <div class="eq-scroll">\[ V_1=\{\,k_1x_1+\cdots+k_mx_m\mid k_i\in K\,\} \]</div>
+              非空，且容易验证对 \(V\) 的线性运算封闭，因而是 \(V\) 的子空间，称为由 \(x_1,x_2,\ldots,x_m\) <strong>生成（张成）</strong>的子空间，记为
+              <div class="eq-scroll">\[ L(x_1,x_2,\ldots,x_m)=\{\,k_1x_1+\cdots+k_mx_m\mid k_i\in K\,\}. \tag{1.1.10} \]</div>
+              在有限维空间 \(V\) 中，任何一个子空间都可以这样表示。若 \(x_1,\ldots,x_m\) 是 \(V_1\) 的一个基，则
+              <div class="eq-scroll">\[ V_1=L(x_1,x_2,\ldots,x_m). \tag{1.1.11} \]</div>
+              特别地，零子空间就是由零元素生成的子空间 \(L(\mathbf 0)\)。</p>
+
+            <h3 class="sub-title" id="range-nullspace">5. 矩阵的值域（列空间）与核空间</h3>
+            <p>矩阵的值域和核空间（零空间）的理论，在线性最小二乘问题和广义逆矩阵的讨论中都占有重要地位。</p>
+            <section class="card def" id="def-1-6">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.6</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A=(a_{ij})\in\R^{m\times n}\)，以 \(a_i\,(i=1,\ldots,n)\) 表示 \(A\) 的第 \(i\) 个<strong>列向量</strong>，称子空间 \(L(a_1,a_2,\ldots,a_n)\) 为矩阵 \(A\) 的<strong>值域</strong>（<strong>列空间</strong>），记为
+                  <div class="eq-scroll">\[ R(A)=L(a_1,a_2,\ldots,a_n), \tag{1.1.12} \]</div>
+                  <div class="eq-scroll">\[ R(A)=\{\,A\mathbf x\mid \mathbf x\in\R^n\,\}. \tag{1.1.12'} \]</div>
+                  同样可以定义 \(A^{\mathrm T}\) 的值域（<strong>行空间</strong>）为
+                  <div class="eq-scroll">\[ R(A^{\mathrm T})=\{\,A^{\mathrm T}\mathbf x\mid \mathbf x\in\R^m\,\}\subset\R^n, \tag{1.1.13} \]</div>
+                  且有
+                  <div class="eq-scroll">\[ \rank A=\dim R(A)=\dim R(A^{\mathrm T}). \]</div></p>
+              </div>
+            </section>
+            <p>为什么 \(R(A)\) 又等于 \(\{A\mathbf x\}\)？令 \(\mathbf x=(\xi_1,\ldots,\xi_n)^{\mathrm T}\in\R^n\)，则
+              \[ A\mathbf x=(a_1,\ldots,a_n)(\xi_1,\ldots,\xi_n)^{\mathrm T}=\xi_1a_1+\cdots+\xi_na_n, \]
+              即 \(A\mathbf x\) 就是列向量组的线性组合。反之任一这样的组合也都可写成 \(A\mathbf x\)，故两个集合相同。</p>
+            <section class="card def" id="def-1-7">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.7</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A=(a_{ij})\in\R^{m\times n}\)，称集合 \(\{\mathbf x\mid A\mathbf x=\mathbf 0\}\) 为 \(A\) 的<strong>核空间</strong>（<strong>零空间</strong>），记为
+                  <div class="eq-scroll">\[ N(A)=\{\,\mathbf x\mid A\mathbf x=\mathbf 0\,\}. \tag{1.1.14} \]</div>
+                  显见 \(N(A)\) 就是齐次线性方程组 \(A\mathbf x=\mathbf 0\) 的解空间，是 \(\R^n\) 的一个子空间。\(A\) 的核空间的维数称为 \(A\) 的<strong>零度</strong>，记为 \(\n(A)\)，即 \(\n(A)=\dim N(A)\)。</p>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-1-9">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 1.9</span>
+                <span class="card-tag">求秩与零度</span>
+              </header>
+              <div class="card-body">
+                <p>已知 \(A=\begin{pmatrix}1&0&1\\0&1&1\end{pmatrix}\)，求 \(A\) 的秩与零度。</p>
+                <details class="proof">
+                  <summary><span>解（点击展开）</span>
+                    <svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg>
+                  </summary>
+                  <div class="proof-body">
+                    <p>记列向量为 \(a_1,a_2,a_3\)。显然有
+                      \[ a_1+a_2-a_3=\mathbf 0, \]
+                      即三个列向量线性相关；但 \(A\) 的任何两个列向量均线性无关，故
+                      \[ \rank A=2. \]
+                      又由 \(A\mathbf x=\mathbf 0\) 可求出 \(\mathbf x=(1,1,-1)^{\mathrm T}t\)（\(t\) 为任意参数），解空间由一个非零向量张成，故
+                      \[ \n(A)=1. \]
+                      同样可求得 \(\rank A^{\mathrm T}=2,\ \n(A^{\mathrm T})=0\)。</p>
+                  </div>
+                </details>
+                <p style="margin-top:8px">从例 1.9 可见 \(\rank A+\n(A)=A\) 的列数，而 \(\n(A)-\n(A^{\mathrm T})=\)列数 \(-\) 行数。这并非偶然：若 \(A=(a_{ij})_{m\times n}\in\R^{m\times n}\)，则
+                  <div class="eq-scroll">\[ \rank A+\n(A)=n, \tag{1.1.15} \]</div>
+                  <div class="eq-scroll">\[ \n(A)-\n(A^{\mathrm T})=n-m. \tag{1.1.16} \]</div>
+                  事实上 \(A\mathbf x=\mathbf 0\) 的解空间维数为 \(\n(A)=n-\rank A\)，故 (1.1.15) 成立；又因 \(\rank A^{\mathrm T}+\n(A^{\mathrm T})=m\)，与 (1.1.15) 相减即得 (1.1.16)。当 \(A\in\C^{m\times n}\) 时结论仍成立。这就是<strong>秩—零度定理</strong>。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="theorem-1-3">6. 定理 1.3：基扩充定理</h3>
+            <section class="card thm" id="thm-1-3">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.3（基扩充定理）</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(V_1\) 是数域 \(K\) 上线性空间 \(V^n\) 的一个 \(m\) 维子空间，\(x_1,\ldots,x_m\) 是 \(V_1\) 的基，则这 \(m\) 个基向量必可扩充为 \(V^n\) 的一个基。换言之，在 \(V^n\) 中必可找到 \(n-m\) 个向量 \(x_{m+1},\ldots,x_n\)，使得 \(x_1,x_2,\ldots,x_n\) 是 \(V^n\) 的一个基。</p>
+                <details class="proof">
+                  <summary><span>证明（对维数差 \(n-m\) 作归纳法，点击展开）</span>
+                    <svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg>
+                  </summary>
+                  <div class="proof-body">
+                    <p>当 \(n-m=0\) 时定理显然成立，因为此时 \(x_1,\ldots,x_m\) 已经是 \(V^n\) 的基。</p>
+                    <p>现在假定 \(n-m=k\) 时定理成立，考虑 \(n-m=k+1\) 的情形。</p>
+                    <p>既然 \(x_1,\ldots,x_m\) 还不是 \(V^n\) 的基，但它又是线性无关的，则由定义 1.3 可知：在 \(V^n\) 中至少有一个向量 \(x_{m+1}\) <strong>不能</strong>被 \(x_1,\ldots,x_m\) 线性表出。把 \(x_{m+1}\) 添加进去，\(x_1,\ldots,x_m,x_{m+1}\) 必定线性无关（一般地，若 \(x_1,\ldots,x_r\) 线性无关，而 \(x_1,\ldots,x_r,x\) 线性相关，那么 \(x\) 可由 \(x_1,\ldots,x_r\) 线性表出，且表示法唯一——与选取矛盾）。</p>
+                    <p>由式 (1.1.11) 知子空间 \(L(x_1,\ldots,x_m,x_{m+1})\) 是 \(m+1\) 维的。因为
+                      \[ n-(m+1)=(n-m)-1=k+1-1=k, \]
+                      由归纳法假定，该子空间的基 \(x_1,\ldots,x_m,x_{m+1}\) 可以扩充为 \(V^n\) 的基。归纳法完成。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+          </section>
+          <!-- ================= 六、子空间的交与和 ================= -->
+          <section class="section" id="sec-intersection-sum">
+            <h2 class="sec-title"><span class="cn">六</span>子空间的交与和</h2>
+            <p>前面讨论了由元素生成子空间的方法理论。子空间的交与和，可以视为由子空间生成的子空间。</p>
+
+            <h3 class="sub-title" id="intersection-subspace">1. 交是子空间（定理 1.4）</h3>
+            <section class="card thm" id="thm-1-4">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.4</span>
+              </header>
+              <div class="card-body">
+                <p>如果 \(V_1,V_2\) 是数域 \(K\) 上线性空间 \(V\) 的两个子空间，那么它们的交 \(V_1\cap V_2\) 也是 \(V\) 的子空间。</p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span>
+                    <svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg>
+                  </summary>
+                  <div class="proof-body">
+                    <p>因为 \(\mathbf 0\in V_1,\ \mathbf 0\in V_2\)，所以 \(\mathbf 0\in V_1\cap V_2\)，交非空。</p>
+                    <p>若 \(x,y\in V_1\cap V_2\)，则 \(x,y\in V_1\) 且 \(x,y\in V_2\)。因 \(V_1,V_2\) 都是子空间，故
+                      \[ x+y\in V_1,\quad x+y\in V_2\ \Longrightarrow\ x+y\in V_1\cap V_2. \]
+                      又因 \(kx\in V_1,\ kx\in V_2\)，故 \(kx\in V_1\cap V_2\)。由定义 1.5 知 \(V_1\cap V_2\) 是 \(V\) 的子空间。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-top:8px">由集合交的定义即知子空间的交满足交换律与结合律：
+                  \[ V_1\cap V_2=V_2\cap V_1,\qquad (V_1\cap V_2)\cap V_3=V_1\cap(V_2\cap V_3). \]</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="sum-subspace">2. 和是子空间（定义 1.8、定理 1.5）</h3>
+            <section class="card def" id="def-1-8">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.8</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(V_1,V_2\) 都是数域 \(K\) 上线性空间 \(V\) 的子空间，且 \(x\in V_1,\ y\in V_2\)，则所有 \(x+y\) 这样的元素的集合称为 \(V_1\) 与 \(V_2\) 的<strong>和</strong>，记为 \(V_1+V_2\)，即
+                  <div class="eq-scroll">\[ V_1+V_2=\{\,\mathbf z\mid \mathbf z=x+y,\ x\in V_1,\ y\in V_2\,\}. \]</div></p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-1-5">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.5</span>
+              </header>
+              <div class="card-body">
+                <p>如果 \(V_1,V_2\) 都是 \(V\) 的子空间，那么它们的和 \(V_1+V_2\) 也是 \(V\) 的子空间。</p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span>
+                    <svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg>
+                  </summary>
+                  <div class="proof-body">
+                    <p>显然 \(V_1+V_2\) 非空（\(\mathbf 0=\mathbf 0+\mathbf 0\)）。对任意 \(x_1,x_2\in V_1\) 及 \(y_1,y_2\in V_2\)，
+                      <div class="eq-scroll">\[
+                      (x_1+y_1)+(x_2+y_2)=(x_1+x_2)+(y_1+y_2)\in V_1+V_2,
+                      \]</div>
+                      <div class="eq-scroll">\[
+                      k(x_1+y_1)=kx_1+ky_1\in V_1+V_2,
+                      \]</div>
+                      两种运算均封闭，故 \(V_1+V_2\) 是 \(V\) 的子空间。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-top:8px">子空间的和同样满足交换律与结合律：
+                  \[ V_1+V_2=V_2+V_1,\qquad (V_1+V_2)+V_3=V_1+(V_2+V_3). \]</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="geometric-example">3. 几何直观：\(\R^3\) 中两条过原点的直线</h3>
+            <p>在线性空间 \(\R^3\) 中，\(V_1\) 表示过原点直线 \(l_1\) 上所有向量形成的子空间，\(V_2\) 表示另一条过原点直线 \(l_2\) 上所有向量形成的子空间。显然：\(V_1\cap V_2\) 是由 \(l_1\) 与 \(l_2\) 的交点（原点）形成的零子空间；而 \(V_1+V_2\) 是由 \(l_1,l_2\) 所决定的平面上全体向量形成的子空间。</p>
+            <div class="subspace-fig" data-subspace-fig>
+              <div class="sf-stage">
+                <svg viewBox="0 0 460 262" role="img" aria-label="两条过原点直线的交与和">
+                  <!-- 和：两直线张成的平面 -->
+                  <polygon class="sf-plane" points="230,200 350,150 260,70 140,120"/>
+                  <!-- 直线 l2 -->
+                  <line class="sf-line sf-l2" x1="275" y1="240" x2="99" y2="84"/>
+                  <!-- 直线 l1 -->
+                  <line class="sf-line sf-l1" x1="164" y1="228" x2="392" y2="132"/>
+                  <!-- 原点（交） -->
+                  <circle class="sf-origin-ring" cx="230" cy="200" r="11"/>
+                  <circle class="sf-origin" cx="230" cy="200" r="5.5"/>
+                  <text class="sf-label" x="396" y="128">l₁（V₁）</text>
+                  <text class="sf-label" x="72" y="80">l₂（V₂）</text>
+                  <text class="sf-label" x="266" y="150">V₁+V₂ 张成的平面</text>
+                  <text class="sf-label" x="238" y="220">O</text>
+                </svg>
+              </div>
+              <div class="sf-buttons">
+                <button type="button" class="sf-btn" data-mode="l1" data-caption="只看 V₁：过原点的一条直线本身是一维子空间。">只看 \(V_1\)</button>
+                <button type="button" class="sf-btn" data-mode="l2" data-caption="只看 V₂：另一条过原点的直线也是一维子空间。">只看 \(V_2\)</button>
+                <button type="button" class="sf-btn" data-mode="int" data-caption="交 V₁∩V₂：两直线只在原点相遇，是零子空间 L(0)。">交 \(V_1\cap V_2\)</button>
+                <button type="button" class="sf-btn" data-mode="sum" data-caption="和 V₁+V₂：两个方向线性组合，张成两直线确定的整个平面（二维）。">和 \(V_1+V_2\)</button>
+              </div>
+              <div class="sf-caption"></div>
+            </div>
+            <p>用集合包含的语言还可得到两个重要事实：</p>
+            <ul>
+              <li>如果 \(W\subset V_1,\ W\subset V_2\)，那么 \(W\subset V_1\cap V_2\)。换言之，<strong>\(V_1\cap V_2\) 是同时包含在 \(V_1,V_2\) 中的最大子空间</strong>。</li>
+              <li>如果 \(W\supset V_1,\ W\supset V_2\)，那么 \(W\supset V_1+V_2\)。换言之，<strong>\(V_1+V_2\) 是同时包含 \(V_1,V_2\) 的最小子空间</strong>。</li>
+            </ul>
+
+            <h3 class="sub-title" id="dimension-formula">4. 定理 1.6：维数公式（本节核心定理）</h3>
+            <section class="card thm" id="thm-1-6">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.6（维数公式）</span>
+              </header>
+              <div class="card-body">
+                <p>如果 \(V_1,V_2\) 是数域 \(K\) 上线性空间 \(V\) 的两个子空间，那么
+                  <div class="eq-scroll">\[
+                  \dim V_1+\dim V_2=\dim(V_1+V_2)+\dim(V_1\cap V_2).
+                  \tag{1.1.17}
+                  \]</div></p>
+                <details class="proof">
+                  <summary><span>证明（点击展开完整证明）</span>
+                    <svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg>
+                  </summary>
+                  <div class="proof-body">
+                    <p>设 \(\dim V_1=n_1,\ \dim V_2=n_2,\ \dim(V_1\cap V_2)=m\)。需要证明
+                      \[ \dim(V_1+V_2)=n_1+n_2-m. \]</p>
+                    <p><strong>情形一：\(m=n_1\)。</strong>由 \(V_1\cap V_2\subset V_1\) 且维数相等，知 \(V_1\cap V_2=V_1\)；再由 \(V_1\cap V_2\subset V_2\) 得 \(V_1\subset V_2\)，从而 \(V_1+V_2=V_2\)，故
+                      \[ \dim(V_1+V_2)=\dim V_2=n_2=n_1+n_2-n_1. \]</p>
+                    <p><strong>情形二：\(m=n_2\)。</strong>同理，式 (1.1.17) 亦成立。</p>
+                    <p><strong>情形三：\(m&lt;n_1\) 且 \(m&lt;n_2\)。</strong>取 \(V_1\cap V_2\) 的一个基 \(x_1,\ldots,x_m\)。由定理 1.3（基扩充定理），把它依次扩充为 \(V_1\) 与 \(V_2\) 的基：
+                      <div class="eq-scroll">\[
+                      V_1:\ x_1,\ldots,x_m,y_1,\ldots,y_{n_1-m};
+                      \]</div>
+                      <div class="eq-scroll">\[
+                      V_2:\ x_1,\ldots,x_m,z_1,\ldots,z_{n_2-m}.
+                      \]</div>
+                      只要证明下列 \(n_1+n_2-m\) 个向量
+                      <div class="eq-scroll">\[
+                      x_1,\ldots,x_m,y_1,\ldots,y_{n_1-m},z_1,\ldots,z_{n_2-m}
+                      \tag{∗}
+                      \]</div>
+                      是 \(V_1+V_2\) 的一个基即可。</p>
+                    <p>先看<strong>生成</strong>：\(V_1\) 中任一向量可由 \(x\)'s 与 \(y\)'s 线性表出，\(V_2\) 中任一向量可由 \(x\)'s 与 \(z\)'s 线性表出，于是 \(V_1+V_2\) 中任一向量都可由 (∗) 线性表出，即
+                      \[ V_1+V_2=L(x_1,\ldots,x_m,y_1,\ldots,y_{n_1-m},z_1,\ldots,z_{n_2-m}). \]</p>
+                    <p>再证这 \(n_1+n_2-m\) 个向量<strong>线性无关</strong>。假定
+                      <div class="eq-scroll">\[
+                      k_1x_1+\cdots+k_mx_m+p_1y_1+\cdots+p_{n_1-m}y_{n_1-m}+q_1z_1+\cdots+q_{n_2-m}z_{n_2-m}=\mathbf 0.
+                      \tag{∗∗}
+                      \]</div>
+                      令
+                      <div class="eq-scroll">\[
+                      x=q_1z_1+\cdots+q_{n_2-m}z_{n_2-m}=-k_1x_1-\cdots-k_mx_m-p_1y_1-\cdots-p_{n_1-m}y_{n_1-m}.
+                      \]</div>
+                      由第一等式知 \(x\in V_2\)，由第二等式知 \(x\in V_1\)，因此 \(x\in V_1\cap V_2\)，可由 \(x_1,\ldots,x_m\) 线性表出。令
+                      \[ x=-l_1x_1-l_2x_2-\cdots-l_mx_m, \]
+                      则
+                      \[ l_1x_1+\cdots+l_mx_m+q_1z_1+\cdots+q_{n_2-m}z_{n_2-m}=\mathbf 0. \]
+                      但 \(x_1,\ldots,x_m,z_1,\ldots,z_{n_2-m}\) 是 \(V_2\) 的基，线性无关，故
+                      \[ l_1=\cdots=l_m=0,\quad q_1=\cdots=q_{n_2-m}=0, \]
+                      从而 \(x=\mathbf 0\)。代回 (∗∗) 得
+                      \[ k_1x_1+\cdots+k_mx_m+p_1y_1+\cdots+p_{n_1-m}y_{n_1-m}=\mathbf 0. \]
+                      又因 \(x_1,\ldots,x_m,y_1,\ldots,y_{n_1-m}\) 是 \(V_1\) 的基，线性无关，故
+                      \[ k_1=\cdots=k_m=0,\quad p_1=\cdots=p_{n_1-m}=0. \]</p>
+                    <p>于是又有 \(q_1=\cdots=q_{n_2-m}=0\)，向量组 (∗) 线性无关，因而是 \(V_1+V_2\) 的基，维数为 \(n_1+n_2-m\)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-top:8px">式 (1.1.17) 表明：<strong>和空间的维数，往往比两个空间维数之和要小</strong>——因为公共部分（交）被重复计算了一次。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="direct-sum-def">5. 表示不唯一与直和（定义 1.9）</h3>
+            <p>定义 1.8 只保证和空间中任一向量 \(\mathbf z\) 可表为 \(x+y\)（\(x\in V_1,y\in V_2\)），但一般说来这种表示<strong>并不唯一</strong>。例如在 \(\R^3\) 中，\(V_1=L(x_1,x_2)\)，其中 \(x_1=(1,0,0),x_2=(1,1,1)\)；\(V_2=L(y_1,y_2)\)，其中 \(y_1=(0,0,1),y_2=(3,1,2)\)。零向量一方面可写成 \(\mathbf 0=\mathbf 0+\mathbf 0\)，另一方面又可写成
+              <div class="eq-scroll">\[
+              \mathbf 0=(2x_1+x_2)-(y_2-y_1),
+              \]</div>
+              （验证：\(2x_1+x_2=(3,1,1)\)，\(y_2-y_1=(3,1,1)\)。）零向量表示尚不唯一，何况其他向量。针对这一现象，作如下定义。</p>
+            <section class="card def" id="def-1-9">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 1.9</span>
+              </header>
+              <div class="card-body">
+                <p>如果 \(V_1+V_2\) 中的任一向量只能<strong>唯一</strong>地表示为子空间 \(V_1\) 的一个向量与子空间 \(V_2\) 的一个向量之和，则称 \(V_1+V_2\) 为 \(V_1\) 与 \(V_2\) 的<strong>直和</strong>（或<strong>直接和</strong>），记为
+                  \[ V_1\oplus V_2\quad(\text{或写作 }V_1\dotplus V_2). \]</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="theorem-1-7">6. 定理 1.7：直和的充要条件</h3>
+            <section class="card thm" id="thm-1-7">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 1.7</span>
+              </header>
+              <div class="card-body">
+                <p>和 \(V_1+V_2\) 为直和的充要条件是
+                  <div class="eq-scroll">\[ V_1\cap V_2=L(\mathbf 0). \]</div>
+                  即两个子空间<strong>只在零向量处重合</strong>。</p>
+                <details class="proof">
+                  <summary><span>充分性（点击展开）</span>
+                    <svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg>
+                  </summary>
+                  <div class="proof-body">
+                    <p>设 \(V_1\cap V_2=L(\mathbf 0)\)。对 \(\mathbf z\in V_1+V_2\)，若有两种表示
+                      \[ \mathbf z=x_1+x_2=y_1+y_2,\quad x_1,y_1\in V_1,\ x_2,y_2\in V_2, \]
+                      则
+                      \[ (x_1-y_1)+(x_2-y_2)=\mathbf 0,\quad x_1-y_1\in V_1,\ x_2-y_2\in V_2, \]
+                      即
+                      \[ x_1-y_1=-(x_2-y_2)\in V_1\cap V_2=L(\mathbf 0), \]
+                      故 \(x_1-y_1=\mathbf 0,\ x_2-y_2=\mathbf 0\)，即 \(x_1=y_1,\ x_2=y_2\)。表示法唯一，\(V_1+V_2\) 为直和。</p>
+                  </div>
+                </details>
+                <details class="proof">
+                  <summary><span>必要性（点击展开）</span>
+                    <svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg>
+                  </summary>
+                  <div class="proof-body">
+                    <p>假定 \(V_1+V_2\) 是直和，求证 \(V_1\cap V_2=L(\mathbf 0)\)。反设某个非零向量 \(x\in V_1\cap V_2\)，则因交是子空间，\(-x\in V_1\cap V_2\)。于是零向量有两种表示
+                      \[ \mathbf 0=\mathbf 0+\mathbf 0,\qquad \mathbf 0=x+(-x), \]
+                      与直和表示唯一矛盾。故 \(V_1\cap V_2=L(\mathbf 0)\)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="corollaries">7. 两个推论与直和的推广</h3>
+            <section class="card thm cor" id="cor-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">推论 1（维数判定）</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(V_1,V_2\) 都是线性空间 \(V\) 的子空间，令 \(U=V_1+V_2\)，则
+                  <div class="eq-scroll">\[ U=V_1\oplus V_2\quad\Longleftrightarrow\quad \dim U=\dim V_1+\dim V_2. \tag{1.1.18} \]</div></p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span>
+                    <svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg>
+                  </summary>
+                  <div class="proof-body">
+                    <p>由维数公式 (1.1.17)
+                      \[ \dim U+\dim(V_1\cap V_2)=\dim V_1+\dim V_2. \]
+                      由定理 1.7，直和的充要条件是 \(V_1\cap V_2=L(\mathbf 0)\)，这与 \(\dim(V_1\cap V_2)=0\) 等价，也就与 \(\dim U=\dim V_1+\dim V_2\) 等价。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <section class="card thm cor" id="cor-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">推论 2（直和的基拼接）</span>
+              </header>
+              <div class="card-body">
+                <p>如果 \(x_1,\ldots,x_k\) 是 \(V_1\) 的基，\(y_1,\ldots,y_l\) 是 \(V_2\) 的基，且 \(V_1+V_2\) 为直和，则
+                  \[ x_1,\ldots,x_k,\ y_1,\ldots,y_l \]
+                  是 \(V_1\oplus V_2\) 的基。</p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span>
+                    <svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg>
+                  </summary>
+                  <div class="proof-body">
+                    <p>由式 (1.1.18) 知 \(\dim(V_1\oplus V_2)=k+l\)，而上面恰有 \(k+l\) 个向量，只需证它们线性无关。设
+                      \[ c_1x_1+\cdots+c_kx_k+d_1y_1+\cdots+d_ly_l=\mathbf 0, \]
+                      则
+                      \[ c_1x_1+\cdots+c_kx_k=-(d_1y_1+\cdots+d_ly_l)\in V_1\cap V_2=L(\mathbf 0), \]
+                      即两边都等于 \(\mathbf 0\)。由 \(x\)'s 无关得 \(c_1=\cdots=c_k=0\)，由 \(y\)'s 无关得 \(d_1=\cdots=d_l=0\)，故合并后的向量组线性无关，是 \(V_1\oplus V_2\) 的基。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <p><strong>推广到多个子空间：</strong>设 \(V_i\;(i=1,2,\ldots,s)\) 是线性空间 \(V\) 的子空间，如果和 \(\displaystyle\sum_{i=1}^{s}V_i\) 中每个向量 \(\mathbf x\) 的分解式
+              \[ \mathbf x=\mathbf x_1+\cdots+\mathbf x_s,\qquad \mathbf x_i\in V_i\;(i=1,\ldots,s) \]
+              是唯一的，则称该和为直和，记为 \(V_1\oplus V_2\oplus\cdots\oplus V_s\)。本节习题第 13 题（二阶矩阵空间分解为对称矩阵与反对称矩阵子空间的直和）正是这一思想的典型应用。</p>
+          </section>
+          <!-- ================= 七、习题 1.1 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 1.1（共 13 题）</h2>
+            <div class="ex-toolbar">
+              <span data-fold-tools="details.solution">
+                <button type="button" data-fold="open">全部展开解答</button>
+                <button type="button" data-fold="close">全部收起</button>
+              </span>
+              <span class="ex-hint">建议先独立动笔，再展开详解对照；矩阵题保留了完整中间步骤</span>
+            </div>
+
+            <!-- 1 -->
+            <article class="card task" id="ex-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">集合运算</span></header>
+              <div class="card-body">
+                <p>设 \(S_1\subset S_2\)，证明 \(S_1\cap S_2=S_1\)，\(S_1\cup S_2=S_2\)。</p>
+                <details class="solution">
+                  <summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="solution-body">
+                    <h3>思路</h3><p>集合相等靠"双向包含"，这是全节反复出现的手法。</p>
+                    <h3>解答</h3>
+                    <p>由交、并定义立刻有 \(S_1\cap S_2\subset S_1\)（公共元素必在 \(S_1\) 中）；反过来 \(\forall a\in S_1\)，因 \(S_1\subset S_2\) 有 \(a\in S_2\)，故 \(a\in S_1\cap S_2\)，即 \(S_1\subset S_1\cap S_2\)。双向包含得 \(S_1\cap S_2=S_1\)。</p>
+                    <p>并集同理：\(S_2\subset S_1\cup S_2\)；反过来若 \(x\in S_1\cup S_2\)，则 \(x\in S_1\subset S_2\) 或 \(x\in S_2\)，无论哪种都有 \(x\in S_2\)，故 \(S_1\cup S_2\subset S_2\)。得 \(S_1\cup S_2=S_2\)。</p>
+                  </div>
+                </details>
+              </div>
+            </article>
+
+            <!-- 2 -->
+            <article class="card task" id="ex-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag">数域判别</span></header>
+              <div class="card-body">
+                <p>判别数集 \(\{\,a+b\sqrt 2\mid a,b\in\R\,\}\) 是否形成数域。</p>
+                <details class="solution">
+                  <summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="solution-body">
+                    <h3>解答</h3>
+                    <p>记该数集为 \(K\)。取两个元素 \(x=a+b\sqrt2,\ y=c+d\sqrt2\)。</p>
+                    <p><strong>和差：</strong>\(x\pm y=(a\pm c)+(b\pm d)\sqrt2\in K\)；<strong>积：</strong>
+                      \[ xy=(ac+2bd)+(ad+bc)\sqrt2\in K. \]</p>
+                    <p><strong>商（\(y\ne 0\)）：</strong>乘以共轭式 \(c-d\sqrt2\) 化简
+                      <div class="eq-scroll">\[
+                      \frac{a+b\sqrt2}{c+d\sqrt2}
+                      =\frac{(a+b\sqrt2)(c-d\sqrt2)}{c^2-2d^2}
+                      =\frac{ac-2bd}{c^2-2d^2}+\frac{bc-ad}{c^2-2d^2}\sqrt2.
+                      \]</div>
+                      若 \(c^2-2d^2\ne0\)，上式已给出商 \(\frac{ac-2bd}{c^2-2d^2}+\frac{bc-ad}{c^2-2d^2}\sqrt2\in K\)。若 \(c^2-2d^2=0\)，实系数下 \(c=\pm\sqrt2\,d\)：\(c=-\sqrt2\,d\) 时 \(y=0\) 与 \(y\ne0\) 矛盾，故必 \(c=\sqrt2\,d\) 且 \(d\ne0\)，此时 \(y=2\sqrt2\,d\)，直接算 \(\frac{a+b\sqrt2}{2\sqrt2\,d}=\frac{b}{2d}+\frac{a}{4d}\sqrt2\in K\)。两种情形商都属于 \(K\)，四则封闭且含非零数，\(K\) 是数域。</p>
+                    <h3>注</h3><p>本题 \(a,b\in\R\) 时实际上取 \(b=0\) 已遍历一切实数，\(K=\R\)；非平凡版本是 \(a,b\in\Q\) 的 \(\Q(\sqrt2)\)，上面的验证说明它对有理系数同样成立，是典型的"添加无理数得到的新数域"。</p>
+                  </div>
+                </details>
+              </div>
+            </article>
+
+            <!-- 3 -->
+            <article class="card task" id="ex-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag tag-mid">线性空间判别</span></header>
+              <div class="card-body">
+                <p>判别下列集合对所指运算是否构成 \(\R\) 上的线性空间：</p>
+                <p>（1）<strong>次数<em>等于</em> \(m\;(m\ge1)\)</strong> 的实系数多项式的集合，对多项式加法与数乘多项式；<br>
+                   （2）<strong>实对称矩阵</strong>的集合，对矩阵加法和实数与矩阵的乘法；<br>
+                   （3）平面上全体向量的集合，用通常加法，数乘定义为 \(k\circ x=\mathbf 0\)。</p>
+                <details class="solution">
+                  <summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="solution-body">
+                    <h3>（1）不是线性空间</h3>
+                    <p>加法不封闭：两个 \(m\) 次多项式相加可能"掉次数"，\(t^m+(-t^m+1)=1\) 不是 \(m\) 次多项式；零多项式也不在集合中，连零元素都没有。注意对比：次数<strong>不超过</strong> \(m\) 的多项式集合 \(P_m\) 就是线性空间（例 1.2）。</p>
+                    <h3>（2）是线性空间</h3>
+                    <p>若 \(A^{\mathrm T}=A,\ B^{\mathrm T}=B\)，则 \((A+B)^{\mathrm T}=A^{\mathrm T}+B^{\mathrm T}=A+B\)，\((kA)^{\mathrm T}=kA^{\mathrm T}=kA\)，两种运算封闭；零矩阵对称，\(-A\) 对称；其余运算律从 \(\R^{n\times n}\) 继承。</p>
+                    <h3>（3）不是线性空间</h3>
+                    <p>数乘 \(k\circ x=\mathbf 0\) 不满足公理 8：\(1\circ x=\mathbf 0\ne x\)（只要 \(x\ne\mathbf 0\)）。封闭性虽满足（结果恒为 \(\mathbf 0\)），但公理残缺仍然不是线性空间——这正说明 8 条公理一条都不能少。</p>
+                  </div>
+                </details>
+              </div>
+            </article>
+
+            <!-- 4 -->
+            <article class="card task" id="ex-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag">线性相关</span></header>
+              <div class="card-body">
+                <p>证明：在实函数空间中，\(1,\ \cos^2 t,\ \cos 2t\) 线性相关。</p>
+                <details class="solution">
+                  <summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="solution-body">
+                    <h3>解答</h3><p>由三角恒等式（倍角公式）
+                      \[ \cos 2t=2\cos^2 t-1, \]
+                      移项得不全为零的系数组合
+                      \[ -1\cdot 1+2\cdot\cos^2 t-1\cdot\cos 2t\equiv 0, \]
+                      系数 \((-1,2,-1)\) 不全为零，故 \(1,\cos^2 t,\cos 2t\) 线性相关。</p>
+                    <h3>注</h3><p>函数空间中"恒等于零"是对一切 \(t\) 成立，不能只代一个 \(t\) 值下结论；本题用恒等式直接给出了非平凡组合。</p>
+                  </div>
+                </details>
+              </div>
+            </article>
+
+            <!-- 5 -->
+            <article class="card task" id="ex-5">
+              <header class="card-head"><span class="card-label">第 5 题</span><span class="tag">维数与基</span></header>
+              <div class="card-body">
+                <p>求第 3 题之（2）中线性空间（\(n\) 阶实对称矩阵空间）的维数与一个基。</p>
+                <details class="solution">
+                  <summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="solution-body">
+                    <h3>解答</h3>
+                    <p>记该空间为 \(S_n\)。对称矩阵对角线上有 \(n\) 个自由元，上三角（不含对角线）有 \(\frac{n(n-1)}2\) 个自由元，其余被对称条件确定，故
+                      \[ \dim S_n=n+\frac{n(n-1)}2=\frac{n(n+1)}2. \]
+                      一个基由两类矩阵组成：
+                      \[ E_{ii}\;(i=1,\ldots,n),\qquad E_{ij}+E_{ji}\;(1\le i&lt;j\le n). \]
+                      事实上任何对称矩阵都能唯一写成
+                      \[ A=\sum_{i=1}^n a_{ii}E_{ii}+\sum_{i&lt;j}a_{ij}(E_{ij}+E_{ji}), \]
+                      这些矩阵彼此形状独立、线性无关，构成基。（\(n=2\) 时维数为 3，见第 13 题。）</p>
+                  </div>
+                </details>
+              </div>
+            </article>
+
+            <!-- 6 -->
+            <article class="card task" id="ex-6">
+              <header class="card-head"><span class="card-label">第 6 题</span><span class="tag tag-mid">求坐标（\(\R^3\)）</span></header>
+              <div class="card-body">
+                <p>求 \(\R^3\) 中向量 \(x=(3,7,1)\) 对基 \(x_1=(1,3,5),\ x_2=(6,3,2),\ x_3=(3,1,0)\) 的坐标。</p>
+                <details class="solution">
+                  <summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="solution-body">
+                    <h3>解答</h3>
+                    <p>设 \(x=\xi_1x_1+\xi_2x_2+\xi_3x_3\)，比较分量得线性方程组
+                      \[
+                      \begin{cases}
+                      \xi_1+6\xi_2+3\xi_3=3,\\
+                      3\xi_1+3\xi_2+\xi_3=7,\\
+                      5\xi_1+2\xi_2=1.
+                      \end{cases} \]
+                      由第三式 \(\xi_1=(1-2\xi_2)/5\)，代入第二式得 \(\xi_3=\frac{32}5-\frac95\xi_2\)，再代入第一式（两边乘 5）：
+                      \[ 1-2\xi_2+30\xi_2+96-27\xi_2=15\ \Longrightarrow\ \xi_2=-82. \]
+                      于是 \(\xi_1=33,\ \xi_3=154\)。</p>
+                    <p>所求坐标为 \(\boxed{(33,-82,154)^{\mathrm T}}\)。</p>
+                    <p>验算：\(33x_1-82x_2+154x_3=(33-492+462,\ 99-246+154,\ 165-164)=(3,7,1)\)。</p>
+                    <h3>注</h3><p>数字偏大，是因为这组基向量方向彼此接近、过渡矩阵接近奇异；坐标对基的选择可以非常敏感。</p>
+                  </div>
+                </details>
+              </div>
+            </article>
+
+            <!-- 7 -->
+            <article class="card task" id="ex-7">
+              <header class="card-head"><span class="card-label">第 7 题</span><span class="tag">求坐标（\(P_2\)）</span></header>
+              <div class="card-body">
+                <p>求 \(P_2\) 中向量 \(1+t+t^2\) 对基 \(1,\ t-1,(t-2)(t-1)\) 的坐标。</p>
+                <details class="solution">
+                  <summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="solution-body">
+                    <h3>解答</h3>
+                    <p>设
+                      \[ 1+t+t^2=a+b(t-1)+c(t-2)(t-1)=c\,t^2+(b-3c)t+(a-b+2c), \]
+                      比较同次幂系数：
+                      \[ t^2:\ c=1;\qquad t:\ b-3=1\Rightarrow b=4;\qquad \text{常数项}:\ a-4+2=1\Rightarrow a=3. \]
+                      坐标为 \(\boxed{(3,4,1)^{\mathrm T}}\)，即 \(1+t+t^2=3+4(t-1)+(t-2)(t-1)\)。</p>
+                  </div>
+                </details>
+              </div>
+            </article>
+
+            <!-- 8 -->
+            <article class="card task" id="ex-8">
+              <header class="card-head"><span class="card-label">第 8 题</span><span class="tag tag-hard">过渡矩阵 + 坐标</span></header>
+              <div class="card-body">
+                <p>设线性空间 \(V^4\) 中两个基 (I) \(x_1,x_2,x_3,x_4\)；(II) \(y_1,y_2,y_3,y_4\) 满足
+                  <div class="eq-scroll">\[
+                  x_1+2x_2=y_3,\quad x_2+2x_3=y_4,\quad y_1+2y_2=x_3,\quad y_2+2y_3=x_4.
+                  \]</div>
+                  （1）求由基 (I) 到基 (II) 的过渡矩阵 \(C\)；（2）求向量 \(x=2y_1-y_2+y_3+y_4\) 在基 (I) 下的坐标。</p>
+                <details class="solution">
+                  <summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="solution-body">
+                    <h3>（1）求过渡矩阵</h3>
+                    <p>过渡矩阵要求把每个 \(y_j\) 用旧基 \(x\) 表示。由第一式 \(y_3=x_1+2x_2\)，代入第四式
+                      \[ y_2=x_4-2y_3=-2x_1-4x_2+x_4, \]
+                      再代入第三式
+                      \[ y_1=x_3-2y_2=4x_1+8x_2+x_3-2x_4, \]
+                      第二式直接给出 \(y_4=x_2+2x_3\)。因此
+                      <div class="eq-scroll">\[
+                      C=\begin{pmatrix}
+                      4&-2&1&0\\
+                      8&-4&2&1\\
+                      1&0&0&2\\
+                      -2&1&0&0
+                      \end{pmatrix},
+                      \quad (y_1,y_2,y_3,y_4)=(x_1,x_2,x_3,x_4)\,C.
+                      \]</div></p>
+                    <h3>（2）求 \(x\) 在 (I) 下的坐标</h3>
+                    <p>\(x\) 在新基 (II) 下坐标为 \(\eta=(2,-1,1,1)^{\mathrm T}\)，由式 (1.1.7) \(\xi=C\eta\)：
+                      <div class="eq-scroll">\[
+                      \xi=\begin{pmatrix}
+                      4&-2&1&0\\8&-4&2&1\\1&0&0&2\\-2&1&0&0
+                      \end{pmatrix}
+                      \begin{pmatrix}2\\-1\\1\\1\end{pmatrix}
+                      =\begin{pmatrix}11\\23\\4\\-5\end{pmatrix}.
+                      \]</div>
+                      坐标为 \(\boxed{(11,23,4,-5)^{\mathrm T}}\)。</p>
+                  </div>
+                </details>
+              </div>
+            </article>
+
+            <!-- 9 -->
+            <article class="card task" id="ex-9">
+              <header class="card-head"><span class="card-label">第 9 题</span><span class="tag tag-hard">\(\R^4\) 两基三问</span></header>
+              <div class="card-body">
+                <p>在 \(\R^4\) 中有两个基
+                  \[ x_1=e_1,\ x_2=e_2,\ x_3=e_3,\ x_4=e_4; \]
+                  \[ y_1=(2,1,-1,1),\ y_2=(0,3,1,0),\ y_3=(5,3,2,1),\ y_4=(6,6,1,3). \]
+                  （1）求由前一基改变为后一基的过渡矩阵；（2）求向量 \(x=(\xi_1,\xi_2,\xi_3,\xi_4)\) 对后一基的坐标；（3）求对两个基有相同坐标的非零向量。</p>
+                <details class="solution">
+                  <summary><span>查看详细解答（含 \(C^{-1}\) 完整计算）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="solution-body">
+                    <h3>（1）过渡矩阵</h3>
+                    <p>旧基是标准基，新基向量的坐标直接排成列：
+                      <div class="eq-scroll">\[
+                      C=\begin{pmatrix}
+                      2&0&5&6\\1&3&3&6\\-1&1&2&1\\1&0&1&3
+                      \end{pmatrix}.
+                      \]</div></p>
+                    <h3>（2）新坐标 \(\eta=C^{-1}\xi\)</h3>
+                    <p>对增广矩阵 \((C\mid I)\) 作 Gauss–Jordan 消元（过程略，核每一步即可）得到
+                      <div class="eq-scroll">\[
+                      C^{-1}=\frac1{27}\begin{pmatrix}
+                      12&9&-27&-33\\
+                      1&12&-9&-23\\
+                      9&0&0&-18\\
+                      -7&-3&9&26
+                      \end{pmatrix},
+                      \]</div>
+                      故
+                      <div class="eq-scroll">\[
+                      \eta=\frac1{27}\begin{pmatrix}
+                      12\xi_1+9\xi_2-27\xi_3-33\xi_4\\
+                      \xi_1+12\xi_2-9\xi_3-23\xi_4\\
+                      9\xi_1-18\xi_4\\
+                      -7\xi_1-3\xi_2+9\xi_3+26\xi_4
+                      \end{pmatrix}.
+                      \]</div></p>
+                    <h3>（3）两基坐标相同的非零向量</h3>
+                    <p>坐标相同即 \(\xi=\eta=C^{-1}\xi\)，等价于 \((C-I)\xi=\mathbf 0\)，其中
+                      <div class="eq-scroll">\[
+                      C-I=\begin{pmatrix}
+                      1&0&5&6\\1&2&3&6\\-1&1&1&1\\1&0&1&2
+                      \end{pmatrix}.
+                      \]</div>
+                      第一式减第四式得 \(4(\xi_3+\xi_4)=0\)，即 \(\xi_3=-\xi_4\)；第四式给 \(\xi_1=-\xi_4\)；第二式给 \(\xi_2=-\xi_4\)；第三式自动成立。令 \(\xi_4=-t\)，得
+                      \[ x=t(1,1,1,-1),\quad t\ne 0, \]
+                      即所有在两基下坐标相同的非零向量为 \(\boxed{t(1,1,1,-1)\;(t\in\R,\ t\ne0)}\)。</p>
+                  </div>
+                </details>
+              </div>
+            </article>
+
+            <!-- 10 -->
+            <article class="card task" id="ex-10">
+              <header class="card-head"><span class="card-label">第 10 题</span><span class="tag tag-mid">生成子空间的基</span></header>
+              <div class="card-body">
+                <p>假定 \(x_1,x_2,x_3\) 是 \(\R^3\) 的一个基，试求由
+                  \[ y_1=x_1-2x_2+3x_3,\quad y_2=2x_1+3x_2+2x_3,\quad y_3=4x_1+13x_2 \]
+                  生成的子空间 \(L(y_1,y_2,y_3)\) 的基。</p>
+                <details class="solution">
+                  <summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="solution-body">
+                    <h3>解答</h3>
+                    <p>因 \(x_1,x_2,x_3\) 是基，\(y_j\) 的线性关系与其坐标列的线性关系完全相同。将坐标排成矩阵并作初等行变换：
+                      <div class="eq-scroll">\[
+                      \begin{pmatrix}
+                      1&2&4\\-2&3&13\\3&2&0
+                      \end{pmatrix}
+                      \xrightarrow{R_2+2R_1}_{R_3-3R_1}
+                      \begin{pmatrix}1&2&4\\0&7&21\\0&-4&-12\end{pmatrix}
+                      \xrightarrow{R_2/7}_{R_3+4R_2}
+                      \begin{pmatrix}1&2&4\\0&1&3\\0&0&0\end{pmatrix}.
+                      \]</div>
+                      秩为 2，且第一、二列是阶梯形的列向量组中一个极大无关组，故 \(\boxed{y_1,y_2}\) 是 \(L(y_1,y_2,y_3)\) 的一个基。</p>
+                    <p>顺带读出线性关系（初等行变换不改变列之间的线性关系）：第三列 \(=-2\times\)第一列 \(+3\times\)第二列，故
+                      \[ y_3=-2y_1+3y_2, \]
+                      直接展开验证：\(-2(x_1-2x_2+3x_3)+3(2x_1+3x_2+2x_3)=4x_1+13x_2\)，吻合。</p>
+                  </div>
+                </details>
+              </div>
+            </article>
+
+            <!-- 11 -->
+            <article class="card task" id="ex-11">
+              <header class="card-head"><span class="card-label">第 11 题</span><span class="tag">子空间的交的基</span></header>
+              <div class="card-body">
+                <p>求 \(\R^4\) 的两个子空间
+                  \[ V_1=\{(\xi_1,\xi_2,\xi_3,\xi_4)\mid \xi_1-\xi_2+\xi_3-\xi_4=0\}, \]
+                  \[ V_2=\{(\xi_1,\xi_2,\xi_3,\xi_4)\mid \xi_1+\xi_2+\xi_3+\xi_4=0\} \]
+                  的交 \(V_1\cap V_2\) 的基。</p>
+                <details class="solution">
+                  <summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="solution-body">
+                    <h3>解答</h3>
+                    <p>交中的向量同时满足两个方程。两式相加、相减得
+                      \[ \xi_1+\xi_3=0,\qquad \xi_2+\xi_4=0, \]
+                      即 \(\xi_3=-\xi_1,\ \xi_4=-\xi_2\)，其中 \(\xi_1,\xi_2\) 自由。于是
+                      <div class="eq-scroll">\[
+                      V_1\cap V_2=\{\,t_1(1,0,-1,0)+t_2(0,1,0,-1)\mid t_1,t_2\in\R\,\}.
+                      \]</div>
+                      两个生成向量显然线性无关，故一个基为
+                      \[ \boxed{(1,0,-1,0),\;(0,1,0,-1)}. \]
+                      交是 2 维子空间。可用维数公式复核：\(\dim V_1=\dim V_2=3\)，\(\dim(V_1+V_2)=4\)，故 \(\dim(V_1\cap V_2)=3+3-4=2\)，一致。</p>
+                  </div>
+                </details>
+              </div>
+            </article>
+
+            <!-- 12 -->
+            <article class="card task" id="ex-12">
+              <header class="card-head"><span class="card-label">第 12 题</span><span class="tag tag-mid">迹零矩阵子空间</span></header>
+              <div class="card-body">
+                <p>给定 \(\R^{2\times 2}=\{\,A=(a_{ij})_{2\times 2}\mid a_{ij}\in\R\,\}\) 的子集
+                  \[ V=\{\,A=(a_{ij})_{2\times 2}\mid a_{ij}\in\R\text{ 且 }a_{11}+a_{22}=0\,\}. \]
+                  （1）证明 \(V\) 是 \(\R^{2\times 2}\) 的子空间；（2）求 \(V\) 的维数和一个基。</p>
+                <details class="solution">
+                  <summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="solution-body">
+                    <h3>（1）证明子空间</h3>
+                    <p>\(V\) 非空（零矩阵的迹为 0）。若 \(A,B\in V\)，利用迹的线性：
+                      \[ \tr(A+B)=\tr A+\tr B=0+0=0\ \Rightarrow\ A+B\in V; \]
+                      \[ \tr(kA)=k\,\tr A=0\ \Rightarrow\ kA\in V. \]
+                      两种运算封闭，故 \(V\) 是子空间。</p>
+                    <h3>（2）维数与基</h3>
+                    <p>条件 \(a_{11}+a_{22}=0\) 是 4 个自由元上的一个独立线性约束，故维数 \(4-1=3\)。取
+                      <div class="eq-scroll">\[
+                      E_{11}-E_{22}=\begin{pmatrix}1&0\\0&-1\end{pmatrix},\quad
+                      E_{12}=\begin{pmatrix}0&1\\0&0\end{pmatrix},\quad
+                      E_{21}=\begin{pmatrix}0&0\\1&0\end{pmatrix},
+                      \]</div>
+                      则任何迹零矩阵唯一写成
+                      \[ A=a_{11}(E_{11}-E_{22})+a_{12}E_{12}+a_{21}E_{21}, \]
+                      三者线性无关，构成 \(V\) 的一个基，\(\boxed{\dim V=3}\)。</p>
+                  </div>
+                </details>
+              </div>
+            </article>
+
+            <!-- 13 -->
+            <article class="card task" id="ex-13">
+              <header class="card-head"><span class="card-label">第 13 题</span><span class="tag tag-hard">直和证明</span></header>
+              <div class="card-body">
+                <p>试证明所有二阶矩阵之集合形成的实线性空间，是所有二阶实对称矩阵之集合形成的子空间与所有二阶实反对称矩阵之集合形成的子空间的直和。</p>
+                <details class="solution">
+                  <summary><span>查看详细解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="solution-body">
+                    <h3>解答</h3>
+                    <p>记 \(M_2=\R^{2\times 2}\)，对称矩阵子空间 \(S=\{A\mid A^{\mathrm T}=A\}\)，反对称矩阵子空间 \(T=\{A\mid A^{\mathrm T}=-A\}\)（二者为子空间的验证同第 3 题思路）。</p>
+                    <p><strong>① 任意矩阵都能分解（\(M_2=S+T\)）：</strong>对任意 \(A\in M_2\)，
+                      <div class="eq-scroll">\[
+                      A=\underbrace{\frac{A+A^{\mathrm T}}2}_{\in S}
+                      +\underbrace{\frac{A-A^{\mathrm T}}2}_{\in T},
+                      \]</div>
+                      因为 \(\left(\frac{A+A^{\mathrm T}}2\right)^{\mathrm T}=\frac{A+A^{\mathrm T}}2\)，\(\left(\frac{A-A^{\mathrm T}}2\right)^{\mathrm T}=-\frac{A-A^{\mathrm T}}2\)。故 \(M_2=S+T\)。</p>
+                    <p><strong>② 分解唯一（用定理 1.7 证 \(S\cap T=L(\mathbf 0)\)）：</strong>若 \(A\in S\cap T\)，则 \(A=A^{\mathrm T}=-A\)，即 \(2A=\mathbf 0\)，故 \(A=\mathbf 0\)。由定理 1.7，\(S+T\) 是直和：
+                      \[ \R^{2\times 2}=S\oplus T. \]</p>
+                    <p><strong>维数复核（推论 1）：</strong>\(\dim S=3\)（第 5 题），\(\dim T=1\)（基为 \(\begin{pmatrix}0&1\\-1&0\end{pmatrix}\)），\(3+1=4=\dim\R^{2\times 2}\)，与直和维数公式一致。</p>
+                    <h3>注</h3><p>这一分解对任意 \(n\) 阶矩阵都成立：\(\R^{n\times n}=S_n\oplus T_n\)，其中 \(\dim S_n=\frac{n(n+1)}2\)，\(\dim T_n=\frac{n(n-1)}2\)，和恰为 \(n^2\)。它是"对称部分 + 反对称部分"这一常用分解的理论根据。</p>
+                  </div>
+                </details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 八、本节小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结与自检</h2>
+            <div class="summary-block">
+              <p>本节走完了一条完整的抽象链条：<strong>集合与映射 → 线性空间（8 条公理）→ 维数 / 基 / 坐标 → 基变换公式 → 子空间 → 交、和与直和</strong>。核心索引用锚点整理如下：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>概念 / 结论</th><th>内容一句话</th><th>位置</th></tr>
+                  <tr><td>定义 1.1</td><td>封闭 + 8 条公理的非空集合 \(V\)</td><td><a href="#def-1-1">线性空间</a></td></tr>
+                  <tr><td>例 1.5</td><td>\(\R^+\) 上 \(m\oplus n=mn,\ k\circ m=m^k\) 是线性空间；零元是 1</td><td><a href="#exm-1-5">八条验证</a></td></tr>
+                  <tr><td>定理 1.1</td><td>零元唯一、负元唯一</td><td><a href="#thm-1-1">定理 1.1</a></td></tr>
+                  <tr><td>定义 1.2–1.4</td><td>维数 \(\dim V\)、基、坐标</td><td><a href="#def-1-2">维数</a>·<a href="#definition-1-3">基</a>·<a href="#definition-1-4">坐标</a></td></tr>
+                  <tr><td>例 1.6</td><td>维数依赖数域：\(\dim_{\C}\C=1,\ \dim_{\R}\C=2\)</td><td><a href="#exm-1-6">例 1.6</a></td></tr>
+                  <tr><td>过渡矩阵 / 坐标变换</td><td>\((y)=(x)C\)；\(\xi=C\eta\)，\(\eta=C^{-1}\xi\)</td><td><a href="#transition-matrix">式 (1.1.6)–(1.1.8)</a></td></tr>
+                  <tr><td>定义 1.5</td><td>对加法、数乘封闭的非空子集合</td><td><a href="#definition-1-5">线性子空间</a></td></tr>
+                  <tr><td>值域 / 核空间</td><td>\(R(A)=\{A\mathbf x\}\)，\(N(A)=\{\mathbf x:A\mathbf x=\mathbf 0\}\)</td><td><a href="#range-nullspace">定义 1.6–1.7</a></td></tr>
+                  <tr><td>秩—零度公式</td><td>\(\rank A+\n(A)=n\)，\(\n(A)-\n(A^{\mathrm T})=n-m\)</td><td><a href="#exm-1-9">式 (1.1.15–16)</a></td></tr>
+                  <tr><td>定理 1.3</td><td>子空间的基可扩充为全空间的基</td><td><a href="#theorem-1-3">基扩充定理</a></td></tr>
+                  <tr><td>维数公式</td><td>\(\dim V_1+\dim V_2=\dim(V_1+V_2)+\dim(V_1\cap V_2)\)</td><td><a href="#dimension-formula">定理 1.6</a></td></tr>
+                  <tr><td>直和</td><td>表示唯一 \(\Longleftrightarrow V_1\cap V_2=L(\mathbf 0)\) \(\Longleftrightarrow \dim\) 可加</td><td><a href="#direct-sum-def">定义 1.9</a>·<a href="#theorem-1-7">定理 1.7</a></td></tr>
+                </table>
+              </div>
+              <div class="self-check">
+                <h3>三个自检问题（合上书口述）</h3>
+                <ol style="margin-bottom:0">
+                  <li>正实数集按普通加法为什么不是线性空间？按 \(m\oplus n=mn\) 后，"零向量"和"\(x\) 的负向量"分别是谁？</li>
+                  <li>为什么过渡矩阵的第 \(j\) <em>列</em>对应新基向量 \(y_j\)？坐标变换时旧坐标与新坐标谁乘 \(C\)、谁乘 \(C^{-1}\)？</li>
+                  <li>不用看书，复述维数公式的证明骨架：如何选交的基、如何扩充、怎样证明合并后的向量组线性无关？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <span class="ln-prev disabled" aria-disabled="true"><span class="ln-dir">上一节</span><span class="ln-ttl">本节是第一章第一节</span></span>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="1.2-linear-transformations.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§1.2 线性变换及其矩阵</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

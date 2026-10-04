@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§7.5 Toeplitz 矩阵及其有关矩阵（选学） · 矩阵论</title>
+  <meta name="description" content="矩阵论 §7.5（选学）：Toeplitz 矩阵（沿对角线常值）、Hankel 矩阵（多项式最小二乘拟合、反序矩阵 J 互化）、次对称与中心对称矩阵（分块对角化）、循环矩阵 circ（DFT 对角化、f(λₖ) 谱、逆与行列式）、幺矩阵、三角 Toeplitz">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§7.5 Toeplitz 矩阵及其有关矩阵（选学）</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="7.5" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 7 章 若干特殊矩阵类介绍</a><span class="sep" aria-hidden="true">/</span>
+            <span>§7.5 Toeplitz 矩阵及其有关矩阵（选学）</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 7 章 · 沿对角线取常值的矩阵</div>
+            <h1>§7.5 Toeplitz 矩阵及其有关矩阵</h1>
+            <p class="lede">数据处理、有限元、概率统计、滤波理论中反复出现"<strong>每条对角线元素相同</strong>"的矩阵：Toeplitz（沿主对角线）与 Hankel（沿副对角线）。它们由 \(2n-1\) 个数确定，求逆可从 \(O(n^3)\) 加速到 \(O(n^2)\)。Toeplitz 的特殊情形——<strong>循环矩阵</strong>——更被 DFT 完全对角化，谱、逆、行列式都有闭式；次对称、中心对称结构则把大矩阵问题化为两个半阶问题。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.407–416</strong></span>
+              <span class="chip">建议 <strong>2 学时</strong></span>
+              <span class="chip">矩阵族 <strong>T / Hankel / 循环</strong></span>
+              <span class="chip">核心工具 <strong>DFT 对角化</strong></span>
+            </div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>写出 Toeplitz 与 Hankel 矩阵的结构，会用反序矩阵 J 把二者互化；</li>
+                  <li>理解 Hankel 矩阵来自多项式最小二乘的法方程，知道其非奇异性证明；</li>
+                  <li>区分次对称与中心对称矩阵，会用正交变换分块对角化中心对称阵；</li>
+                  <li>掌握循环矩阵的多项式表示、DFT 特征值 \(f(\lambda_k)\)、特征向量、逆与行列式公式；</li>
+                  <li>知道幺矩阵、三对角 T 矩阵、三角 T 矩阵的结构与性质。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>循环矩阵的 DFT 对角化；</li>
+                      <li>Hankel↔Toeplitz；</li>
+                      <li>中心对称分块。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>单位根与特征向量；</li>
+                      <li>逆循环公式 (7.5.20)；</li>
+                      <li>次对称与中心对称区别。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 2 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>Toeplitz、Hankel（最小二乘来源、J 互化）、次对称与中心对称</td><td class="num">p.407–412</td></tr>
+                    <tr><td class="num">2</td><td>循环矩阵（DFT、谱、逆）、幺矩阵、三对角/三角 T 矩阵、实验</td><td class="num">p.412–416</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 200" role="img" aria-label="Toeplitz 矩阵族脉络图">
+                    <defs><marker id="m75" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b"><rect x="30" y="24" width="170" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="115" y="46">Toeplitz 矩阵</text><text x="115" y="64" font-size="11" fill="#666">(aᵢ₋ⱼ)，主对角常值</text>
+                    </g>
+                    <g class="fm-node" fill="#f4f0e2" stroke="#a06a17"><rect x="250" y="24" width="170" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="335" y="46">Hankel 矩阵</text><text x="335" y="64" font-size="11" fill="#666">(aᵢ₊ⱼ)，反序 J 互化</text>
+                    </g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="470" y="24" width="170" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="555" y="46">循环矩阵 circ</text><text x="555" y="64" font-size="11" fill="#666">f(A)，DFT 对角化</text>
+                    </g>
+                    <g class="fm-node" fill="#eef7f0" stroke="#3d7a4e"><rect x="690" y="24" width="120" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="750" y="46">幺矩阵 Eₙ</text><text x="750" y="64" font-size="11" fill="#666">秩 1 特例</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m75)"><line x1="200" y1="50" x2="248" y2="50"/><line x1="420" y1="50" x2="468" y2="50"/><line x1="640" y1="50" x2="688" y2="50"/></g>
+                    <g class="fm-node" fill="#f3eef7" stroke="#6b4e9e"><rect x="230" y="126" width="380" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="420" y="148">次对称 JAᵀJ=A ／ 中心对称 JDJ=D（QᵀDQ 分半阶）</text><text x="420" y="166" font-size="11" fill="#666">三对角 T（特征值显式）、上/下三角 T（求逆 O(n²)）</text>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、T 与 Hankel ================= -->
+          <section class="section" id="sec-th">
+            <h2 class="sec-title"><span class="cn">一</span>Toeplitz 矩阵与 Hankel 矩阵</h2>
+            <p><strong>Toeplitz 矩阵（T 矩阵）</strong>是任一条平行于主对角线的直线上元素全相同的 \(n\) 阶矩阵（仅 \(2n-1\) 个自由元素）：</p>
+            <div class="eq-scroll">\[
+            A=\begin{pmatrix}
+            a_0&a_{-1}&a_{-2}&\cdots&a_{-n+1}\\
+            a_1&a_0&a_{-1}&\cdots&a_{-n+2}\\
+            a_2&a_1&a_0&\cdots&a_{-n+3}\\
+            \vdots&\vdots&\vdots&\ddots&\vdots\\
+            a_{n-1}&a_{n-2}&a_{n-3}&\cdots&a_0
+            \end{pmatrix}=(a_{i-j})_{i,j=1}^{n}. \tag{7.5.1}
+            \]</div>
+            <p>Trench(1964) 等提出快速求逆，把通常 \(O(n^3)\) 的计算量降到 <strong>\(O(n^2)\)</strong>；60 年代末以后又出现不经过求逆、直接数值解 T 矩阵方程组的快速算法。一般 T 矩阵的特征值快速算法仍较少见。</p>
+
+            <p>T 矩阵沿<strong>副对角线</strong>的对应物是 <strong>Hankel 矩阵</strong>（\(n+1\) 阶，\(2n+1\) 个自由元素）：</p>
+            <div class="eq-scroll">\[
+            H_{n+1}=\begin{pmatrix}
+            a_0&a_1&a_2&\cdots&a_n\\
+            a_1&a_2&a_3&\cdots&a_{n+1}\\
+            a_2&a_3&a_4&\cdots&a_{n+2}\\
+            \vdots&\vdots&\vdots&\ddots&\vdots\\
+            a_n&a_{n+1}&a_{n+2}&\cdots&a_{2n}
+            \end{pmatrix}=(a_{i+j})_{i,j=0}^{n}. \tag{7.5.2}
+            \]</div>
+
+            <section class="card thm" id="thm-hankel-ls">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">来源：最小二乘多项式拟合的法方程</span>
+              </header>
+              <div class="card-body">
+                <p>给定互异观测点 \((\xi_i,\eta_i)\ (i=1,\cdots,m)\)，求 \(n\) 次（\(n&lt;m\)）非零多项式 \(f(x)=\sum_{i=0}^{n}\mu_i x^i\) 使 \(S=\sum_{j=1}^{m}[\eta_j-f(\xi_j)]^2\) 最小。令</p>
+                <div class="eq-scroll">\[ a_k=\sum_{j=1}^{m}\xi_j^k,\qquad \beta_k=\sum_{j=1}^{m}\xi_j^k\eta_j, \]</div>
+                <p style="margin-bottom:0">由极值必要条件 \(\partial S/\partial\mu_k=0\) 得到法方程（恰为 Hankel 线性方程组）</p>
+                <div class="eq-scroll">\[ \sum_{i=0}^{n}a_{k+i}\mu_i=\beta_k\quad(k=0,1,\cdots,n)\quad\Longleftrightarrow\quad H_{n+1}u=b. \tag{7.5.4} \]</div>
+                <details class="proof"><summary><span>Hankel 矩阵必非奇异（证明）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">若 \(\det H_{n+1}=0\)，则齐次方程 \(\sum_{i=0}^{n}a_{k+i}\mu_i=0\) 有非零解。第 \(k\) 式乘 \(\mu_k\) 对 \(k\) 求和：
+                  \(0=\sum_k\mu_k\sum_i a_{k+i}\mu_i=\sum_k\mu_k\sum_i\mu_i\sum_j\xi_j^{k+i}=\sum_{j=1}^{m}\big(\sum_{i=0}^{n}\mu_i\xi_j^i\big)^2=\sum_j f^2(\xi_j)\)，
+                  故 \(f\) 在 \(m&gt;n\) 个互异点全为零，只能 \(f\equiv0\)，与非零解矛盾。这同时说明最小二乘解唯一。</p>
+                </details>
+                <p style="margin-bottom:0">实际计算中 \(n\) 较大（如 \(n\ge7\)）时 \(\det H\) 虽非零但很小，法方程易<strong>病态</strong>，需用正交多项式等专门方法（与 §7.6 Hilbert 矩阵同源）。</p>
+              </div>
+            </section>
+
+            <p><strong>Hankel 与 Toeplitz 的互化。</strong>引入<strong>反序矩阵</strong>（次对角全 1）</p>
+            <div class="eq-scroll">\[ J=\begin{pmatrix}&amp;&amp;1\\&amp;\ddots&amp;\\1&amp;&amp;\end{pmatrix},\qquad J^2=I,\ J^{\mathrm T}=J, \tag{7.5.5} \]</div>
+            <p style="margin-bottom:0">则 \(JH_{n+1}\) 或 \(H_{n+1}J\) 都是 Toeplitz 矩阵，且</p>
+            <div class="eq-scroll">\[ (JH_{n+1})^{\mathrm T}=H_{n+1}J. \tag{7.5.6} \]</div>
+            <p>于是 T 矩阵的求逆等研究可转化为 Hankel 矩阵问题（数值验证 \(JHJ\) 把 Hankel 旋转 180°，\(JH\) 即 Toeplitz 型）。</p>
+          </section>
+
+          <!-- ================= 次对称/中心对称 ================= -->
+          <section class="section" id="sec-symmetry">
+            <h2 class="sec-title"><span class="cn">二</span>次对称矩阵与中心对称矩阵</h2>
+            <p>若 \(n\) 阶 A 的元素关于<strong>副（次）对角线</strong>对称：</p>
+            <div class="eq-scroll">\[ a_{ij}=a_{n+1-j,n+1-i}, \tag{7.5.7} \]</div>
+            <p>称 <strong>A 为次对称矩阵（Persymmetric）</strong>。任一 T 矩阵都是次对称矩阵（\(a_{i-j}=a_{n+1-j-(n+1-i)}\)）。次对称阵满足</p>
+            <div class="eq-scroll">\[ JA^{\mathrm T}J=A,\qquad (JA)^{\mathrm T}=JA. \tag{7.5.8–9} \]</div>
+            <p style="margin-bottom:0">由 \(J^2=I\) 可证 \(A^{-1}\) 也次对称。</p>
+            <p>若元素关于矩阵<strong>中心</strong>对称（旋转 180° 不变）：</p>
+            <div class="eq-scroll">\[ d_{ij}=d_{n+1-i,n+1-j}, \tag{7.5.10} \]</div>
+            <p>称 <strong>D 为中心对称矩阵（Centrosymmetric）</strong>，满足</p>
+            <div class="eq-scroll">\[ JDJ=D. \tag{7.5.11} \]</div>
+            <p>关于主、副两条对角线都对称的矩阵必中心对称。对称 T 矩阵是对称中心对称的特例。任意 \(2n\) 阶中心对称阵 D 可写为</p>
+            <div class="eq-scroll">\[ D=\begin{pmatrix}A&amp;BJ\\JB&amp;JAJ\end{pmatrix}\quad\text{或（取 }B=JC\text{）}\quad \begin{pmatrix}A&amp;JCJ\\C&amp;JAJ\end{pmatrix}. \tag{7.5.12–13} \]</div>
+            <section class="card thm" id="thm-centro">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">正交分块对角化</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">取 \(2n\) 阶正交矩阵 \(Q=\frac1{\sqrt2}\begin{pmatrix}I&amp;I\\-J&amp;J\end{pmatrix}\)，则</p>
+                <div class="eq-scroll">\[ Q^{\mathrm T}DQ=\begin{pmatrix}A-B&amp;O\\O&amp;A+B\end{pmatrix}, \tag{7.5.14} \]</div>
+                <p>故 \(\det D=\det(A+B)\det(A-B)\)，且逆有显式</p>
+                <div class="eq-scroll">\[ D^{-1}=\begin{pmatrix}C&amp;RJ\\JR&amp;JCJ\end{pmatrix},\quad
+                C=\tfrac12[(A+B)^{-1}+(A-B)^{-1}],\ R=\tfrac12[(A+B)^{-1}-(A-B)^{-1}]. \tag{7.5.15} \]</div>
+                <p style="margin-bottom:0">即 \(2n\) 阶中心对称阵（特别是对称 Toeplitz 阵）的求逆与特征值问题化为两个 \(n\) 阶问题；奇数阶有对应表示。对称中心对称阵与对称三对角 T 阵的特征值、特征向量有显式表达式；一般 T 阵与正定 T 阵的逆分别由 Trench(1964)、Justice(1972) 算法给出。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 三、循环矩阵 ================= -->
+          <section class="section" id="sec-circ">
+            <h2 class="sec-title"><span class="cn">三</span>循环矩阵</h2>
+            <p>T 矩阵最重要的特殊情形是每行由上一行<strong>循环右移</strong>得到的循环矩阵：</p>
+            <div class="eq-scroll">\[
+            C_n=\operatorname{circ}(c_0,c_1,\cdots,c_{n-1})=
+            \begin{pmatrix}
+            c_0&amp;c_1&amp;c_2&amp;\cdots&amp;c_{n-2}&amp;c_{n-1}\\
+            c_{n-1}&amp;c_0&amp;c_1&amp;\cdots&amp;c_{n-3}&amp;c_{n-2}\\
+            \vdots&amp;\vdots&amp;\vdots&amp;&amp;\vdots&amp;\vdots\\
+            c_1&amp;c_2&amp;c_3&amp;\cdots&amp;c_{n-1}&amp;c_0
+            \end{pmatrix}. \tag{7.5.16}
+            \]</div>
+            <p>引入基本循环矩阵（移位矩阵）</p>
+            <div class="eq-scroll">\[ A=\begin{pmatrix}0&amp;1&amp;0&amp;\cdots&amp;0\\0&amp;0&amp;1&amp;\cdots&amp;0\\\vdots&amp;&amp;&amp;\ddots&amp;\vdots\\0&amp;0&amp;0&amp;\cdots&amp;1\\1&amp;0&amp;0&amp;\cdots&amp;0\end{pmatrix}, \tag{7.5.17} \]</div>
+            <p style="margin-bottom:0">则循环矩阵恰是 A 的多项式：</p>
+            <div class="eq-scroll">\[ C_n=c_0I+c_1A+c_2A^2+\cdots+c_{n-1}A^{n-1}=f(A). \tag{7.5.18} \]</div>
+            <p>由此<strong>循环矩阵构成交换代数</strong>：线性组合、乘积仍循环，乘法交换；逆也是循环矩阵</p>
+            <div class="eq-scroll">\[ C_n^{-1}=\operatorname{circ}(b_0,b_1,\cdots,b_{n-1}). \tag{7.5.19} \]</div>
+
+            <section class="card thm" id="thm-dft">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">DFT 完全对角化</span>
+              </header>
+              <div class="card-body">
+                <p>A 的特征值是全部 \(n\) 次单位根</p>
+                <div class="eq-scroll">\[ \lambda_k=\mathrm e^{\frac{2k\pi}{n}\mathrm j}=\cos\frac{2k\pi}{n}+\mathrm j\sin\frac{2k\pi}{n}\quad(k=0,1,\cdots,n-1), \tag{7.5.21} \]</div>
+                <p>即 \(\lambda^n-1=0\)（7.5.22）的 \(n\) 个根。令 <strong>生成多项式</strong></p>
+                <div class="eq-scroll">\[ f(x)=c_0+c_1x+c_2x^2+\cdots+c_{n-1}x^{n-1}, \tag{7.5.23} \]</div>
+                <p style="margin-bottom:0">则 \(C_n=f(A)\)，且 \(Ax=\lambda x\Rightarrow C_nx=f(\lambda)x\)（7.5.25），故 \(C_n\) 的<strong>特征值</strong>为 \(f(\lambda_k)\)，对应特征向量（实或复）为 Fourier 向量</p>
+                <div class="eq-scroll">\[ x_k=(1,\lambda_k,\lambda_k^2,\cdots,\lambda_k^{n-1})^{\mathrm T}\quad(k=0,\cdots,n-1). \tag{7.5.26} \]</div>
+                <p>Fourier 矩阵 \(V_n=V_n(\lambda_0,\cdots,\lambda_{n-1})=(x_0,x_1,\cdots,x_{n-1})\)（7.5.27）满足</p>
+                <div class="eq-scroll">\[ V_n^{-1}C_nV_n=\operatorname{diag}(f(\lambda_0),f(\lambda_1),\cdots,f(\lambda_{n-1})). \tag{7.5.28} \]</div>
+                <p><strong>可逆判据：</strong>\(C_n\) 非奇异 \(\Leftrightarrow f(\lambda_k)\ne0\ (k=0,\cdots,n-1)\)。逆循环矩阵的系数（7.5.20）为</p>
+                <div class="eq-scroll">\[ b_j=\frac1n\sum_{k=0}^{n-1}\lambda_{n-j}^{k}[f(\lambda_k)]^{-1}\ (j=1,\cdots,n-1),\qquad
+                b_0=\frac1n\sum_{k=0}^{n-1}\lambda_0^{k}[f(\lambda_k)]^{-1}. \]</div>
+                <p>行列式与对角元的迹公式：</p>
+                <div class="eq-scroll">\[ \det C_n=\prod_{k=0}^{n-1}f(\lambda_k),\qquad c_0=\frac1n\sum_{k=0}^{n-1}f(\lambda_k). \tag{7.5.29–30} \]</div>
+                <p style="margin-bottom:0">循环阵的和、差、积、逆的特征值依次为 \(f(\lambda_k)\pm g(\lambda_k),\ f(\lambda_k)g(\lambda_k),\ [f(\lambda_k)]^{-1}\)（Good, 1950）。式 (7.5.30) 可用于检查特征值计算是否正确。</p>
+              </div>
+            </section>
+
+            <p><strong>幺矩阵</strong>（全 1 矩阵）\(E_n=\mathbf 1\mathbf 1^{\mathrm T}\)（7.5.31）是循环矩阵的特例（circ 全为 1）：阶数 \(n\) 就是它的非零单特征值（\(E_nx_0=nx_0\)），0 为 \(n-1\) 重特征值；秩为 1。循环矩阵的丰富性质使涉及该类的复杂计算得到较好解决。</p>
+            <p>对非低阶特殊循环阵 \(C_n=\operatorname{circ}(1,a,b,0,\cdots,0,b,a)\)（7.5.32）的<strong>稳定性区域</strong>已有结果；数值代数中三对角 Jacobi 阵 \(J_n=(c,a,d)_1^n\) 可"添加一行一列"扩成 \(n+1\) 阶循环阵（7.5.33），从而借用循环阵结果求逆。</p>
+
+            <h3 class="sub-title" id="t-other">其他特殊 T 矩阵</h3>
+            <p>令 \(a_k=0\ (k=\pm2,\cdots,\pm(n-1))\) 得<strong>三对角 T 矩阵</strong>（7.5.34），其全部特征值有显式表达式；对称三对角 T 可相似对角化，用于求解椭圆型差分方程。令 \(a_k=0\)（或 \(a_{-k}=0\)）得<strong>上（下）三角 T 矩阵</strong>（7.5.35–36）：同型三角 T 阵的乘积、逆仍是同型三角 T 阵，运算与多项式乘除密切对应，快速算法可互相引用。</p>
+
+            <h3 class="sub-title" id="circ-lab-title">动手实验：循环矩阵 DFT 台</h3>
+            <p>输入循环系数 \(c_0,\cdots,c_{n-1}\)（\(n=3,4,5\)），工具直接构造完整循环矩阵，计算生成多项式在全部单位根处的值 \(f(\lambda_k)\)（即特征值）、Fourier 特征向量、行列式与迹校验，并在复平面画出单位圆上的 \(n\) 个单位根与 \(f(\lambda_k)\)；改变某个系数可实时看到谱的变化与可逆性。</p>
+            <section class="card lab" data-circ-lab></section>
+          </section>
+
+          <!-- ================= 小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结</h2>
+            <div class="summary-block">
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>对象</th><th>结构 / 公式</th></tr>
+                  <tr><td>Toeplitz</td><td>\(a_{ij}=a_{i-j}\)，\(2n-1\) 参数；快速求逆 \(O(n^2)\)</td></tr>
+                  <tr><td>Hankel</td><td>\(h_{ij}=a_{i+j}\)；最小二乘法方程；\(JH\) 或 \(HJ\) 化为 Toeplitz</td></tr>
+                  <tr><td>次对称</td><td>\(JA^{\mathrm T}J=A\)；T 矩阵必次对称；逆仍次对称</td></tr>
+                  <tr><td>中心对称</td><td>\(JDJ=D\)；\(Q^{\mathrm T}DQ=\mathrm{diag}(A-B,A+B)\)，求逆降为两个半阶</td></tr>
+                  <tr><td>循环矩阵</td><td>\(C=f(A)\)；特征值 \(f(\mathrm e^{2k\pi\mathrm j/n})\)，Fourier 对角化；交换代数；逆与行列式闭式</td></tr>
+                  <tr><td>幺矩阵</td><td>\(E_n=\mathbf1\mathbf1^{\mathrm T}\)：谱 \(\{n,0,\cdots,0\}\)，秩 1</td></tr>
+                  <tr><td>特殊 T</td><td>三对角 T（特征值显式）、上/下三角 T（乘除、求逆封闭）</td></tr>
+                </table>
+              </div>
+              <p style="margin-top:12px">下一节 §7.6 介绍三个经典名矩阵：<strong>Vandermonde</strong>（插值）、<strong>Hilbert</strong>（最小二乘/病态的标准试矩阵）、<strong>Hadamard</strong>（正交 ±1 矩阵，编码应用）。</p>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>为什么循环矩阵的求逆、乘法、特征值问题全部"免费"？DFT 在其中扮演什么角色（对照 §5.4 直积中的 Fourier 结构）？</li>
+                  <li>Hankel 法方程在拟合点数大时为什么病态？这与 §7.6 的 Hilbert 矩阵是什么关系？</li>
+                  <li>中心对称矩阵的正交分块对角化如何把求逆的计算量约省一半？\(A+B\) 与 \(A-B\) 分别对应哪类对称/反对称向量？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="7.4-m-matrices.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§7.4 M 矩阵与广义 M 矩阵（选学）</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="7.6-other-special-matrices.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§7.6 其他特殊矩阵（选学）</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

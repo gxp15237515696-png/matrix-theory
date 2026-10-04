@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§6.6 Drazin 广义逆（选学） · 矩阵论</title>
+  <meta name="description" content="矩阵论 §6.6（选学）：方阵的指标（引理10、定义6.9、定理6.42三等价、例6.12）、Drazin 逆（定义6.10 三方程、引理11、定理6.43 存在唯一性、例6.13）、谱性质（定理6.44）、计算方法（引理12、定理6.45、Cline 逐次满秩分解定理6.46、例6.14–6.15）、群逆（定理6.47–6.50）">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§6.6 Drazin 广义逆（选学）</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="6.6" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 6 章 广义逆矩阵</a><span class="sep" aria-hidden="true">/</span>
+            <span>§6.6 Drazin 广义逆（选学）</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 6 章 · 收官（选学）</div>
+            <h1>§6.6 Drazin 广义逆</h1>
+            <p class="lede">\(A^{(1)},A^{(1,3)},A^{(1,4)},A^+\) 这些广义逆虽然实用，却丢掉了通常逆的一些"好性质"：<strong>不交换</strong>（一般 \(AA^+\ne A^+A\)）、<strong>没有幂法则</strong>、<strong>谈不上特征值倒数</strong>，且只对方阵才有特征值问题。1958 年 Drazin 定义的广义逆反其道而行：用方程 \(AX=XA\) 强制交换，用 \(A^{k+1}X=A^k\) 容纳幂零部分——得到的 \(A^{(d)}\) 与通常逆最为相似，在<strong>奇异线性常/差分微分方程组</strong>求解中有重要应用。指标为 1 时它特称为<strong>群逆</strong> \(A^\#\)。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.352–362</strong></span>
+              <span class="chip">建议 <strong>2 学时</strong></span>
+              <span class="chip">定义 <strong>2.9–6.10</strong></span>
+              <span class="chip">定理 <strong>9.42–6.50（9 个）</strong></span>
+              <span class="chip">例题 <strong>4.12–6.15</strong></span>
+
+              <span class="chip">引理 <strong>3 个</strong></span></div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>陈述方阵指标的定义与三个等价刻画（定理 6.42），会由秩序列或最小多项式求指标；</li>
+                  <li>写出 Drazin 逆的三个方程 \((i^k)\)(ii)(iii)，知道它存在、唯一且是 \(A\) 的多项式；</li>
+                  <li>陈述谱性质定理 6.44：\(\lambda\) 是 \(A\) 的特征值 \(\Leftrightarrow\) \(\lambda^+\) 是 \(A^{(d)}\) 的特征值；</li>
+                  <li>用式 (6.6.9) \(A^{(d)}=A^k(A^{2k+1})^{(1)}A^k\) 与 Cline 逐次满秩分解式 (6.6.12) 计算；</li>
+                  <li>知道群逆 \(A^\#\)（指标 1）的公式 \(F(GF)^{-2}G\) 及 \(A^{(d)}=A^+\) 的条件。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>指标概念与定理 6.42；</li>
+                      <li>Drazin 三方程；</li>
+                      <li>计算式 (6.6.9) 与 (6.6.12)。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>引理 10/11 的秩与幂次论证；</li>
+                      <li>\((G_kB_k)^{-(k+1)}\) 的幂次；</li>
+                      <li>Drazin 逆与 MP 逆的区别。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 2 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>指标（引理 10、定义 6.9、定理 6.42、例 6.12）、Drazin 逆（定义 6.10、引理 11、定理 6.43、例 6.13）、谱性质</td><td class="num">p.352–357</td></tr>
+                    <tr><td class="num">2</td><td>计算方法（引理 12、定理 6.45–6.46、例 6.14–6.15）、群逆、实验与习题、全章总结</td><td class="num">p.357–362</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 200" role="img" aria-label="Drazin 逆脉络图">
+                    <defs><marker id="m66" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b"><rect x="30" y="24" width="180" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="120" y="46">指标 k（秩首次稳定）</text><text x="120" y="64" font-size="11" fill="#666">引理10 / 定义6.9 / 定理6.42</text>
+                    </g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="250" y="24" width="200" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="350" y="46">Drazin 逆 A^(d)</text><text x="350" y="64" font-size="11" fill="#666">A^{k+1}X=A^k，XAX=X，AX=XA</text>
+                    </g>
+                    <g class="fm-node" fill="#f4f0e2" stroke="#a06a17"><rect x="490" y="24" width="180" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="580" y="46">谱：λ ↦ λ⁺</text><text x="580" y="64" font-size="11" fill="#666">定理6.44（非零取倒数）</text>
+                    </g>
+                    <g class="fm-node" fill="#eef7f0" stroke="#3d7a4e"><rect x="710" y="24" width="110" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="765" y="46">群逆 A#</text><text x="765" y="64" font-size="11" fill="#666">k=1</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m66)"><line x1="210" y1="50" x2="248" y2="50"/><line x1="450" y1="50" x2="488" y2="50"/><line x1="670" y1="50" x2="708" y2="50"/></g>
+                    <g class="fm-node" fill="#f3eef7" stroke="#6b4e9e"><rect x="230" y="126" width="380" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="420" y="148">计算：A^k(A^{2k+1})⁽¹⁾A^k（定理6.45）</text><text x="420" y="166" font-size="11" fill="#666">Cline 逐次满秩分解 B₁…Bₖ(GₖBₖ)^{-k-1}Gₖ…G₁（定理6.46）</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m66)"><line x1="350" y1="76" x2="350" y2="124"/></g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 引言 ================= -->
+          <section class="section" id="sec-intro">
+            <h2 class="sec-title"><span class="cn">引</span>为什么还要一种广义逆</h2>
+            <p>非奇异矩阵 \(A\) 的逆 \(A^{-1}\) 有四条好性质：(1) \(AA^{-1}=A^{-1}A=I\)（交换）；(2) \((A^{-1})^p=(A^p)^{-1}\)（幂法则）；(3) \((AB)^{-1}=B^{-1}A^{-1}\)（穿脱法则）；(4) \(\lambda\) 是 \(A\) 的特征值 \(\Leftrightarrow\) \(\lambda^{-1}\) 是 \(A^{-1}\) 的特征值。</p>
+            <p>而 \(A^{(1)},A^{(1,3)},A^{(1,4)},A^+\) 一般<strong>不具有</strong>这些性质（长方矩阵更谈不上特征值）。本节介绍<strong>方阵</strong>的另一种广义逆——Drazin 逆，它从某个角度看与通常逆更为相似，并在奇异线性常微分方程组、奇异差分方程组求解中起关键作用。</p>
+          </section>
+
+          <!-- ================= 一、方阵的指标 ================= -->
+          <section class="section" id="sec-index">
+            <h2 class="sec-title"><span class="cn">一</span>方阵的指标</h2>
+
+            <section class="card thm" id="lem-6-10">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 3v18"/><path d="M5 8l7-5 7 5"/><path d="M5 16l7 5 7-5"/></svg></span>
+                <span class="card-label">引理 10：秩序列必在某处稳定</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\C^{n\times n}\)，则</p>
+                <div class="eq-scroll">\[ 0\le\operatorname{rank}A^{n+1}\le\operatorname{rank}A^n\le\cdots\le\operatorname{rank}A^2\le\operatorname{rank}A\le n, \]</div>
+                <p style="margin-bottom:0">这是一列不增、有下界 \(0\) 的整数，故必存在 \(1\) 与 \(n\) 之间的某个整数 \(k\)，使</p>
+                <div class="eq-scroll">\[ \operatorname{rank}A^k=\operatorname{rank}A^{k+1}. \tag{6.6.1} \]</div>
+              </div>
+            </section>
+
+            <section class="card def" id="def-6-9">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 6.9：方阵的指标</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">使式 (6.6.1) 成立的<strong>最小正整数</strong> \(k\) 称为 \(A\) 的<strong>指标</strong>（index）。非奇异矩阵的指标为 1（因 \(A^k\) 恒满秩，首次稳定在 \(k=1\)）。幂零矩阵 \(A^k=O\) 的指标即其幂零指数。</p>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-6-42">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.42：指标的三个等价定义</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\C^{n\times n}\)，则下列叙述等价：</p>
+                <div class="table-wrap">
+                  <table class="book">
+                    <tr><th>#</th><th>叙述</th></tr>
+                    <tr><td class="num">(1)</td><td>\(A\) 的指标为 \(k\)（\(A\) 奇异时 \(\operatorname{rank}A^{k-1}&gt;\operatorname{rank}A^k=\operatorname{rank}A^{k+1}\)；非奇异时指标为 1，秩链自 \(\operatorname{rank}A\) 起）</td></tr>
+                    <tr><td class="num">(2)</td><td>使得 \(A^{k+1}X=A^k\) 有解的最小正整数是 \(k\)</td></tr>
+                    <tr><td class="num">(3)</td><td>若 \(A\) 奇异且最小多项式为 \(m(\lambda)\)，则 \(k\) 是 \(\lambda=0\) 作为 \(m(\lambda)\) 零点的重数</td></tr>
+                  </table>
+                </div>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>(1)\(\Rightarrow\)(2)：由 \(R(A^{k+1})\subset R(A^k)\) 且秩相等，得 \(R(A^{k+1})=R(A^k)\)，即存在 \(X\) 使 \(A^{k+1}X=A^k\)；若更小的 \(l&lt;k\) 也行，则推出 \(\operatorname{rank}A^l=\operatorname{rank}A^{l+1}\)，与指标为 \(k\) 矛盾。(2)\(\Rightarrow\)(1) 逆推。</p>
+                  <p>(2)\(\Leftrightarrow\)(3)：写最小多项式 \(m(\lambda)=\lambda^l p(\lambda),\ p(0)\ne0\)，并设 \(k\) 由 (2) 确定，下面证明 \(k=l\)。由 \(m(A)=O\) 得</p>
+                  <div class="eq-scroll">\[ p(A)A^l=m(A)=O. \]</div>
+                  <p>若 \(l&gt;k\)，取 (2) 中满足 \(A^{k+1}X=A^k\) 的解 \(X\)，则 \(A^lX=A^{l-k-1}A^{k+1}X=A^{l-1}\)，于是</p>
+                  <div class="eq-scroll">\[ O=p(A)A^lX=p(A)A^{l-1}, \]</div>
+                  <p>而 \(\lambda^{l-1}p(\lambda)\) 是非零多项式，其次数比 \(m(\lambda)\) 低一次，却在 \(A\) 处为零，与最小多项式的次数最小性矛盾。又因 \(p(0)\ne0\)，可把 \(p(\lambda)\) 写成 \(c(1-\lambda q(\lambda))\)（\(c\ne0\)），即</p>
+                  <div class="eq-scroll">\[ m(\lambda)=c\lambda^l(1-\lambda q(\lambda)), \tag{6.6.2} \]</div>
+                  <p>由此得</p>
+                  <div class="eq-scroll">\[ A^{l+1}q(A)=A^l, \tag{6.6.3} \]</div>
+                  <p style="margin-bottom:0">若 \(l&lt;k\)，则 (6.6.3) 说明 \(A^{l+1}X=A^l\) 有解，与 (2) 中 \(k\) 的最小性矛盾。两情形合起来即得 \(l=k\)。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-6-12">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 6.12：由最小多项式定指标</span>
+              </header>
+              <div class="card-body">
+                <p>求 \(A=\begin{pmatrix}1&1&0&0\\1&1&1&0\\1&1&1&1\\1&1&1&1\end{pmatrix}\) 的指标。</p>
+                <p><strong>解</strong>　\(A\) 奇异，其最小多项式为</p>
+                <div class="eq-scroll">\[ m(\lambda)=\lambda^2(\lambda^2-4\lambda+3)=\lambda^2(\lambda-1)(\lambda-3), \]</div>
+                <p style="margin-bottom:0">\(\lambda=0\) 的重数为 2，故 \(A\) 的指标为 2。（验证：\(\operatorname{rank}A=3,\ \operatorname{rank}A^2=2=\operatorname{rank}A^3\)；特征值为 \(3,1,0,0\)。）</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 二、Drazin 逆 ================= -->
+          <section class="section" id="sec-drazin-def">
+            <h2 class="sec-title"><span class="cn">二</span>Drazin 逆</h2>
+            <p>1958 年 Drazin 定义了方阵的这一类广义逆。</p>
+
+            <section class="card def" id="def-6-10">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 6.10：Drazin 逆 A^(d)</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\C^{n\times n}\) 的指标为 \(k\)，满足</p>
+                <div class="eq-scroll">\[
+                A^kXA=A^k \qquad (i^k),\qquad XAX=X \qquad (ii),\qquad AX=XA \qquad (iii)
+                \]</div>
+                <p style="margin-bottom:0">的矩阵 \(X\) 称为 \(A\) 的 <strong>Drazin 逆</strong>，记为 \(A^{(d)}\)。按前几节记号它是 \(A\) 的 \(\{1^k,2,5\}\)-逆（5 号方程即交换性）。对任意 \(l\ge k\)，它也是 \(\{1^l,2,5\}\)-逆。</p>
+                <p style="margin-bottom:0">三个方程等价于</p>
+                <div class="eq-scroll">\[ AX=XA,\qquad A^{k+1}X=A^k\ (6.6.4),\qquad AX^2=X\ (6.6.5). \]</div>
+              </div>
+            </section>
+
+            <section class="card thm" id="lem-6-11">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 3v18"/><path d="M5 8l7-5 7 5"/><path d="M5 16l7 5 7-5"/></svg></span>
+                <span class="card-label">引理 11：由 {1^l,5}-逆构造 Drazin 逆</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">若 \(Y\) 是方阵 \(A\) 的 \(\{1^l,5\}\)-逆（即 \(A^{l+1}Y=A^l,\ AY=YA\)），则</p>
+                <div class="eq-scroll">\[ X=A^lY^{l+1} \tag{6.6.6} \]</div>
+                <p style="margin-bottom:0">是 \(A\) 的 \(\{1^l,2,5\}\)-逆。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">由 \(A^lYX=A^l\) 与 \(AY=YA\)，得 \(AX=A^{l+1}Y^{l+1}=A^lY^{l+1}A=XA\)；反复降幂：\(A^{l+1}X=A^{2l+1}Y^{l+1}=A^{2l}Y^l=\cdots=A^l\)，\(AX^2=A^{2l+1}Y^{2l+2}=\cdots=A^lY^{l+1}=X\)。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-6-43">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.43：存在、唯一、且为 A 的多项式</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设指标为 \(k\)，则 \(A\) 有唯一的 Drazin 逆，它可表示为 \(A\) 的多项式；且对任意 \(l\ge k\)，它也是唯一的 \(\{1^l,2,5\}\)-逆。具体地，式 (6.6.3) 中的 \(q(A)\) 是 \(A\) 的 \(\{1^k,5\}\)-逆，由引理 11：</p>
+                <div class="eq-scroll">\[ X=A^k(q(A))^{k+1}. \tag{6.6.7} \]</div>
+                <details class="proof"><summary><span>证明（唯一性）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">设 \(X,Y\in A\{1^l,2,5\}\)，记 \(E=AX=XA,\ F=AY=YA\)，二者皆幂等。利用交换性：\(E=AX=A^lX^l=A^lYAX^l=AYA^lX^l=FAX=FE\)，同理 \(F=FE\)，故 \(E=F\)；于是 \(X=XAX=EX=FX=YAX=YE=YF=Y\)。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-6-13">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 6.13：用式 (6.6.7) 计算 Drazin 逆</span>
+              </header>
+              <div class="card-body">
+                <p>例 6.12 的矩阵指标为 2，且 \(m(\lambda)=3\lambda^2\!\left[1+\tfrac{\lambda}{3}(\lambda-4)\right]\)，与式 (6.6.2) 比较得 \(q(\lambda)=-\tfrac13(\lambda-4)\)，所以</p>
+                <div class="eq-scroll">\[ q(A)=\frac13\begin{pmatrix}3&-1&0&0\\-1&3&-1&0\\-1&-1&3&-1\\-1&-1&-1&3\end{pmatrix}. \]</div>
+                <p>由式 (6.6.7) \(A^{(d)}=A^2(q(A))^3\)：</p>
+                <div class="eq-scroll">\[
+                A^{(d)}=\begin{pmatrix}2&2&1&0\\3&3&2&1\\4&4&3&2\\4&4&3&2\end{pmatrix}\frac1{27}\begin{pmatrix}35&-29&9&-1\\-21&43&-30&9\\-13&-13&43&-29\\-13&-13&-21&35\end{pmatrix}
+                =\frac1{27}\begin{pmatrix}15&15&1&-13\\3&3&2&1\\-9&-9&3&15\\-9&-9&3&15\end{pmatrix}.
+                \]</div>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 三、谱性质 ================= -->
+          <section class="section" id="sec-spectrum">
+            <h2 class="sec-title"><span class="cn">三</span>Drazin 逆的谱性质</h2>
+            <section class="card thm" id="thm-6-44">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.44：特征值映射 λ ↦ λ⁺</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">\(\lambda\) 是 \(A\) 的特征值的充要条件是 \(\lambda^+\)（式 6.2.1：非零取倒数、零仍为零）是 \(A^{(d)}\) 的特征值。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>设指标为 \(k,\ Ax=\lambda x\)。若 \(\lambda\ne0\)，由 \(\lambda^kx=A^kx=A^{(d)}A^{k+1}x=\lambda^{k+1}A^{(d)}x\) 得 \(A^{(d)}x=\lambda^{-1}x\)；若 \(Ax=0\)，则 \(A^{(d)}x=(A^{(d)})^2Ax=0\)，即 \(\lambda^+=0\) 是特征值。反之，由 \(A^{(d)}x=\lambda^{-1}x\) 与 \(\lambda^{-1}x=A^{(d)}x=A(A^{(d)})^2x=\lambda^{-2}Ax\) 得 \(Ax=\lambda x\)；\(A^{(d)}x=0\) 时由 \(A^kx=A^{k+1}A^{(d)}x=0\) 得 \(\lambda=0\)。</p>
+                </details>
+                <p style="margin-bottom:0">而且：若 \(x\) 是 \(A\) 的属于非零特征值的特征向量，则它也是 \(A^{(d)}\) 的属于 \(\lambda^{-1}\) 的<strong>同一</strong>特征向量；反之亦然。但对零特征值，此结论不一定成立。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 四、计算方法 ================= -->
+          <section class="section" id="sec-computation">
+            <h2 class="sec-title"><span class="cn">四</span>Drazin 逆的计算方法</h2>
+
+            <section class="card thm" id="lem-6-12">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 3v18"/><path d="M5 8l7-5 7 5"/><path d="M5 16l7 5 7-5"/></svg></span>
+                <span class="card-label">引理 12：夹心乘积 B(CAB)⁽¹⁾C 是不变量</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">给定 \(A,B,C\) 且 \(CAB\) 有意义，若</p>
+                <div class="eq-scroll">\[ \operatorname{rank}(CAB)=\operatorname{rank}C=\operatorname{rank}B, \tag{6.6.8} \]</div>
+                <p style="margin-bottom:0">则对任意 \((CAB)^{(1)}\in(CAB)\{1\}\)，乘积 \(B(CAB)^{(1)}C\) 与所选的 \(\{1\}\)-逆无关。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">由秩相等及值域包含关系得 \(R(CAB)=R(C),\ R((CAB)^{\mathrm H})=R(B^{\mathrm H})\)，故存在 \(U,V\) 使 \(C=(CAB)U,\ B=V^{\mathrm H}(CAB)\)。于是 \(B(CAB)^{(1)}C=V^{\mathrm H}(CAB)(CAB)^{(1)}(CAB)U=V^{\mathrm H}(CAB)U\)，不含 \((CAB)^{(1)}\)。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-6-45">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.45：仅用一个 {1}-逆</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设指标为 \(k\)，则</p>
+                <div class="eq-scroll">\[ A^{(d)}=A^k(A^{2k+1})^{(1)}A^k, \tag{6.6.9} \]</div>
+                <p style="margin-bottom:0">其中 \((A^{2k+1})^{(1)}\in A^{2k+1}\{1\}\)，右端与该 \(\{1\}\)-逆的选取无关。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">先注意</p>
+                  <div class="eq-scroll">\[ \operatorname{rank}A^{2k+1}=\operatorname{rank}A^k, \tag{6.6.10} \]</div>
+                  <p style="margin-bottom:0">在引理 12 中取 \(B=C=A^k\)（此时 \(CAB=A^{2k+1}\)，秩条件 (6.6.8) 即式 (6.6.10)），则对任意 \((A^{2k+1})^{(1)}\in A^{2k+1}\{1\}\)，</p>
+                  <div class="eq-scroll">\[ X=A^k(A^{2k+1})^{(1)}A^k \tag{6.6.11} \]</div>
+                  <p>是不变的；它与 \(A\) 交换、满足 \(A^{k+1}X=A^k,\ XAX=X\)，由唯一性 \(X=A^{(d)}\)。优点：只需求一个 \(\{1\}\)-逆，指标小且易求时适用；缺点是矩阵阶数高、病态严重时高次幂会放大误差。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-6-14">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 6.14：用式 (6.6.9) 计算</span>
+              </header>
+              <div class="card-body">
+                <p>指标为 2，算出</p>
+                <div class="eq-scroll">\[
+                A^2=\begin{pmatrix}2&2&1&0\\3&3&2&1\\4&4&3&2\\4&4&3&2\end{pmatrix},\quad
+                A^5=\begin{pmatrix}41&41&27&13\\81&81&54&27\\121&121&81&41\\121&121&81&41\end{pmatrix},
+                \]</div>
+                <p style="margin-bottom:0">取其一个 \(\{1\}\)-逆：取 \(A^5\) 的第 1、2 行与第 1、3 列构成的 2 阶子块 \(\begin{pmatrix}41&27\\81&54\end{pmatrix}\)（行列式为 27，非奇异），把它的逆矩阵放回转置位置（第 1、3 行、第 1、2 列），其余位置补零，得</p>
+                <div class="eq-scroll">\[ (A^5)^{(1)}=\frac1{27}\begin{pmatrix}54&-27&0&0\\0&0&0&0\\-81&41&0&0\\0&0&0&0\end{pmatrix}, \]</div>
+                <p>可直接验证 \(A^5(A^5)^{(1)}A^5=A^5\)。于是</p>
+                <div class="eq-scroll">\[ A^{(d)}=A^2(A^5)^{(1)}A^2=\frac1{27}\begin{pmatrix}15&15&1&-13\\3&3&2&1\\-9&-9&3&15\\-9&-9&3&15\end{pmatrix}, \]</div>
+                <p>与例 6.13 相同（由定理 6.45，该结果与 \(\{1\}\)-逆的选取无关）。</p>
+                <p style="margin-bottom:0"><small>注：教材原书此处给出的矩阵 \(\frac1{27}\begin{pmatrix}27&27&0&-27\\0&0&0&0\\-39&-39&1&41\\0&0&0&0\end{pmatrix}\) 排印有误——它不满足 \(\{1\}\)-逆定义 \(A^5PA^5=A^5\)（实际有 \(A^5PA^5=A^7\ne A^5\)），此处已按定义更正。</small></p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="cline">Cline 逐次满秩分解法</h3>
+            <p>当阶数高、指标不易求或高次幂放大病态时，宜采用 Cline 方法：每一步只作较小阶矩阵的满秩分解。</p>
+            <section class="card thm" id="thm-6-46">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.46：逐次满秩分解与 Drazin 逆</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\) 的满秩分解为 \(A=B_1G_1\)，并逐次分解</p>
+                <div class="eq-scroll">\[ G_iB_i=B_{i+1}G_{i+1}\qquad(i=1,2,\cdots), \]</div>
+                <p style="margin-bottom:0">则 \(A\) 的指标为 \(k\) 的充要条件是 \(G_kB_k\) 非奇异，并且</p>
+                <div class="eq-scroll">\[ A^{(d)}=B_1B_2\cdots B_k\,(G_kB_k)^{-(k+1)}\,G_kG_{k-1}\cdots G_1. \tag{6.6.12} \]</div>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">逐次有 \(A^i=B_1\cdots B_iG_i\cdots G_1\)、\(A^{i+1}=B_1\cdots B_i(G_iB_i)G_i\cdots G_1\)；利用 \(B_i^{(1)}B_i=I,\ G_iG_i^{(1)}=I\) 得 \(\operatorname{rank}A^i=r_i,\ \operatorname{rank}A^{i+1}=\operatorname{rank}(G_iB_i)\)，故指标为 \(k\) 恰对应 \(G_kB_k\) 非奇异。代入 \(X=B_1\cdots B_k(G_kB_k)^{-(k+1)}G_k\cdots G_1\) 可验证三方程，由唯一性 \(X=A^{(d)}\)。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-6-15">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 6.15：Cline 方法</span>
+              </header>
+              <div class="card-body">
+                <div class="eq-scroll">\[
+                A=B_1G_1=\begin{pmatrix}1&0&0\\1&1&0\\1&1&1\\1&1&1\end{pmatrix}\begin{pmatrix}1&1&0&0\\0&0&1&0\\0&0&0&1\end{pmatrix},
+                \quad G_1B_1=B_2G_2=\begin{pmatrix}2&1\\1&1\\1&1\end{pmatrix}\begin{pmatrix}1&0&-1\\0&1&2\end{pmatrix},
+                \]</div>
+                <p>其中 \(G_2B_2=\begin{pmatrix}1&0\\3&3\end{pmatrix}\)，\(\det(G_2B_2)=3\ne0\)，故指标为 2。又 \((G_2B_2)^{-3}=\frac1{27}\begin{pmatrix}27&0\\-39&1\end{pmatrix}\)，所以</p>
+                <div class="eq-scroll">\[ A^{(d)}=B_1B_2(G_2B_2)^{-3}G_2G_1=\frac1{27}\begin{pmatrix}15&15&1&-13\\3&3&2&1\\-9&-9&3&15\\-9&-9&3&15\end{pmatrix}. \]</div>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 五、群逆 ================= -->
+          <section class="section" id="sec-group">
+            <h2 class="sec-title"><span class="cn">五</span>Drazin 逆的特例——群逆</h2>
+            <p>当指标 \(k=1\) 时，Drazin 逆特称为<strong>群逆</strong>，记为 \(A^\#\)。其方程为</p>
+            <div class="eq-scroll">\[ AXA=A,\qquad XAX=X,\qquad AX=XA. \]</div>
+            <p>名称来源：\(A\) 的正幂、负幂（看做 \(A^\#\) 的幂）并以 \(AA^\#\) 作为单位元素，构成一个 Abel 群（习题 13）。</p>
+
+            <section class="card thm" id="thm-6-47-49">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.47–6.49：群逆的三个计算公式</span>
+              </header>
+              <div class="card-body">
+                <p><strong>定理 6.47</strong>（指标 1，多项式法）：\(A^\#=A(q(A))^2\)，其中 \(q(\lambda)\) 由式 (6.6.2) 确定。</p>
+                <p><strong>定理 6.48</strong>（指标 1，\{1\}-逆法）：\(A^\#=A(A^3)^{(1)}A\)，其中 \((A^3)^{(1)}\in A^3\{1\}\)。</p>
+                <p style="margin-bottom:0"><strong>定理 6.49</strong>（满秩分解法）：设满秩分解 \(A=FG\)，则 \(A\) 有群逆的充要条件是 \(GF\) 非奇异，且</p>
+                <div class="eq-scroll">\[ A^\#=F(GF)^{-2}G. \]</div>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-6-50">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.50：Drazin 逆何时等于 MP 逆</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">\(A^{(d)}\)（或群逆 \(A^\#\)）等于 Moore–Penrose 逆 \(A^+\) 的充要条件是</p>
+                <div class="eq-scroll">\[ AA^+=A^+A. \tag{6.6.13} \]</div>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">若 (6.6.13) 成立，则 \(A^+\) 已具有群逆（Drazin 逆）的全部性质（交换 + Penrose 方程），故 \(A^+=A^{(d)}=A^\#\)。反之若 \(A^+=A^{(d)}\)，则 \(AA^{(d)}A=A\)，而 \(AA^{(d)}=A^{(d)}A\)，即 \(AA^+=A^+A\)。</p>
+                </details>
+                <p style="margin-bottom:0">一般 \(A^{(d)}\ne A^+\)：例如幂零阵的 \(A^{(d)}=O\) 而 \(A^+\) 未必为零；正规矩阵（特别是对称/正交阵）满足 (6.6.13)，此时二者一致。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="drazin-lab-title">动手实验：Drazin 逆 / 群逆计算器</h3>
+            <p>输入 3×3 矩阵，工具先由秩序列 \(\operatorname{rank}A,\operatorname{rank}A^2,\cdots\) 自动定指标 \(k\)，再按式 (6.6.9) 计算 \(A^{(d)}=A^k(A^{2k+1})^{(1)}A^k\)（以 MP 逆充当 \(\{1\}\)-逆），逐条核验三个方程，并列出特征值对照 \(\lambda\to\lambda^+\)（定理 6.44）。\(k=1\) 时额外报告群逆 \(F(GF)^{-2}G\) 与 \(AA^+=A^+A\) 是否成立（定理 6.50）。</p>
+            <section class="card lab" data-drazin-lab></section>
+          </section>
+
+          <!-- ================= 习题 6.6 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 6.6（教材 p.361–362）</h2>
+            <div class="fold-bar no-print" data-fold-tools=".card.task">
+              <button type="button" data-fold="open">全部展开</button>
+              <button type="button" data-fold="close">全部收起</button>
+            </div>
+
+            <article class="card task" id="ex66-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">共轭 / 转置</span></header>
+              <div class="card-body">
+                <p>证明 \((A^{\mathrm H})^{(d)}=(A^{(d)})^{\mathrm H}\)，\((A^{\mathrm T})^{(d)}=(A^{(d)})^{\mathrm T}\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>对 \(A\) 的三方程取共轭转置：\(A^kXA=A^k\Rightarrow A^{\mathrm H}X^{\mathrm H}(A^{\mathrm H})^k=(A^{\mathrm H})^k\)；\(XAX=X\Rightarrow X^{\mathrm H}A^{\mathrm H}X^{\mathrm H}=X^{\mathrm H}\)；\(AX=XA\Rightarrow X^{\mathrm H}A^{\mathrm H}=A^{\mathrm H}X^{\mathrm H}\)。故 \(X^{\mathrm H}=(A^{\mathrm H})^{(d)}\)（指标相同，因 \(\operatorname{rank}(A^{\mathrm H})^j=\operatorname{rank}(A^j)^{\mathrm H}=\operatorname{rank}A^j\)）。转置同法。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex66-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag">幂法则</span></header>
+              <div class="card-body">
+                <p>证明 \((A^l)^{(d)}=(A^{(d)})^l\)（\(l=1,2,\cdots\)）。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>令 \(X=(A^{(d)})^l\)。交换性：\(A^lX=XA^l\)（每个因子都交换）。幂次方程：\(A^l\) 的指标设为 \(k'=\lceil k/l\rceil\) 型，直接验证 \((A^l)^{k'+1}X=(A^l)^{k'}\)；且 \(X A^l X=(A^{(d)})^l A^l (A^{(d)})^l=(A^{(d)})^l=X\)（用 \(A^{(d)}AA^{(d)}=A^{(d)}\) 与交换性）。由 Drazin 逆唯一性即得。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex66-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag">幂的指标</span></header>
+              <div class="card-body">
+                <p>若 \(A\) 的指标为 \(k\)，则对 \(l\ge k\)，\(A^l\) 的指标为 1，且 \((A^l)^\#=(A^{(d)})^l\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>当 \(l\ge k\)，\(\operatorname{rank}A^{2l}=\operatorname{rank}A^l\)（秩自 \(k\) 起稳定），故 \(A^l\) 的指标为 1。再由第 2 题 \((A^l)^{(d)}=(A^{(d)})^l\)，指标 1 时 Drazin 逆即群逆。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex66-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag">双重 Drazin</span></header>
+              <div class="card-body">
+                <p>证明 \((A^\#)^\#=A\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>指标 1 时 \(A^\#\) 的指标也是 1（\(R(A)=R(A^\#)\)，秩相同且 \(AA^\#=A^\#A\) 幂等）。把 \(A^\#\) 的群逆方程中的角色互换：\(A\) 满足 \(A^\# A A^\#=A^\#\)、\(AA^\#A=A\)、\(AA^\#=A^\#A\)，即 \(A\) 正是 \(A^\#\) 的群逆，由唯一性 \((A^\#)^\#=A\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex66-5">
+              <header class="card-head"><span class="card-label">第 5 题</span><span class="tag">双重 Drazin</span></header>
+              <div class="card-body">
+                <p>证明 \((A^{(d)})^{(d)}=A\) 的充要条件是 \(A\) 的指标为 1。</p>
+                <details class="solution"><summary><span>查看提示</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>指标 1 时由第 4 题成立（此时 \(A^{(d)}=A^\#\)）。反之，\(A^{(d)}\) 总有指标 1（\(R(A^{(d)})=R(A^k)\) 与 \(A\) 交换且秩在一次幂稳定），若 \((A^{(d)})^{(d)}=A\)，则 \(A\) 必须本身指标为 1（指标为 1 的矩阵其 Drazin 逆指标也为 1，等式两边指标须一致）；\(k&gt;1\) 时 \(A^{(d)}\) 丢失幂零 Jordan 块方向，\((A^{(d)})^{(d)}\ne A\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex66-6">
+              <header class="card-head"><span class="card-label">第 6 题</span><span class="tag tag-mid">条件恒等式</span></header>
+              <div class="card-body">
+                <p>证明 \(A^{(d)}\) 的指标为 1，且 \((A^{(d)})^\#=A^2A^{(d)}\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>令 \(X=A^2A^{(d)}\)。验证群逆三方程：\(A^{(d)}XA^{(d)}=A^{(d)}A^2(A^{(d)})^2=A^{(d)}\)（用 \(A^{(d)}=A(A^{(d)})^2\) 与交换性）；\(XA^{(d)}X=A^2A^{(d)}\cdot A^{(d)}\cdot A^2A^{(d)}=A^2A^{(d)}=X\)；交换性显然。故 \(X=(A^{(d)})^\#\)，且方程中只出现一次幂，说明 \(A^{(d)}\) 指标为 1。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex66-7">
+              <header class="card-head"><span class="card-label">第 7 题</span><span class="tag">复合</span></header>
+              <div class="card-body">
+                <p>证明 \(((A^{(d)})^{(d)})^{(d)}=A^{(d)}\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(A^{(d)}\) 的指标恒为 1（第 6 题），故对其两次取 Drazin 互为群逆（第 4 题）：\((A^{(d)})^{(d)}=(A^{(d)})^\#\)，再取一次得 \(((A^{(d)})^\#)^{(d)}=((A^{(d)})^\#)^\#=A^{(d)}\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex66-8">
+              <header class="card-head"><span class="card-label">第 8 题</span><span class="tag">与群逆的乘积</span></header>
+              <div class="card-body">
+                <p>证明 \(A^{(d)}(A^{(d)})^\#=AA^{(d)}\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由第 6 题 \((A^{(d)})^\#=A^2A^{(d)}\)，故左端 \(=A^{(d)}A^2A^{(d)}=A\cdot AA^{(d)}A^{(d)}=A\cdot A(A^{(d)})^2=AA^{(d)}\)（用 \(A(A^{(d)})^2=A^{(d)}\)）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex66-9">
+              <header class="card-head"><span class="card-label">第 9 题</span><span class="tag">幂零阵</span></header>
+              <div class="card-body">
+                <p>若 \(A\) 是幂零矩阵（存在正整数 \(l\) 使 \(A^l=O\)），则 \(A^{(d)}=O\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>取指标 \(k=l\)（或最小的使 \(A^k=O\) 者）。\(X=O\) 满足三方程：\(A^kOA=O=A^k\)、\(OOO=O\)、\(AO=OA\)。由唯一性 \(A^{(d)}=O\)。（这与 MP 逆不同：幂零阵的 \(A^+\) 一般不是零。）</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex66-10">
+              <header class="card-head"><span class="card-label">第 10 题</span><span class="tag">非奇异退化</span></header>
+              <div class="card-body">
+                <p>若 \(A\) 非奇异，则 \(A^{(d)}=A^{-1}\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>非奇异时指标为 1，三方程为 \(AXA=A,\ XAX=X,\ AX=XA\)。由第一式左乘 \(A^{-1}\) 得 \(XA=I\)，故 \(X=A^{-1}\)（交换性自动成立）。广义逆再次退化为通常逆。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex66-11">
+              <header class="card-head"><span class="card-label">第 11 题</span><span class="tag">幂律一</span></header>
+              <div class="card-body">
+                <p>若整数 \(l&gt;m&gt;0\)，则 \(A^m(A^{(d)})^l=(A^{(d)})^{l-m}\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>利用 \(AA^{(d)}A^{(d)}=A^{(d)}\)（即 \(A(A^{(d)})^2=A^{(d)}\)，来自 \(AX^2=X\)），每用一个 \(A\) 配两个 \(A^{(d)}\) 可消去一个 \(A^{(d)}\)：\(A^m(A^{(d)})^l=A^{m-1}(A^{(d)})^{l-1}=\cdots=(A^{(d)})^{l-m}\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex66-12">
+              <header class="card-head"><span class="card-label">第 12 题</span><span class="tag">幂律二</span></header>
+              <div class="card-body">
+                <p>若整数 \(m&gt;0\) 且 \(l-m\ge k\)，则 \(A^l(A^{(d)})^m=A^{l-m}\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由 \(A^{k+1}A^{(d)}=A^k\) 知，当剩余幂次 \(\ge k\) 时每配一个 \(A^{(d)}\) 可消去一个 \(A\)：即当 \(l-1\ge k\) 时 \(A^lA^{(d)}=A^{l-1}\)。逐次消去：第 \(j\) 次（\(j=0,1,\cdots,m-1\)）把 \(A^{l-j}(A^{(d)})^{m-j}\) 化为 \(A^{l-j-1}(A^{(d)})^{m-j-1}\)，需 \(l-j-1\ge k\)；其中最严的是 \(j=m-1\) 一步，即 \(l-m\ge k\)，恰为题设。重复 \(m\) 次即得 \(A^l(A^{(d)})^m=A^{l-m}\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex66-13">
+              <header class="card-head"><span class="card-label">第 13 题</span><span class="tag tag-hard">Abel 群</span></header>
+              <div class="card-body">
+                <p>设 \(A\) 的指标为 1。记 \((A^\#)^j\) 为 \(A^{-j}\ (j=1,2,\cdots)\)，又记 \(AA^\#\) 为 \(A^0\)。证明对所有整数 \(l,m\) 都有 \(A^lA^m=A^{l+m}\)（因此 \(A\) 的幂——正、负、零——在矩阵乘积下构成 Abel 群）。</p>
+                <details class="solution"><summary><span>查看提示</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>正幂情形显然；异号情形用第 11、12 题的消去规则（指标 1 时门槛 \(k=1\)，条件自动满足）：\(A^l(A^\#)^m=A^{l-m}\) 或 \((A^\#)^{m-l}\)；零幂 \(A^0=AA^\#\) 是幂等单位元，与所有幂交换（因 \(A,A^\#\) 交换）；\(A\) 与 \(A^\#\) 互为逆元（\(AA^\#=A^\#A=A^0\)）。交换性来自指标 1 的交换方程，故乘法交换——构成 Abel 群。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex66-14">
+              <header class="card-head"><span class="card-label">第 14 题</span><span class="tag tag-hard">三法对照大例题</span></header>
+              <div class="card-body">
+                <p>对习题 6.3 第 3 题的矩阵 \(A=\begin{pmatrix}1&0&0&1\\1&1&0&0\\0&1&1&0\\0&0&1&1\end{pmatrix}\)，分别用式 (6.6.7)、式 (6.6.9) 和式 (6.6.12) 计算 \(A^{(d)}\)。</p>
+                <details class="solution"><summary><span>查看完整解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>先定指标：\(\operatorname{rank}A=3=\operatorname{rank}A^2\)，故指标 \(k=1\)（存在群逆）；特征值为 \(2,1+\mathrm i,1-\mathrm i,0\)。</p>
+                  <p><strong>式 (6.6.9)</strong>（取 \(k=1\)）：\(A^{(d)}=A(A^3)^{(1)}A\)，取 \((A^3)^{(1)}=(A^3)^+\)，计算得
+                  \[ A^{(d)}=\frac18\begin{pmatrix}3&3&-1&-1\\-1&3&3&-1\\-1&-1&3&3\\3&-1&-1&3\end{pmatrix}. \]</p>
+                  <p><strong>式 (6.6.12)</strong>（Cline）：取 §6.3 习题 3 的满秩分解
+                  \[ F=\begin{pmatrix}1&0&0\\1&1&0\\0&1&1\\0&0&1\end{pmatrix},\quad G=\begin{pmatrix}1&0&0&1\\0&1&0&-1\\0&0&1&1\end{pmatrix}, \]</p>
+                  <p>则 \(GF=\begin{pmatrix}1&0&1\\1&1&-1\\0&1&2\end{pmatrix}\)，\(\det(GF)=4\ne0\)，指标确为 1；\(A^\#=F(GF)^{-2}G\)，计算结果同上。</p>
+                  <p><strong>式 (6.6.7)</strong>（多项式）：由最小多项式 \(m(\lambda)=\lambda(\lambda-2)(\lambda^2-2\lambda+2)\)（\(\lambda=0\) 重数 1）得 \(p(\lambda)=(\lambda-2)(\lambda^2-2\lambda+2)=\lambda^3-4\lambda^2+6\lambda-4\)，\(c=p(0)=-4\)，由 \(p(\lambda)=c(1-\lambda q(\lambda))\) 解出 \(q(\lambda)=\frac14(\lambda^2-4\lambda+6)\)；按定理 6.47 应为 \(A^\#=A(q(A))^2\)（注意是 \(q(A)\) 的<strong>平方</strong>），结果相同。三法一致，且恰有 \(A^{(d)}=A^+\)：验证 \(AA^+=A^+A\) 成立（定理 6.50），即该循环阵虽奇异但"值域与零空间正交配对"，Drazin 逆与 MP 逆重合。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 小结 + 第6章总结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结（兼第 6 章总结）</h2>
+            <div class="summary-block">
+              <p>Drazin 逆是"为方阵保留逆的代数性质"的广义逆：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>对象</th><th>结论</th></tr>
+                  <tr><td>指标（定义 6.9、定理 6.42）</td><td>秩首次稳定的最小 \(k\)；= \(A^{k+1}X=A^k\) 最小 \(k\)；= 最小多项式中零根重数</td></tr>
+                  <tr><td>Drazin 逆（定义 6.10）</td><td>\(A^{k+1}X=A^k,\ XAX=X,\ AX=XA\)；存在、唯一、是 \(A\) 的多项式</td></tr>
+                  <tr><td>谱（定理 6.44）</td><td>\(\lambda\to\lambda^+\)：非零取倒数，零映零；非零特征向量共用</td></tr>
+                  <tr><td>计算</td><td>多项式 (6.6.7)；\(A^k(A^{2k+1})^{(1)}A^k\)（6.6.9）；Cline 逐次满秩分解 (6.6.12)</td></tr>
+                  <tr><td>群逆（\(k=1\)）</td><td>\(A^\#=F(GF)^{-2}G\)；正负零幂构成 Abel 群</td></tr>
+                  <tr><td>与 MP 逆关系（定理 6.50）</td><td>\(A^{(d)}=A^+\Leftrightarrow AA^+=A^+A\)</td></tr>
+                </table>
+              </div>
+
+              <h3 class="sum-cap" style="margin-top:16px">第 6 章全章回顾</h3>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>节</th><th>核心</th></tr>
+                  <tr><td>§6.1 投影矩阵</td><td>投影 ⇔ 幂等（定理 6.1）；正交投影 ⇔ 幂等 Hermite（定理 6.2）；\(P_L=X(X^{\mathrm H}X)^{-1}X^{\mathrm H}\)</td></tr>
+                  <tr><td>§6.2 存在与性质</td><td>Penrose 四方程；\(A^+\) 存在唯一（SVD 构造）；15 类 \(\{i,\cdots,l\}\)-逆；Moore 投影等价定义</td></tr>
+                  <tr><td>§6.3 计算方法</td><td>Hermite 形、满秩分解、Zlobec、Greville、Noble、Hessenberg（选学）、迭代/Neumann</td></tr>
+                  <tr><td>§6.4 方程组应用</td><td>相容 \(AA^{(1)}b=b\)；极小范数 \(\{1,4\}\)；最小二乘 \(\{1,3\}\)/法方程；最佳解 \(x=A^+b,\ X=A^+DB^+\)</td></tr>
+                  <tr><td>§6.5 约束/加权（选学）</td><td>\(P_S(AP_S)^{(\cdot)}\)；Cholesky 去权；加权 MP 逆 \(A_{MN}^+\)</td></tr>
+                  <tr><td>§6.6 Drazin（选学）</td><td>指标、交换的广义逆、群逆、谱对应 \(\lambda\to\lambda^+\)</td></tr>
+                </table>
+              </div>
+              <p style="margin-top:12px">一条主线贯穿全章：<strong>§6.1 的幂等（正交投影）矩阵是单位矩阵在子空间上的替代物</strong>；Penrose 方程 (iii)(iv) 本质是要求 \(AX,XA\) 成为正交投影；\(A^+\) 把"逆、投影、最小二乘、最佳逼近"统一为一个对象；Drazin 逆则补上了"交换、幂律、谱"这一侧。第 7 章（选学）将转向有实际背景的特殊矩阵类（正定稳定、对角占优、非负、\(M\)-矩阵、Toeplitz/Hankel 等）。</p>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>为什么指标可以用秩序列、方程 \(A^{k+1}X=A^k\)、最小多项式零根重数三种方式定义？它们各自的证明桥梁是什么？</li>
+                  <li>Drazin 逆与 MP 逆都"存在且唯一"，根本区别在哪一条方程？对幂零阵二者分别等于什么？</li>
+                  <li>Cline 方法中为什么是 \((G_kB_k)^{-(k+1)}\) 而不是 \(-1\) 次方？满秩分解的阶数 \(r_i\) 如何随步数下降，并在第 \(k\) 步使 \(G_kB_k\) 成为方阵且非奇异？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="6.5-constrained-weighted-inverse.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§6.5 约束广义逆和加权广义逆（选学）</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="../ch7/7.1-positive-definite-stable.html"><span class="ln-dir">下一章</span><span class="ln-ttl">第 7 章 §7.1 正定矩阵与正稳定矩阵（选学）</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

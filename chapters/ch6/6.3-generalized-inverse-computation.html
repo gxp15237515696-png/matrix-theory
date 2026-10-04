@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§6.3 广义逆矩阵的计算方法 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §6.3：Hermite 标准形法（定理6.14、例6.4）、满秩分解法（定理6.15、例6.5）、Zlobec 公式（引理3–4、定理6.16、例6.6）、Greville 逐列迭代（定理6.17、例6.7）、特殊分块 Noble 公式（定理6.18）、实下 Hessenberg 矩阵广义逆（引理5、定理6.19–6.23、例6.8）、p 阶迭代法与 Neumann 展式（定理6.24–6.25）">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§6.3 广义逆矩阵的计算方法</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="6.3" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 6 章 广义逆矩阵</a><span class="sep" aria-hidden="true">/</span>
+            <span>§6.3 广义逆矩阵的计算方法</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 6 章 · 算法集</div>
+            <h1>§6.3 广义逆矩阵的计算方法</h1>
+            <p class="lede">定理 6.3 已用奇异值分解证明 \(A^+\) 总能算出，但 SVD 本身并非易事。本节给出七类<strong>更简单的实用算法</strong>：① Hermite 标准形（只靠初等行变换就得到 \(\{1\}\)-逆）；② 满秩分解（把 \(A^+\) 化为两个普通逆）；③ Zlobec 公式（只需一个 \(\{1\}\)-逆）；④ Greville 逐列递推（<strong>不用任何逆</strong>）；⑤ 特殊分块的 Noble 公式；⑥ 下 Hessenberg 矩阵的参数公式（选学）；⑦ 迭代法与 Neumann 展式（选学，适合计算机）。同一道例题将被五种方法反复求解，正可对照各法的代价与特点。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.309–334</strong></span>
+              <span class="chip">建议 <strong>3 学时</strong></span>
+              <span class="chip">定理 <strong>9.14–6.25（12 个）</strong></span>
+              <span class="chip">引理 <strong>3–5</strong></span>
+              <span class="chip">例题 <strong>5 道</strong></span>
+
+              <span class="chip">定义 <strong>1 个</strong></span></div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>用 Hermite 标准形写出 \(\{1\}\)-逆通式 (6.3.3)，知道取 \(L=O\) 得 \(\{1,2\}\)-逆；</li>
+                  <li>用满秩分解 \(A=FG\) 和定理 6.15 求各类广义逆与 \(A^+\)；</li>
+                  <li>运用 Zlobec 公式 (6.3.6) 与 Greville 递推 (6.3.7)–(6.3.9)；</li>
+                  <li>对含非奇异主子阵的矩阵用 Noble 公式 (4)；</li>
+                  <li>说出迭代法 (6.3.46) 的收敛条件 \(\rho(R_0)&lt;1\)、\(\beta\) 范围与二阶格式；</li>
+                  <li>了解 Hessenberg 参数化方法的思路（选学）。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>Hermite 形法与满秩分解法；</li>
+                      <li>Zlobec 与 Greville；</li>
+                      <li>迭代收敛条件与 Neumann 展式。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>置换阵 \(P,Q\) 的方向；</li>
+                      <li>Greville 中 \(c_k=0\) 分支的推导；</li>
+                      <li>\(\rho(R_0)&lt;1\) 的特征值分析。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 3 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>Hermite 形法（定理 6.14、例 6.4）、满秩分解法（定理 6.15、例 6.5）</td><td class="num">p.309–312</td></tr>
+                    <tr><td class="num">2</td><td>Zlobec（引理 3/4、定理 6.16、例 6.6）、Greville（定理 6.17、例 6.7）、分块 Noble（定理 6.18）</td><td class="num">p.312–321</td></tr>
+                    <tr><td class="num">3</td><td>Hessenberg 参数法（选学）、迭代法与 Neumann 展式、实验与习题</td><td class="num">p.321–334</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 210" role="img" aria-label="广义逆计算方法脉络图">
+                    <defs><marker id="m63" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="20" y="22" width="180" height="52"/><rect x="230" y="22" width="180" height="52"/><rect x="440" y="22" width="180" height="52"/><rect x="650" y="22" width="170" height="52"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="110" y="44">① Hermite 形</text><text x="110" y="62" font-size="11" fill="#666">初等行变换→{1},{1,2}</text>
+                      <text x="320" y="44">② 满秩分解</text><text x="320" y="62" font-size="11" fill="#666">A=FG→普通逆</text>
+                      <text x="530" y="44">③ Zlobec</text><text x="530" y="62" font-size="11" fill="#666">A^H(A^HAA^H)⁽¹⁾A^H</text>
+                      <text x="735" y="44">④ Greville</text><text x="735" y="62" font-size="11" fill="#666">逐列，不用逆</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m63)"><line x1="200" y1="48" x2="228" y2="48"/><line x1="410" y1="48" x2="438" y2="48"/><line x1="620" y1="48" x2="648" y2="48"/></g>
+                    <g class="fm-node" fill="#f4f0e2" stroke="#a06a17"><rect x="120" y="128" width="260" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="250" y="150">⑤ Noble 分块公式（定理6.18）</text><text x="250" y="168" font-size="11" fill="#666">非奇异 r 阶主子阵 + 置换</text>
+                    </g>
+                    <g class="fm-node" fill="#f3eef7" stroke="#6b4e9e"><rect x="420" y="128" width="180" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="510" y="150">⑥ Hessenberg（选学）</text><text x="510" y="168" font-size="11" fill="#666">参数 α 公式 (6.3.30)</text>
+                    </g>
+                    <g class="fm-node" fill="#eef7f0" stroke="#3d7a4e"><rect x="630" y="128" width="190" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="725" y="150">⑦ 迭代 / Neumann</text><text x="725" y="168" font-size="11" fill="#666">ρ(R₀)&lt;1，p 阶收敛</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m63)"><line x1="380" y1="154" x2="418" y2="154"/><line x1="600" y1="154" x2="628" y2="154"/></g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、Hermite 标准形法 ================= -->
+          <section class="section" id="sec-hermite">
+            <h2 class="sec-title"><span class="cn">一</span>利用 Hermite 标准形计算 {1}-逆和 {1,2}-逆</h2>
+            <p>由 §4.3 知，任意 \(A\in\C_r^{m\times n}\ (r&gt;0)\) 都可通过初等行变换化为 Hermite 标准形 \(B\)：存在有限个初等矩阵之积 \(Q\)，使</p>
+            <div class="eq-scroll">\[ QA=B. \tag{6.3.1} \]</div>
+            <p>再构造置换矩阵 \(P\)，把 \(B\) 的 \(r\) 个主元列换到前面：</p>
+            <div class="eq-scroll">\[ QAP=\begin{pmatrix}I_r&K\\O&O\end{pmatrix}, \tag{6.3.2} \]</div>
+            <p>其中 \(K\) 是 \(r\times(n-r)\) 子矩阵。</p>
+
+            <section class="card thm" id="thm-6-14">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.14：Hermite 形给出的 {1}-逆通式</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A\in\C_r^{m\times n}\)，\(Q\in\C^{m\times m},\ P\in\C^{n\times n}\) 使式 (6.3.2) 成立，则对<strong>任意</strong> \(L\in\C^{(n-r)\times(m-r)}\)，</p>
+                <div class="eq-scroll">\[ X=P\begin{pmatrix}I_r&O\\O&L\end{pmatrix}Q \tag{6.3.3} \]</div>
+                <p>是 \(A\) 的 \(\{1\}\)-逆。若取 \(L=O\)，则 \(\operatorname{rank}X=r=\operatorname{rank}A\)，由定理 6.7 知此时 \(X\in A\{1,2\}\)。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">把 (6.3.2) 改写为 \(A=Q^{-1}\begin{pmatrix}I_r&K\\O&O\end{pmatrix}P^{-1}\)。直接分块相乘：
+                  \[ AXA=Q^{-1}\begin{pmatrix}I_r&K\\O&O\end{pmatrix}\underbrace{P^{-1}P}_{I}\begin{pmatrix}I_r&O\\O&L\end{pmatrix}\underbrace{QQ^{-1}}_{I}\begin{pmatrix}I_r&K\\O&O\end{pmatrix}P^{-1}=Q^{-1}\begin{pmatrix}I_r&K\\O&O\end{pmatrix}^2P^{-1}=A, \]</p>
+                  <p>因为 \(\begin{pmatrix}I_r&K\\O&O\end{pmatrix}^2=\begin{pmatrix}I_r&K\\O&O\end{pmatrix}\)（幂等），与右下角的 \(L\) 无关。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-6-4">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 6.4：复矩阵的 {1}-逆（含自由参数）</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(\mathrm j=\sqrt{-1}\)，\(A=\begin{pmatrix}0&2\mathrm j&\mathrm j&0&4+2\mathrm j&1\\0&0&0&-3&-6&-3-3\mathrm j\\0&2&1&1&4-4\mathrm j&1\end{pmatrix}\)，求一个 \(\{1\}\)-逆。</p>
+                <p><strong>解</strong>　对 \((A\ \vdots\ I_3)\) 作初等行变换得</p>
+                <div class="eq-scroll">\[ QA=\begin{pmatrix}0&1&\tfrac12&0&1-2\mathrm j&-\tfrac12\mathrm j\\0&0&0&1&2&1+\mathrm j\\0&0&0&0&0&0\end{pmatrix}, \]</div>
+                <p>主元列为第 2、4 列（\(r=2\)），且行变换矩阵 \(Q=\begin{pmatrix}-\tfrac12\mathrm j&0&0\\0&-\tfrac13&0\\\mathrm j&\tfrac13&1\end{pmatrix}\)。把主元列换到最前的置换阵 \(P\) 对应新列序 \((2,4,1,3,5,6)\)。由式 (6.3.3)，取 \(L=(a,b,c,d)^{\mathrm T}\in\C^{4\times1}\) 任意，得一族 \(\{1\}\)-逆</p>
+                <div class="eq-scroll">\[
+                X=P\begin{pmatrix}I_2&O\\O&L\end{pmatrix}=
+                \begin{pmatrix}
+                a\mathrm j&\tfrac13a&a\\
+                -\tfrac12\mathrm j&0&0\\
+                b\mathrm j&\tfrac13b&b\\
+                0&-\tfrac13&0\\
+                c\mathrm j&\tfrac13c&c\\
+                d\mathrm j&\tfrac13d&d
+                \end{pmatrix},
+                \]</div>
+                <p style="margin-bottom:0">其中 \(a,b,c,d\in\C\) 任意；取 \(a=b=c=d=0\) 即得一个 \(\{1,2\}\)-逆。这直观显示了 \(\{1\}\)-逆的不唯一性与定理 6.14 的"自由参数"来源：4 个参数正是 \((n-r)(m-r)=4\cdot1\)。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 二、满秩分解法 ================= -->
+          <section class="section" id="sec-fullrank">
+            <h2 class="sec-title"><span class="cn">二</span>利用满秩分解求广义逆矩阵</h2>
+            <p>§4.3 给出了 \(A\in\C_r^{m\times n}\ (r&gt;0)\) 的满秩分解（用初等变换即可求得）</p>
+            <div class="eq-scroll">\[ A=FG,\qquad F\in\C_r^{m\times r},\ G\in\C_r^{r\times n}. \tag{6.3.4} \]</div>
+
+            <section class="card thm" id="thm-6-15">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.15：满秩分解给出的五类广义逆</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A\in\C_r^{m\times n}\ (r&gt;0)\) 的满秩分解为式 (6.3.4)，则：</p>
+                <div class="table-wrap">
+                  <table class="book">
+                    <tr><th>#</th><th>结论</th></tr>
+                    <tr><td class="num">(1)</td><td>\(G^{(i)}F^{(1)}\in A\{i\}\)（\(i=1,2,4\)）</td></tr>
+                    <tr><td class="num">(2)</td><td>\(G^{(1)}F^{(i)}\in A\{i\}\)（\(i=1,2,3\)）</td></tr>
+                    <tr><td class="num">(3)</td><td>\(G^{(1)}F^+\in A\{1,2,3\}\)，\(G^+F^{(1)}\in A\{1,2,4\}\)</td></tr>
+                    <tr><td class="num">(4)</td><td>\(A^+=G^+F^{(1,3)}=G^{(1,4)}F^+\)</td></tr>
+                    <tr><td class="num">(5)</td><td>\(A^+=G^+F^+=G^{\mathrm H}(GG^{\mathrm H})^{-1}(F^{\mathrm H}F)^{-1}F^{\mathrm H}=G^{\mathrm H}(F^{\mathrm H}AG^{\mathrm H})^{-1}F^{\mathrm H}\)</td></tr>
+                  </table>
+                </div>
+                <details class="proof"><summary><span>证明要点</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>\(F\) 列满秩、\(G\) 行满秩，由定理 6.5(7) 知 \(F^{(1)}F=GG^{(1)}=I_r\)。(1)(2) 代入定义逐条验证；(3) 由 (1)(2) 合并（把 \(F^+\) 视作 \(F^{(1,2,3)}\)、\(G^+\) 视作 \(G^{(1,2,4)}\) 仍成立）。(4) 中 \(X=G^+F^{(1,3)}\) 满足 (iii)：\((AX)^{\mathrm H}=(FGG^+F^{(1,3)})^{\mathrm H}=(FF^{(1,3)})^{\mathrm H}=FF^{(1,3)}=AX\)，故 \(X\in A\{1,2,3,4\}\)，即 \(X=A^+\)；另一式同理。(5) 先用 (4) 得 \(G^+F^+=A^+\)，再对列满秩的 \(F\) 与行满秩的 \(G\) 分别使用式 (6.2.3)(6.2.4)：\(F^+=(F^{\mathrm H}F)^{-1}F^{\mathrm H}\)，\(G^+=G^{\mathrm H}(GG^{\mathrm H})^{-1}\)；中间还可用 \(F^{\mathrm H}AG^{\mathrm H}=F^{\mathrm H}(FG)G^{\mathrm H}=(F^{\mathrm H}F)(GG^{\mathrm H})\) 把两个逆合并为一个 \(r\times r\) 逆。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-6-5">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 6.5：例 6.4 中矩阵的 A⁺</span>
+              </header>
+              <div class="card-body">
+                <p>例 6.4 中 \(A\) 的一个满秩分解为（\(F\) 取主元列 2、4，\(G\) 取 Hermite 形的非零行）</p>
+                <div class="eq-scroll">\[
+                A=FG,\quad F=\begin{pmatrix}2\mathrm j&0\\0&-3\\2&1\end{pmatrix},\quad
+                G=\begin{pmatrix}0&1&\tfrac12&0&1-2\mathrm j&-\tfrac12\mathrm j\\0&0&0&1&2&1+\mathrm j\end{pmatrix}.
+                \]</div>
+                <p>计算 \(F^{\mathrm H}F=\begin{pmatrix}8&2\\2&10\end{pmatrix}\)，\(GG^{\mathrm H}=\begin{pmatrix}\tfrac{13}{2}&\tfrac32-\tfrac92\mathrm j\\[2pt]\tfrac32+\tfrac92\mathrm j&7\end{pmatrix}\)，于是由定理 6.15(5)</p>
+                <div class="eq-scroll">\[
+                A^+=G^{\mathrm H}(GG^{\mathrm H})^{-1}(F^{\mathrm H}F)^{-1}F^{\mathrm H},
+                \]</div>
+                <p>其中 \((GG^{\mathrm H})^{-1}=\tfrac1{46}\begin{pmatrix}14&-3(1-3\mathrm j)\\-3(1+3\mathrm j)&13\end{pmatrix}\)，\((F^{\mathrm H}F)^{-1}=\tfrac1{38}\begin{pmatrix}5&-1\\-1&4\end{pmatrix}\)，逐步相乘得</p>
+                <div class="eq-scroll">\[
+                A^+=\frac1{1748}
+                \begin{pmatrix}
+                0&0&0\\
+                -18-146\mathrm j&78-108\mathrm j&120+18\mathrm j\\
+                -9-73\mathrm j&39-54\mathrm j&60+9\mathrm j\\
+                -90+56\mathrm j&-165-27\mathrm j&-1-81\mathrm j\\
+                94-70\mathrm j&-36-6\mathrm j&82+96\mathrm j\\
+                39+137\mathrm j&-138+177\mathrm j&-91-20\mathrm j
+                \end{pmatrix}.
+                \]</div>
+                <p style="margin-bottom:0">对照：Hermite 形法几乎只做行变换就给出一族 \(\{1\}\)-逆，而求唯一的 \(A^+\) 需补上两个 \(r\) 阶普通逆——满秩分解把"广义逆"降维成了"普通逆"。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 三、Zlobec ================= -->
+          <section class="section" id="sec-zlobec">
+            <h2 class="sec-title"><span class="cn">三</span>计算 A⁺ 的 Zlobec 公式</h2>
+            <p>能否只用一个 \(\{1\}\)-逆就拼出 \(A^+\)？先立两个引理。</p>
+
+            <section class="card thm" id="lem-6-3">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 3v18"/><path d="M5 8l7-5 7 5"/><path d="M5 16l7 5 7-5"/></svg></span>
+                <span class="card-label">引理 3：夹心式 X=U(VAU)⁽¹⁾V 的四条判据</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\C_r^{m\times n},\ U\in\C^{n\times p},\ V\in\C^{q\times m}\)，又设 \(X=U(VAU)^{(1)}V\)，其中 \((VAU)^{(1)}\in(VAU)\{1\}\)。则</p>
+                <div class="table-wrap">
+                  <table class="book">
+                    <tr><th>#</th><th>结论</th><th>充要条件</th></tr>
+                    <tr><td class="num">(1)</td><td>\(X\in A\{1\}\)</td><td>\(\operatorname{rank}(VAU)=r\)</td></tr>
+                    <tr><td class="num">(2)</td><td>\(X\in A\{2\}\) 且 \(R(X)=R(U)\)</td><td>\(\operatorname{rank}(VAU)=\operatorname{rank}U\)</td></tr>
+                    <tr><td class="num">(3)</td><td>\(X\in A\{2\}\) 且 \(N(X)=N(V)\)</td><td>\(\operatorname{rank}(VAU)=\operatorname{rank}V\)</td></tr>
+                    <tr><td class="num">(4)</td><td>\(X\in A\{1,2\}\) 且 \(R(X)=R(U),\ N(X)=N(V)\)</td><td>\(\operatorname{rank}(VAU)=\operatorname{rank}U=\operatorname{rank}V=r\)</td></tr>
+                  </table>
+                </div>
+                <details class="proof"><summary><span>证明（(1)(2) 思路）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>(1) 充分性：\(r=\operatorname{rank}(VAU)\le\operatorname{rank}(AU)\le\operatorname{rank}A=r\) 迫使 \(R(AU)=R(A)\)，故有 \(Y\) 使 \(A=AUY\)；由定理 6.5(8)，\(AXA=AU(VAU)^{(1)}VAUY=AUY=A\)。必要性由 \(A=AXAXA=AU(VAU)^{(1)}VAU(VAU)^{(1)}VA\) 取秩得 \(r\le\operatorname{rank}(VAU)\le r\)。</p>
+                  <p>(2) 充分性：\(\operatorname{rank}(VAU)=\operatorname{rank}U\) 时由定理 6.5(8) 得 \(XAU=U(VAU)^{(1)}VAU=U\)，于是 \(XAX=XAU(VAU)^{(1)}V=U(VAU)^{(1)}V=X\)；又 \(R(X)=R[U(VAU)^{(1)}V]\subset R(U)\)，而由 \(X\in A\{2\}\) 得 \(X=XAX=U(VAU)^{(1)}VAU(VAU)^{(1)}V\) 取秩反推 \(R(U)\subset R(X)\)，故值域相等。必要性由 \(X=XAX\) 与 \(R(X)=R(U)\) 夹逼秩即可。(3) 与 (2) 对偶。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card thm" id="lem-6-4">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 3v18"/><path d="M5 8l7-5 7 5"/><path d="M5 16l7 5 7-5"/></svg></span>
+                <span class="card-label">引理 4：值域、零空间双对偶唯一刻画</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">对任意给定的 \(A\)，满足 \(X\in A\{1,2\}\) 且 \(R(X)=R(A^{\mathrm H}),\ N(X)=N(A^{\mathrm H})\) 的唯一矩阵为 \(A^+\)。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">首先 \(A^+\) 满足这组条件（定理 6.10(6) 及 \(A,A^+\) 互为 \(\{1,2\}\)-逆）。反之，由 \(R(X)=R(A^{\mathrm H})\) 有 \(X=A^{\mathrm H}U\)；由 \(N(X)=N(A^{\mathrm H})\)，取正交补得 \(R(X^{\mathrm H})=R(A)\)，即 \(X^{\mathrm H}=AV^{\mathrm H}\)，亦即 \(X=VA^{\mathrm H}\)。于是 \(X\) 满足定理 6.12 的三条件 (6.2.8)，故 \(X=A^+\)。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-6-16">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.16：Zlobec 公式</span>
+              </header>
+              <div class="card-body">
+                <p>给定矩阵 \(A\)，则</p>
+                <div class="eq-scroll">\[ A^+=A^{\mathrm H}(A^{\mathrm H}AA^{\mathrm H})^{(1)}A^{\mathrm H}, \tag{6.3.6} \]</div>
+                <p style="margin-bottom:0">其中 \((A^{\mathrm H}AA^{\mathrm H})^{(1)}\in(A^{\mathrm H}AA^{\mathrm H})\{1\}\)。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">在引理 3 中取 \(U=V=A^{\mathrm H}\)。由引理 2 两次使用：\(\operatorname{rank}A^{\mathrm H}=\operatorname{rank}(A^{\mathrm H}A)=\operatorname{rank}(A^{\mathrm H}AA^{\mathrm H}A)\le\operatorname{rank}(A^{\mathrm H}AA^{\mathrm H})\le\operatorname{rank}A^{\mathrm H}\)，故夹逼取等，引理 3(4) 条件成立，从而 \(X=A^{\mathrm H}(A^{\mathrm H}AA^{\mathrm H})^{(1)}A^{\mathrm H}\in A\{1,2\}\) 且 \(R(X)=R(A^{\mathrm H}),\ N(X)=N(A^{\mathrm H})\)；由引理 4 得 \(X=A^+\)。</p>
+                </details>
+                <div class="card note" style="margin-top:10px">
+                  <header class="card-head"><span class="card-label">优点</span></header>
+                  <div class="card-body"><p style="margin-bottom:0">只需计算 \(A^{\mathrm H}AA^{\mathrm H}\) 的<strong>一个</strong> \(\{1\}\)-逆（Hermite 形法即可），不必求满秩分解；且乘积与所选的具体 \(\{1\}\)-逆无关（不变量），因此可取最简单的一个。</p></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-6-6">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 6.6：Zlobec 公式</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A=\begin{pmatrix}-1&0&1\\2&0&-2\end{pmatrix}\)，用 Zlobec 公式计算 \(A^+\)。</p>
+                <p><strong>解</strong>　先算 \(AA^{\mathrm H}=\begin{pmatrix}2&-4\\-4&8\end{pmatrix}\)，于是</p>
+                <div class="eq-scroll">\[ A^{\mathrm H}AA^{\mathrm H}=A^{\mathrm H}(AA^{\mathrm H})=\begin{pmatrix}-1&2\\0&0\\1&-2\end{pmatrix}\begin{pmatrix}2&-4\\-4&8\end{pmatrix}=\begin{pmatrix}-10&20\\0&0\\10&-20\end{pmatrix}. \]</div>
+                <p>该矩阵秩 1，容易取一个 \(\{1\}\)-逆 \((A^{\mathrm H}AA^{\mathrm H})^{(1)}=\begin{pmatrix}-\tfrac1{10}&0&0\\0&0&0\end{pmatrix}\)，于是</p>
+                <div class="eq-scroll">\[ A^+=A^{\mathrm H}(A^{\mathrm H}AA^{\mathrm H})^{(1)}A^{\mathrm H}=\frac1{10}\begin{pmatrix}-1&2\\0&0\\1&-2\end{pmatrix}. \]</div>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 四、Greville ================= -->
+          <section class="section" id="sec-greville">
+            <h2 class="sec-title"><span class="cn">四</span>Greville 方法</h2>
+            <p>Greville 方法是一种<strong>有限迭代法</strong>：在已知前 \(k\) 列构成的子矩阵 \(A_k\) 的广义逆 \(A_k^+\) 的基础上，构造前 \(k+1\) 列子矩阵的广义逆。若 \(A\) 有 \(n\) 列，经过 \(n\) 步即得 \(A^+\)。全程<strong>不需要计算任何矩阵的逆或广义逆</strong>，只用矩阵乘法。</p>
+
+            <section class="card thm" id="thm-6-17">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.17：Greville 逐列递推</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{m\times n}\)，记 \(a_k\) 为 \(A\) 的第 \(k\) 列，\(A_k=(a_1,\cdots,a_k)\)。又记</p>
+                <div class="eq-scroll">\[ d_k=A_{k-1}^+a_k, \tag{6.3.7} \]</div>
+                <div class="eq-scroll">\[ c_k=a_k-A_{k-1}d_k=(I-P_{R(A_{k-1})})a_k=P_{R(A_{k-1})^\perp}a_k=P_{N(A_{k-1}^{\mathrm H})}a_k\quad(k=2,\cdots,n), \tag{6.3.8} \]</div>
+                <p>即 \(c_k\) 是新列减去它在旧列空间上的正交投影（"创新分量"）。则</p>
+                <div class="eq-scroll">\[ A_k^+=\begin{pmatrix}A_{k-1}^+-d_kb_k^{\mathrm H}\\[2pt] b_k^{\mathrm H}\end{pmatrix}, \tag{6.3.9} \]</div>
+                <p>其中行向量</p>
+                <div class="eq-scroll">\[ b_k^{\mathrm H}=\begin{cases}c_k^+=(c_k^{\mathrm H}c_k)^{-1}c_k^{\mathrm H},&c_k\ne0,\\(1+d_k^{\mathrm H}d_k)^{-1}d_k^{\mathrm H}A_{k-1}^+,&c_k=0,\end{cases}\quad(k=2,\cdots,n). \]</div>
+                <details class="proof"><summary><span>证明思路</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>设 \(A_k^+=\begin{pmatrix}B_k\\ b_k^{\mathrm H}\end{pmatrix}\)，则 \(A_kA_k^+=A_{k-1}B_k+a_kb_k^{\mathrm H}\)。利用 \(N(A_{k-1}^+)=N(A_{k-1}^{\mathrm H})\) 及投影关系可推出 \(A_{k-1}^+A_{k-1}B_k=B_k\) 与 \(A_{k-1}^+=B_k+d_kb_k^{\mathrm H}\)，即得式 (6.3.9)。分两种情形确定 \(b_k^{\mathrm H}\)：</p>
+                  <p><strong>(1) \(c_k\ne0\)：</strong>由 \(A_kA_k^+\)、\(A_{k-1}A_{k-1}^+\) 均 Hermite 及式 \(A_k=A_kA_k^+A_k\) 比较，得 \(b_k^{\mathrm H}=\delta c_k^{\mathrm H}\) 与 \(b_k^{\mathrm H}a_k=1\)，再用 \(P_{N(A_{k-1}^{\mathrm H})}a_k=c_k\) 算出 \(\delta=(c_k^{\mathrm H}c_k)^{-1}\)，即 \(b_k^{\mathrm H}=c_k^+\)（式 6.2.5）。</p>
+                  <p><strong>(2) \(c_k=0\)：</strong>此时 \(R(A_k)=R(A_{k-1})\)，由值域相等得 \(A_{k-1}A_{k-1}^+b_k=b_k\)，即 \(b_k^{\mathrm H}A_{k-1}A_{k-1}^+=b_k^{\mathrm H}\)。考察 \(A_k^+A_k\) 的 Hermite 性，令 \(\alpha=b_k^{\mathrm H}a_k\)，得 \(b_k^{\mathrm H}=(1-\alpha)d_k^{\mathrm H}A_{k-1}^+\) 与 \(\alpha=(1-\alpha)d_k^{\mathrm H}d_k\)，解出 \(1-\alpha=(1+d_k^{\mathrm H}d_k)^{-1}\) 即得第二分支。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-6-7">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 6.7：Greville 两步</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A=\begin{pmatrix}1&0\\2&1\\0&1\end{pmatrix}\)，用 Greville 方法计算 \(A^+\)。</p>
+                <p><strong>解</strong>　由式 (6.2.5)：\(A_1^+=\begin{pmatrix}1\\2\\0\end{pmatrix}^+=\tfrac15\begin{pmatrix}1&2&0\end{pmatrix}\)。第一步递推：</p>
+                <div class="eq-scroll">\[
+                d_2=A_1^+a_2=\tfrac25,\qquad
+                c_2=a_2-A_1d_2=\begin{pmatrix}-\tfrac25\\[2pt]\tfrac15\\[2pt]1\end{pmatrix}\ne0,
+                \]</div>
+                <div class="eq-scroll">\[ b_2^{\mathrm H}=c_2^+=\frac16\begin{pmatrix}-2&2&4\end{pmatrix}. \]</div>
+                <p>于是</p>
+                <div class="eq-scroll">\[
+                A^+=\begin{pmatrix}\tfrac15\begin{pmatrix}1&2&0\end{pmatrix}-\tfrac25\cdot\tfrac16\begin{pmatrix}-2&1&5\end{pmatrix}\\[2pt]\tfrac16\begin{pmatrix}-2&1&5\end{pmatrix}\end{pmatrix}
+                =\frac16\begin{pmatrix}2&2&-2\\-2&1&5\end{pmatrix}.
+                \]</div>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 五、分块 Noble ================= -->
+          <section class="section" id="sec-block">
+            <h2 class="sec-title"><span class="cn">五</span>一些特殊分块矩阵的广义逆矩阵</h2>
+            <p>设 \(A\in\C^{m\times n}\) 的秩为 \(r\)，且能找到 \(A\) 的一个 \(r\) 阶非奇异子矩阵 \(A_{11}\)。经行、列置换可把它移到左上角：</p>
+            <div class="eq-scroll">\[ PAQ=\begin{pmatrix}A_{11}&A_{12}\\A_{21}&A_{22}\end{pmatrix}, \]</div>
+            <p>\(P,Q\) 分别为 \(m,n\) 阶置换阵，\(A_{11}\in\C_r^{r\times r}\)。若 \(r=n\) 则 \(A_{12},A_{22}\) 不出现；若 \(r=m\) 则 \(A_{21},A_{22}\) 不出现。由 \(\operatorname{rank}A=\operatorname{rank}A_{11}=r\)，存在 \(T,S\) 使</p>
+            <div class="eq-scroll">\[ \begin{pmatrix}A_{12}\\A_{22}\end{pmatrix}=\begin{pmatrix}A_{11}\\A_{21}\end{pmatrix}T,\qquad (A_{21}\ \vdots\ A_{22})=S(A_{11}\ \vdots\ A_{12}), \]</div>
+            <p>即 \(T=A_{11}^{-1}A_{12},\ S=A_{21}A_{11}^{-1}\)，且 \(A_{22}=SA_{11}T=A_{21}A_{11}^{-1}A_{12}\)。于是得到满秩分解</p>
+            <div class="eq-scroll">\[ A=P^{\mathrm T}\begin{pmatrix}I_r\\S\end{pmatrix}A_{11}\,(I_r\ \vdots\ T)Q^{\mathrm T}. \tag{6.3.21} \]</div>
+
+            <section class="card thm" id="thm-6-18">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.18：分块公式与 Noble 公式</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A\in\C_r^{m\times n}\) 分块为式 (6.3.21)，则</p>
+                <div class="eq-scroll">\[ (1)\quad A^{(1,2)}=Q\begin{pmatrix}A_{11}^{-1}&O\\O&O\end{pmatrix}P; \]</div>
+                <div class="eq-scroll">\[ (2)\quad A^{(1,2,3)}=Q\begin{pmatrix}A_{11}^{-1}\\O\end{pmatrix}(I_r+S^{\mathrm H}S)^{-1}(I_r\ \vdots\ S^{\mathrm H})P; \]</div>
+                <div class="eq-scroll">\[ (3)\quad A^{(1,2,4)}=Q\begin{pmatrix}I_r\\T^{\mathrm H}\end{pmatrix}(I_r+TT^{\mathrm H})^{-1}(A_{11}^{-1}\ \vdots\ O)P; \]</div>
+                <div class="eq-scroll">\[ (4)\quad A^+=Q\begin{pmatrix}I_r\\T^{\mathrm H}\end{pmatrix}(I_r+TT^{\mathrm H})^{-1}A_{11}^{-1}(I_r+S^{\mathrm H}S)^{-1}(I_r\ \vdots\ S^{\mathrm H})P. \]</div>
+                <p style="margin-bottom:0">第 (4) 式称为 <strong>Noble 公式</strong>。\(r=n\) 或 \(r=m\) 的特殊情形请自行推证。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">(1) 由定义直接验证。式 (6.3.21) 本身是满秩分解 \(A=FG\)，其中 \(F=P^{\mathrm T}\begin{pmatrix}I_r\\S\end{pmatrix}A_{11}\) 列满秩、\(G=(I_r\ \vdots\ T)Q^{\mathrm T}\) 行满秩；并且 \(A_{11}^{-1}(I_r\ \vdots\ O)P\in F\{1\}\)、\(Q\begin{pmatrix}I_r\\O\end{pmatrix}\in G\{1\}\)。由式 (6.2.3)(6.2.4) 算出 \(F^+,G^+\) 后，按定理 6.15 的 (3)(5) 组装即得 (2)(3)(4)。</p>
+                </details>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 六、Hessenberg（选学） ================= -->
+          <section class="section" id="sec-hessenberg">
+            <h2 class="sec-title"><span class="cn">六</span>计算一类实 Hessenberg 矩阵的广义逆<sup>选学</sup></h2>
+            <p>任何方阵都可正交相似于 Hessenberg 矩阵，所以求出 Hessenberg 矩阵的广义逆就可求出任意方阵的广义逆。考虑实的 \(n\) 阶<strong>下 Hessenberg 矩阵</strong></p>
+            <div class="eq-scroll">\[
+            H=\begin{pmatrix}
+            h_{11}&h_{12}&&&\\
+            h_{21}&h_{22}&h_{23}&&\\
+            \vdots&\vdots&\ddots&\ddots&\\
+            h_{n-1,1}&h_{n-1,2}&\cdots&h_{n-1,n-1}&h_{n-1,n}\\
+            h_{n1}&h_{n2}&\cdots&h_{n,n-1}&h_{nn}
+            \end{pmatrix}, \tag{6.3.22}
+            \]</div>
+            <p>设<strong>上对角线</strong>（超级对角）元素非零：\(h_{i,i+1}\ne0\ (i=1,\cdots,n-1)\)，并假定 \(H\) 奇异。</p>
+
+            <section class="card thm" id="lem-6-5">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 3v18"/><path d="M5 8l7-5 7 5"/><path d="M5 16l7 5 7-5"/></svg></span>
+                <span class="card-label">引理 5：两组递推数组</span>
+              </header>
+              <div class="card-body">
+                <p>设数组 \(x_i,y_i\ (i=1,\cdots,n)\) 按如下方式递推：</p>
+                <div class="eq-scroll">\[ x_1=1,\qquad x_i=-\frac1{h_{i-1,i}}\sum_{k=1}^{i-1}h_{i-1,k}x_k\quad(i=2,\cdots,n); \tag{6.3.23} \]</div>
+                <div class="eq-scroll">\[ y_n=1,\qquad y_i=-\frac1{h_{i,i+1}}\sum_{k=i+1}^{n}y_kh_{k,i+1}\quad(i=n-1,\cdots,1), \tag{6.3.24} \]</div>
+                <p style="margin-bottom:0">则它们分别与 \(H\) 的最后一行、第一列正交：</p>
+                <div class="eq-scroll">\[ (h_{n1},\cdots,h_{nn})(x_1,\cdots,x_n)^{\mathrm T}=\sum_{k=1}^n h_{nk}x_k=0, \tag{6.3.25} \]</div>
+                <div class="eq-scroll">\[ (y_1,\cdots,y_n)(h_{11},h_{21},\cdots,h_{n1})^{\mathrm T}=\sum_{k=1}^n y_kh_{k1}=0. \tag{6.3.26} \]</div>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">反证法。设 \(\sum h_{nk}x_k=a\ne0\)。由递推式 (6.3.23)，\(x_i\) 满足以 \(H\) 的前 \(n-1\) 行为系数、右端为零的方程组，而最后一行为 \(a\)，即 \(Hx=(0,\cdots,0,a)^{\mathrm T}\)。因 \(h_{i,i+1}\ne0\)，前 \(n-1\) 行已使 \(\operatorname{rank}H=n-1\)，但增广矩阵秩为 \(n\)，方程组无解，矛盾。另一结果类似。</p>
+                </details>
+              </div>
+            </section>
+
+            <p>引入记号（把 \(H\) 去掉首行首列方向的关键块剥出）：</p>
+            <div class="eq-scroll">\[
+            P_{n-1}=\begin{pmatrix}h_{12}&&&\\h_{22}&h_{23}&&\\\vdots&\vdots&\ddots&\\h_{n-1,2}&h_{n-1,3}&\cdots&h_{n-1,n}\end{pmatrix},\quad
+            c_{n-1}=(h_{11},h_{21},\cdots,h_{n-1,1})^{\mathrm T},
+            \]</div>
+            <div class="eq-scroll">\[
+            r_{n-1}^{\mathrm T}=(h_{n2},h_{n3},\cdots,h_{nn}),\quad x=(x_2,\cdots,x_n)^{\mathrm T},\quad y=(y_1,\cdots,y_{n-1})^{\mathrm T}.
+            \]</div>
+            <p>于是</p>
+            <div class="eq-scroll">\[ H=\begin{pmatrix}c_{n-1}&P_{n-1}\\h_{n1}&r_{n-1}^{\mathrm T}\end{pmatrix}, \tag{6.3.27} \]</div>
+            <p>递推式化为</p>
+            <div class="eq-scroll">\[ x=-P_{n-1}^{-1}c_{n-1},\qquad y^{\mathrm T}=-r_{n-1}^{\mathrm T}P_{n-1}^{-1}, \tag{6.3.28} \]</div>
+            <div class="eq-scroll">\[ r_{n-1}^{\mathrm T}x=-h_{n1},\qquad y^{\mathrm T}c_{n-1}=-h_{n1}. \tag{6.3.29} \]</div>
+
+            <section class="card thm" id="thm-6-19">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.19：H⁽¹⁾ 的参数通式</span>
+              </header>
+              <div class="card-body">
+                <div class="eq-scroll">\[
+                H^{(1)}=\begin{pmatrix}0^{\mathrm T}&0\\P_{n-1}^{-1}&0\end{pmatrix}
+                +\begin{pmatrix}1\\x\end{pmatrix}\begin{pmatrix}\alpha_{11}&\alpha_{12}&\cdots&\alpha_{1n}\end{pmatrix}
+                +\begin{pmatrix}\alpha_{1n}\\\alpha_{2n}\\\vdots\\\alpha_{nn}\end{pmatrix}\begin{pmatrix}y^{\mathrm T}&1\end{pmatrix}
+                -\alpha_{1n}\begin{pmatrix}1\\x\end{pmatrix}\begin{pmatrix}y^{\mathrm T}&1\end{pmatrix}, \tag{6.3.30}
+                \]</div>
+                <p style="margin-bottom:0">其中参数 \(\alpha_{1i},\alpha_{in}\ (i=1,\cdots,n)\) 可任意取值；无论参数如何选取，Penrose 方程 (i) 恒成立（即确实是 \(\{1\}\)-逆）。</p>
+              </div>
+            </section>
+
+            <p>适当限制这些参数即可得到其他广义逆（均为把相应 Penrose 方程代入式 (6.3.30) 化简）：</p>
+            <section class="card thm" id="thm-6-20-23">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.20–6.23：参数的四种限制</span>
+              </header>
+              <div class="card-body">
+                <div class="table-wrap">
+                  <table class="book">
+                    <tr><th>定理</th><th>参数须满足</th><th>所得广义逆</th></tr>
+                    <tr><td class="num">6.20</td><td><div class="eq-scroll">\[ \begin{pmatrix}\alpha_{11}&\cdots&\alpha_{1n}\end{pmatrix}H\begin{pmatrix}\alpha_{1n}\\\vdots\\\alpha_{nn}\end{pmatrix}=\alpha_{1n} \tag{6.3.31} \]</div></td><td>\(H^{(1)}=H^{(1,2)}\)</td></tr>
+                    <tr><td class="num">6.21</td><td>\(\alpha_{in}\) 任意，且<div class="eq-scroll">\[ \begin{pmatrix}\alpha_{11}&\cdots&\alpha_{1,n-1}\end{pmatrix}=\alpha_{1n}y^{\mathrm T}-\dfrac{x^{\mathrm T}P_{n-1}^{-1}}{1+x^{\mathrm T}x} \tag{6.3.32} \]</div></td><td>\(H^{(1)}=H^{(1,4)}\)</td></tr>
+                    <tr><td class="num">6.22</td><td>\(\alpha_{1i}\) 任意，且<div class="eq-scroll">\[ \begin{pmatrix}\alpha_{2n}&\cdots&\alpha_{nn}\end{pmatrix}^{\mathrm T}=\alpha_{1n}x-\dfrac{P_{n-1}^{-1}y}{1+y^{\mathrm T}y} \tag{6.3.35} \]</div></td><td>\(H^{(1)}=H^{(1,3)}\)</td></tr>
+                    <tr><td class="num">6.23</td><td>三组参数同时取式 (6.3.36)（即 6.20–6.22 的公共解）</td><td>\(H^{(1)}=H^+\)</td></tr>
+                  </table>
+                </div>
+                <p style="margin-bottom:0">式 (6.3.36) 的显式形式为</p>
+                <div class="eq-scroll">\[
+                \begin{cases}
+                \begin{pmatrix}\alpha_{11}&\cdots&\alpha_{1,n-1}\end{pmatrix}=-\dfrac{x^{\mathrm T}P_{n-1}^{-1}}{1+x^{\mathrm T}x}\begin{pmatrix}I_{n-1}-\dfrac{yy^{\mathrm T}}{1+y^{\mathrm T}y}\end{pmatrix},\\[6pt]
+                \begin{pmatrix}\alpha_{2n}&\cdots&\alpha_{nn}\end{pmatrix}^{\mathrm T}=-\begin{pmatrix}I_{n-1}-\dfrac{xx^{\mathrm T}}{1+x^{\mathrm T}x}\end{pmatrix}\dfrac{P_{n-1}^{-1}y}{1+y^{\mathrm T}y},\\[6pt]
+                \alpha_{1n}=-\begin{pmatrix}\alpha_{11}&\cdots&\alpha_{1,n-1}\end{pmatrix}y.
+                \end{cases} \tag{6.3.36}
+                \]</div>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-6-8">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 6.8：参数 h 的下 Hessenberg 阵族</span>
+              </header>
+              <div class="card-body">
+                <p>已知实下 Hessenberg 矩阵 \(H_n=\begin{pmatrix}h&1&&&\\h^2&h&1&&\\\vdots&\vdots&\ddots&\ddots&\\h^{n-1}&h^{n-2}&\cdots&h&1\\h^n&h^{n-1}&\cdots&h^2&h\end{pmatrix}\)（\(h\) 任意实数），求 \(H_n^{(1)},H_n^{(1,4)},H_n^{(1,3)},H_n^+\)。</p>
+                <p><strong>解</strong>　由式 (6.3.23)(6.3.24) 得 \(x_1=1,\ x_2=-h,\ x_3=\cdots=x_n=0\)；\(y_n=1,\ y_{n-1}=-h,\ y_{n-2}=\cdots=y_1=0\)。因 \(\sum h_{nk}x_k=h^n\cdot1+h^{n-1}(-h)=0\)，矩阵奇异。又 \(P_{n-1}^{-1}=\begin{pmatrix}1&&&\\-h&\ddots&&\\&\ddots&\ddots&\\&&-h&1\end{pmatrix}\)（对角 1、下次对角 \(-h\) 的双对角阵）。代入定理 6.19–6.23：</p>
+                <p>\(H_n^{(1)}\)：以下双对角阵（首行为零、下次对角为 \(-h\)、对角为 \(1\)）为骨架，加上两个含任意参数 \(\alpha_{1i},\alpha_{in}\) 的秩 1 修正项，再减去 \(\alpha_{1n}\begin{pmatrix}1\\-h\\0\\\vdots\\0\end{pmatrix}\begin{pmatrix}0&\cdots&0&-h&1\end{pmatrix}\)；</p>
+                <div class="eq-scroll">\[
+                H_n^{(1,4)}=\begin{pmatrix}\frac{h}{1+h^2}&&&\\\frac1{1+h^2}&0&&\\-h&1&0&\\&\ddots&\ddots&\ddots\\&&-h&1&0\end{pmatrix}
+                +\begin{pmatrix}\alpha_{1n}\\\vdots\\\alpha_{nn}\end{pmatrix}\begin{pmatrix}0&\cdots&0&-h&1\end{pmatrix},
+                \]</div>
+                <p>其中 \(\alpha_{in}\) 任意；</p>
+                <div class="eq-scroll">\[
+                H_n^{(1,3)}=\begin{pmatrix}0&&&\\1&0&&\\-h&1&&\\&\ddots&\ddots&\\&&-h&1&0\\&&&-h&\frac1{1+h^2}&\frac{h}{1+h^2}\end{pmatrix}
+                +\begin{pmatrix}1\\-h\\0\\\vdots\\0\end{pmatrix}\begin{pmatrix}\alpha_{11}&\cdots&\alpha_{1n}\end{pmatrix},
+                \]</div>
+                <p>其中 \(\alpha_{1i}\) 任意；而</p>
+                <div class="eq-scroll">\[
+                H_n^+=\begin{pmatrix}\frac{h}{1+h^2}&&&\\\frac1{1+h^2}&0&&\\-h&1&0&\\&\ddots&\ddots&\ddots\\&&-h&1&0\\&&&-h&\frac1{1+h^2}&\frac{h}{1+h^2}\end{pmatrix},
+                \]</div>
+                <p style="margin-bottom:0">参数全部消失，只剩唯一的 Moore–Penrose 逆。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 七、迭代法 ================= -->
+          <section class="section" id="sec-iter">
+            <h2 class="sec-title"><span class="cn">七</span>计算 A⁺ 的迭代方法<sup>选学</sup></h2>
+            <p>前述方法都是<strong>直接法</strong>（有限步得精确解）。用计算机计算时，受舍入误差影响所得解总是近似的；迭代法编程简单、占用存储单元少，有时更可取。</p>
+            <p>设 \(A\in\C^{m\times n}\)，计算 \(A^+\) 的迭代法就是构造收敛于 \(A^+\) 的序列 \(\{X_k\}\)，其收敛性由<strong>残差序列</strong></p>
+            <div class="eq-scroll">\[ R_k=P_{R(A)}-AX_k\quad(k=0,1,\cdots), \tag{6.3.37} \]</div>
+            <div class="eq-scroll">\[ \widetilde R_k=P_{R(A^{\mathrm H})}-X_kA\quad(k=0,1,\cdots) \tag{6.3.38} \]</div>
+            <p>确定。因 \(AA^+=P_{R(A)},\ A^+A=P_{R(A^{\mathrm H})}\)，当 \(X_k\to A^+\) 时 \(R_k\to O\)（或 \(\widetilde R_k\to O\)）。</p>
+
+            <section class="card def" id="def-6-7">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 6.7：p 阶收敛</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">若对某矩阵范数存在常数 \(c&gt;0\)，使残差序列满足 \(\|R_{k+1}\|\le c\,\|R_k\|^p\)（或 \(\|\widetilde R_{k+1}\|\le c\,\|\widetilde R_k\|^p\)），\(k=0,1,\cdots\)，则称该迭代方法是 <strong>\(p\) 阶的</strong>。</p>
+              </div>
+            </section>
+
+            <p><strong>迭代格式。</strong>(1) 当 \(m\le n\) 时，考虑</p>
+            <div class="eq-scroll">\[ X_{k+1}=X_k+C_kR_k,\qquad R_k=P_{R(A)}-AX_k, \tag{6.3.39} \]</div>
+            <p>其中 \(X_0\) 与 \(C_k\) 事先给定。因 \(P_{R(A)}\) 通常未知，要求 \(C_k\) 满足附加条件</p>
+            <div class="eq-scroll">\[ C_kP_{R(A)}=C_k, \tag{6.3.40} \]</div>
+            <p>于是 \(C_kR_k=C_k(I-AX_k)\)，格式化为（令 \(Z_k=I-AX_k\)）</p>
+            <div class="eq-scroll">\[ X_{k+1}=X_k+C_kZ_k,\qquad Z_k=I-AX_k. \tag{6.3.41} \]</div>
+            <p>(2) 当 \(m&gt;n\) 时，对偶地有</p>
+            <div class="eq-scroll">\[ X_{k+1}=X_k+\widetilde R_k\widetilde C_k,\quad \widetilde R_k=P_{R(A^{\mathrm H})}-X_kA,\quad \widetilde C_k=P_{R(A^{\mathrm H})}\widetilde C_k, \tag{6.3.42} \]</div>
+            <div class="eq-scroll">\[ X_{k+1}=X_k+\widetilde Z_k\widetilde C_k,\qquad \widetilde Z_k=I-X_kA. \tag{6.3.43} \]</div>
+            <p>区分两种情形是因为式 (6.3.41) 中 \(Z_k\) 为 \(m\times m\) 而式 (6.3.43) 中 \(\widetilde Z_k\) 为 \(n\times n\)：当 \(m&gt;n\) 时后者更小、每步更可取。以下只讨论 \(m\le n\)。</p>
+
+            <section class="card thm" id="thm-6-24">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.24：一阶迭代的收敛性</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(O\ne A\in\C^{m\times n}\)，又设</p>
+                <div class="eq-scroll">\[ X_0=A^{\mathrm H}Y_0A^{\mathrm H}\qquad(Y_0\in\C^{m\times n}\text{ 取定}), \tag{6.3.44} \]</div>
+                <p>如果</p>
+                <div class="eq-scroll">\[ \rho(R_0)=\rho(P_{R(A)}-AX_0)&lt;1, \tag{6.3.45} \]</div>
+                <p>则当 \(k\to\infty\) 时一阶迭代</p>
+                <div class="eq-scroll">\[ X_{k+1}=X_k+X_0Z_k,\qquad Z_k=I-AX_k \tag{6.3.46} \]</div>
+                <p>收敛到 \(A^+\)，且残差满足 \(\|R_{k+1}\|\le\|R_0\|\,\|R_k\|\)（一阶收敛）。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>取 \(C_k=X_0\)。由式 (6.3.44)，\(X_0P_{R(A)}=A^{\mathrm H}Y_0A^{\mathrm H}P_{R(A)}=A^{\mathrm H}Y_0(P_{R(A)}A)^{\mathrm H}=A^{\mathrm H}Y_0A^{\mathrm H}=X_0\)，条件 (6.3.40) 成立。于是 \(X_{k+1}=X_k+X_0(I-AX_k)=X_k+X_0R_k\)，从而</p>
+                  <p>\(R_{k+1}=R_k-AX_0R_k=(P_{R(A)}-AX_0)R_k=R_0R_k\)，故 \(\|R_{k+1}\|\le\|R_0\|\|R_k\|\)，且 \(R_k=R_0^{k+1}\)。由 \(\rho(R_0)&lt;1\) 知 \(R_k\to O\)。展开迭代式得 \(X_{k+1}=X_0(I+R_0+\cdots+R_0^k)\)，取极限 \(X_k\to G=X_0(I-R_0)^{-1}\)。对 \(P_{R(A)}-AX_k=R_k\) 取极限得 \(P_{R(A)}=AG\)，右乘 \(A\) 得 \(AGA=A\)；由式 (6.3.44) 可归纳 \(X_{k+1}=A^{\mathrm H}Y_{k+1}A^{\mathrm H}\)，极限 \(G=A^{\mathrm H}TA^{\mathrm H}\)。由定理 6.13（夹心刻画）知 \(G=A^+\)。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-6-25">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.25：p 阶迭代</span>
+              </header>
+              <div class="card-body">
+                <p>条件同定理 6.24。则当 \(k\to\infty\) 时，序列</p>
+                <div class="eq-scroll">\[ X_{k+1}=X_k(I+Z_k+Z_k^2+\cdots+Z_k^{p-1}),\qquad Z_k=I-AX_k \tag{6.3.47} \]</div>
+                <p>收敛到 \(A^+\)，且残差满足</p>
+                <div class="eq-scroll">\[ \|R_{k+1}\|\le\|R_k\|^p. \tag{6.3.48} \]</div>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">在式 (6.3.41) 中取 \(C_k=X_k(I+Z_k+\cdots+Z_k^{p-2})\)，迭代即化为</p>
+                  <div class="eq-scroll">\[ X_{k+1}=X_k(I+R_k+\cdots+R_k^{p-1}). \tag{6.3.49} \]</div>
+                  <p>于是 \(R_{k+1}=P_{R(A)}-AX_{k+1}=R_k-AX_k(R_k+\cdots+R_k^{p-1})\)，反复利用 \(R_k^j-AX_kR_k^j=R_k^{j+1}\)（\(j=1,\cdots,p-1\)），中间项全部望远镜消去，得 \(R_{k+1}=R_k^p\)，即式 (6.3.48)。其余同定理 6.24。</p>
+                </details>
+                <p>达到同样精度时，\(p\) 阶方法在第 \(j\) 步所需的步数相当于一阶方法的 \(p^j-1\) 步，故高阶方法收敛更快，但每步计算量更大。实际中常用 \(p=2\) 的格式：</p>
+                <div class="eq-scroll">\[ X_{k+1}=X_k(I+Z_k)=X_k(2I-AX_k). \tag{6.3.51} \]</div>
+              </div>
+            </section>
+
+            <p><strong>初值与 \(\beta\) 的取值。</strong>在式 (6.3.46)(6.3.47) 中常取初始近似</p>
+            <div class="eq-scroll">\[ X_0=\beta A^{\mathrm H}, \tag{6.3.52} \]</div>
+            <p>即在式 (6.3.44) 中取 \(Y_0=\beta(A^{\mathrm H})^{(1)}\)，其中 \(\beta\) 为实数。此时 \(R_0=P_{R(A)}-\beta AA^{\mathrm H}\) 是 Hermite 阵。对 \(x\in N(A^{\mathrm H})=R(A)^\perp\) 有 \(R_0x=0\)；对 \(x\in R(A)=R(AA^{\mathrm H})\) 有 \(R_0x=(I-\beta AA^{\mathrm H})x\)。故 \(R_0\) 的特征值为 \(0\) 或 \(1-\beta\lambda_i(AA^{\mathrm H})\)，其中 \(\lambda_1\ge\lambda_2\ge\cdots\ge\lambda_r&gt;0\) 是 \(AA^{\mathrm H}\) 的非零特征值。条件 \(\rho(R_0)&lt;1\) 等价于</p>
+            <div class="eq-scroll">\[ |1-\beta\lambda_i(AA^{\mathrm H})|&lt;1\quad(i=1,\cdots,r), \tag{6.3.53} \]</div>
+            <p>由此得 \(\beta\) 的收敛范围</p>
+            <div class="eq-scroll">\[ 0&lt;\beta&lt;\frac{2}{\lambda_1(AA^{\mathrm H})}. \tag{6.3.54} \]</div>
+            <p>当此式成立时，迭代格式 (6.3.46) 与 (6.3.47) 均收敛。特别地，一阶格式 (6.3.46) 此时可显式写成
+            \(X_{k+1}=(I-\beta A^{\mathrm H}A)X_k+\beta A^{\mathrm H}=\beta\sum_{j=0}^{k}(I-\beta A^{\mathrm H}A)^jA^{\mathrm H}\)，
+            取极限得到<strong>Neumann 展式</strong>：</p>
+            <div class="eq-scroll">\[ A^+=\beta\sum_{j=0}^{\infty}(I-\beta A^{\mathrm H}A)^jA^{\mathrm H}. \tag{6.3.55} \]</div>
+            <p>它与第 3 章矩阵幂级数 \((I-B)^{-1}=\sum B^j\) 的形式完全一致，只是这里的"逆"换成了广义逆。</p>
+
+            <h3 class="sub-title" id="ginv-lab-title">动手实验：广义逆计算方法对比台</h3>
+            <p>输入 3×3 矩阵，工具同时用五条路线计算 \(A^+\)：满秩分解（定理 6.15）、Zlobec（定理 6.16）、Greville 逐列（定理 6.17）、一阶迭代（式 6.3.46）与二阶迭代（式 6.3.51，\(\beta=1/\operatorname{tr}(AA^{\mathrm T})\)）。重点观察最后两行的<strong>收敛步数</strong>：秩亏、\(\beta\) 较小时一阶要上百步，二阶通常个位数——定理 6.25 的"平方收敛"直觉。</p>
+            <section class="card lab" data-ginv-lab></section>
+          </section>
+
+          <!-- ================= 习题 6.3 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 6.3（教材 p.334）</h2>
+            <div class="fold-bar no-print" data-fold-tools=".card.task">
+              <button type="button" data-fold="open">全部展开</button>
+              <button type="button" data-fold="close">全部收起</button>
+            </div>
+
+            <article class="card task" id="ex63-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">非奇异 {1}-逆</span></header>
+              <div class="card-body">
+                <p>证明每个方阵有非奇异的 \(\{1\}\)-逆。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>设 \(A\in\C^{n\times n}\)（奇异与否均可），\(\operatorname{rank}A=r\)。取式 (6.3.2) 中的可逆阵 \(P,Q\) 使 \(QAP=\begin{pmatrix}I_r&K\\O&O\end{pmatrix}\)。在定理 6.14 的通式 (6.3.3) 中取 \(L=I_{n-r}\)：</p>
+                  <p>\[ X=P\begin{pmatrix}I_r&O\\O&I_{n-r}\end{pmatrix}Q=PQ. \]</p>
+                  <p>置换阵 \(P\) 与初等阵之积 \(Q\) 均可逆，故 \(X\) 非奇异；由定理 6.14 仍有 \(AXA=A\)，即 \(X\in A\{1\}\)。（长方矩阵没有相应结论——\(X\) 是方阵时对角块才能凑成完整的单位阵。）</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex63-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag">非奇异退化</span></header>
+              <div class="card-body">
+                <p>非奇异矩阵 \(A\) 的 Hermite 标准形是什么？矩阵 \(Q\) 与 \(A\) 的关系如何？置换矩阵 \(P\) 是什么矩阵？由式 (6.3.3) 给出的 \(X\) 是什么？</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(A\) 非奇异时 \(r=n=m\)，Gauss–Jordan 消元可把 \(A\) 直接化为单位阵，故 Hermite 标准形 \(B=I_n\)；由 \(QA=I_n\) 得 \(Q=A^{-1}\)。所有列都是主元列，无需列置换，故 \(P=I_n\)。式 (6.3.3) 中没有非主元块（\(L\) 是空矩阵），于是</p>
+                  <p>\[ X=P\,I_n\,Q=A^{-1}. \]</p>
+                  <p>这再次验证广义逆对非奇异阵退化为通常的逆。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex63-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag tag-hard">五法对照大例题</span></header>
+              <div class="card-body">
+                <p>已知 \(A=\begin{pmatrix}1&0&0&1\\1&1&0&0\\0&1&1&0\\0&0&1&1\end{pmatrix}\)。</p>
+                <p>(1) 求 \(A\) 的 Hermite 标准形，利用式 (6.3.3) 求 \(A\) 的 \(\{1\}\)-逆和 \(\{1,2\}\)-逆；(2) 构造 \(A\) 的满秩分解，利用定理 6.15(5) 求 \(A^+\)；(3) 利用 Zlobec 公式 (6.3.6) 计算 \(A^+\)；(4) 利用 Greville 方法计算 \(A^+\)；(5) 利用定理 6.18 计算 \(A^{(1,2)},A^{(1,2,3)},A^{(1,2,4)}\) 和 \(A^+\)；(6) 矩阵 \(A\) 是上 Hessenberg 矩阵（实为下 Hessenberg 形），根据式 (6.3.23)(6.3.24)(6.3.30)(6.3.36) 计算 \(A^+\)。</p>
+                <details class="solution"><summary><span>查看完整解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>先注意 \(\det A=0\)（沿环列结构可验），\(\operatorname{rank}A=3\)。</p>
+                  <p><strong>(1) Hermite 标准形法。</strong>对 \((A\ \vdots\ I_4)\) 作行变换得</p>
+                  <p>\[ B=\begin{pmatrix}1&0&0&1\\0&1&0&-1\\0&0&1&1\\0&0&0&0\end{pmatrix},\quad Q=\begin{pmatrix}1&0&0&0\\-1&1&0&0\\1&-1&1&0\\-1&1&-1&1\end{pmatrix}, \]</p>
+                  <p>主元列为前 3 列，故 \(P=I_4\)，且 \(QAP=\begin{pmatrix}I_3&K\\O&0\end{pmatrix}\)，\(K=(1,-1,1)^{\mathrm T}\)。由式 (6.3.3)，\(L=(l)\) 为任意数：</p>
+                  <p>\[ X=P\begin{pmatrix}I_3&0\\0&l\end{pmatrix}Q=\begin{pmatrix}1&0&0&0\\-1&1&0&0\\1&-1&1&0\\-l&l&-l&l\end{pmatrix}. \]</p>
+                  <p>取 \(l\ne0\) 得一族非奇异的 \(\{1\}\)-逆（第 1 题结论的实例：\(l=1\) 时 \(X=Q\) 可逆）；取 \(l=0\) 得 \(X=\begin{pmatrix}1&0&0&0\\-1&1&0&0\\1&-1&1&0\\0&0&0&0\end{pmatrix}\)，秩为 3，是 \(\{1,2\}\)-逆。</p>
+                  <p><strong>(2) 满秩分解。</strong>\(F\) 取主元列 1,2,3，\(G\) 取 \(B\) 的前 3 行：</p>
+                  <p>\[ F=\begin{pmatrix}1&0&0\\1&1&0\\0&1&1\\0&0&1\end{pmatrix},\quad G=\begin{pmatrix}1&0&0&1\\0&1&0&-1\\0&0&1&1\end{pmatrix},\quad A=FG. \]</p>
+                  <p>按定理 6.15(5) 计算 \(F^{\mathrm H}AG^{\mathrm H}=(F^{\mathrm H}F)(GG^{\mathrm H})\)（3 阶对称正定阵，求普通逆即可），得</p>
+                  <p>\[ A^+=G^{\mathrm H}(F^{\mathrm H}AG^{\mathrm H})^{-1}F^{\mathrm H}=\frac18\begin{pmatrix}3&3&-1&-1\\-1&3&3&-1\\-1&-1&3&3\\3&-1&-1&3\end{pmatrix}. \]</p>
+                  <p><strong>(3) Zlobec。</strong>计算夹心矩阵</p>
+                  <p>\[ C=A^{\mathrm T}AA^{\mathrm T}=\begin{pmatrix}3&3&1&1\\1&3&3&1\\1&1&3&3\\3&1&1&3\end{pmatrix}, \]</p>
+                  <p>用 Hermite 形法取它的一个 \(\{1\}\)-逆（例如）</p>
+                  <p>\[ C^{(1)}=\begin{pmatrix}\tfrac38&-\tfrac12&\tfrac38&0\\0&\tfrac12&-\tfrac12&0\\-\tfrac18&0&\tfrac38&0\\0&0&0&0\end{pmatrix}, \]</p>
+                  <p>代入式 (6.3.6)：\(A^+=A^{\mathrm T}C^{(1)}A^{\mathrm T}=\frac18\begin{pmatrix}3&3&-1&-1\\-1&3&3&-1\\-1&-1&3&3\\3&-1&-1&3\end{pmatrix}\)，与 (2) 相同；换别的 \(C^{(1)}\) 乘积不变。</p>
+                  <p><strong>(4) Greville。</strong>\(A_1^+=\tfrac12\begin{pmatrix}1&1&0&0\end{pmatrix}\)。第 2 步：\(d_2=\tfrac12,\ c_2=(-\tfrac12,\tfrac12,1,0)^{\mathrm T}\ne0,\ b_2^{\mathrm H}=c_2^+=\tfrac16\begin{pmatrix}-2&2&4&0\end{pmatrix}\)；第 3 步：\(d_3=(-\tfrac13,\tfrac23)^{\mathrm T},\ c_3=(\tfrac13,-\tfrac13,\tfrac13,1)^{\mathrm T}\ne0\)；第 4 步：\(d_4=(1,-1,1)^{\mathrm T},\ c_4=0\)，走第二分支 \(b_4^{\mathrm H}=(1+d_4^{\mathrm T}d_4)^{-1}d_4^{\mathrm T}A_3^+\)。逐次拼接，最终得同一矩阵 \(A^+=\tfrac18(\cdots)\)。</p>
+                  <p><strong>(5) 定理 6.18。</strong>取前 3 行前 3 列为 \(A_{11}\)（行列式为 1，可逆），\(P=Q=I_4\)，且</p>
+                  <p>\[ T=A_{11}^{-1}A_{12}=S=A_{21}A_{11}^{-1}=\begin{pmatrix}1\\-1\\1\end{pmatrix}. \]</p>
+                  <p>代入四个公式：</p>
+                  <p>\[ A^{(1,2)}=\begin{pmatrix}1&0&0&0\\-1&1&0&0\\1&-1&1&0\\0&0&0&0\end{pmatrix}, \]</p>
+                  <p>\[ A^{(1,2,3)}=\frac14\begin{pmatrix}3&1&-1&1\\-2&2&2&-2\\1&-1&1&3\\0&0&0&0\end{pmatrix},\quad A^{(1,2,4)}=\frac14\begin{pmatrix}1&2&-1&0\\-1&2&1&0\\1&-2&3&0\\3&-2&1&0\end{pmatrix}, \]</p>
+                  <p>\[ A^+=\frac18\begin{pmatrix}3&3&-1&-1\\-1&3&3&-1\\-1&-1&3&3\\3&-1&-1&3\end{pmatrix}. \]</p>
+                  <p><strong>(6) Hessenberg 路线。</strong>注意 \(h_{12}=0\)，不满足引理 5 的超级对角非零假设，不能直接套式 (6.3.23)。先作同步行列置换：取新序 \((1,4,3,2)\)（置换阵 \(P_0\)），则</p>
+                  <p>\[ H=P_0AP_0^{\mathrm T}=\begin{pmatrix}1&1&0&0\\0&1&1&0\\0&0&1&1\\1&0&0&1\end{pmatrix}, \]</p>
+                  <p>其超级对角全为 1、严格上下次对角全为 0，满足条件且仍奇异。由式 (6.3.23)(6.3.24) 得 \(x=(1,-1,1,-1)^{\mathrm T}\)、\(y=(-1,1,-1,1)^{\mathrm T}\)（代入 (6.3.25)(6.3.26) 均得 0）。再由式 (6.3.36) 定出全部参数并代入式 (6.3.30) 得 \(H^+\)，最后换回原坐标：</p>
+                  <p>\[ A^+=P_0^{\mathrm T}H^+P_0=\frac18\begin{pmatrix}3&3&-1&-1\\-1&3&3&-1\\-1&-1&3&3\\3&-1&-1&3\end{pmatrix}, \]</p>
+                  <p>与前五法完全一致。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结</h2>
+            <div class="summary-block">
+              <p>计算 \(A^+\) 的路线可按"愿意付什么代价"来选：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>方法</th><th>核心公式</th><th>代价 / 特点</th></tr>
+                  <tr><td>① Hermite 形（定理 6.14）</td><td>\(P\begin{pmatrix}I&O\\O&L\end{pmatrix}Q\)</td><td>仅初等行变换；得一族 \(\{1\}\)-逆，\(L=O\) 得 \(\{1,2\}\)</td></tr>
+                  <tr><td>② 满秩分解（定理 6.15）</td><td>\(G^{\mathrm H}(F^{\mathrm H}AG^{\mathrm H})^{-1}F^{\mathrm H}\)</td><td>只需一个 \(r\) 阶普通逆；最常用直接法</td></tr>
+                  <tr><td>③ Zlobec（定理 6.16）</td><td>\(A^{\mathrm H}(A^{\mathrm H}AA^{\mathrm H})^{(1)}A^{\mathrm H}\)</td><td>只需一个 \(\{1\}\)-逆；与选取无关</td></tr>
+                  <tr><td>④ Greville（定理 6.17）</td><td>\(A_k^+=\begin{pmatrix}A_{k-1}^+-d_kb_k^{\mathrm H}\\b_k^{\mathrm H}\end{pmatrix}\)</td><td>逐列递推，不用任何逆；适合增列更新</td></tr>
+                  <tr><td>⑤ Noble（定理 6.18）</td><td>置换 + \(A_{11}^{-1}\) 的分块公式</td><td>已知非奇异主子阵时方便</td></tr>
+                  <tr><td>⑥ Hessenberg（6.19–6.23）</td><td>参数式 (6.3.30)，限参得各类逆</td><td>选学；结构性矩阵的闭式表达</td></tr>
+                  <tr><td>⑦ 迭代（6.24–6.25）</td><td>\(X_{k+1}=X_k(2I-AX_k)\)；Neumann (6.3.55)</td><td>选学；存储少，\(0&lt;\beta&lt;2/\lambda_1(AA^{\mathrm H})\)</td></tr>
+                </table>
+              </div>
+              <p style="margin-top:12px"><strong>承上启下：</strong>下一节 §6.4 把广义逆投入应用——线性方程组 \(Ax=b\) 的相容性判据、通解、最小二乘解与极小范数最小二乘解都将用 \(A^{(1)}\) 与 \(A^+\) 一句话写出；本节的算法正是那些公式可计算的保证。</p>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>同一个矩阵用 Hermite 形法得到一族 \(\{1\}\)-逆，自由参数为什么恰有 \((n-r)(m-r)\) 个？取哪些参数值能让它非奇异？</li>
+                  <li>Greville 递推中 \(c_k\) 的几何意义是什么？为什么 \(c_k=0\) 时要换用含 \((1+d_k^{\mathrm H}d_k)^{-1}\) 的第二分支？</li>
+                  <li>迭代法中 \(\rho(R_0)&lt;1\) 为什么等价于 \(0&lt;\beta&lt;2/\lambda_1(AA^{\mathrm H})\)？二阶格式每步只多一次矩阵乘，为什么收敛步数能从"上百步"降到"个位数"？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="6.2-penrose-existence.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§6.2 广义逆矩阵的存在、性质及构造方法</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="6.4-linear-systems.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§6.4 广义逆矩阵与线性方程组求解</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

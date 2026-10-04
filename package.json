@@ -1,0 +1,19 @@
+{
+  "name": "matrix-theory",
+  "version": "1.0.0",
+  "private": true,
+  "description": "矩阵论精讲离线教学网页（纯 HTML/CSS/JS，零构建零联网）。本文件仅供「重新拉取 KaTeX」时使用，运行课件不需要 npm。",
+  "keywords": ["matrix-theory", "offline", "katex"],
+  "author": "",
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "scripts": {
+    "check": "node check-katex.js && node check-site.js",
+    "check:offline": "node check-katex.js && node check-site.js",
+    "check:browser": "node check-math.js && node tools/qa/check-features.js",
+    "test": "node check-katex.js && node check-site.js"
+  },
+  "dependencies": {
+    "katex": "^0.18.7"
+  }
+}

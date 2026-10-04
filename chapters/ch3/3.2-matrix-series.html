@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§3.2 矩阵级数 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §3.2：矩阵级数收敛与绝对收敛、四条性质、Cauchy 乘积、Neumann 级数 ΣAᵏ=(I−A)⁻¹、截断误差、矩阵幂级数与纯量幂级数收敛半径">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§3.2 矩阵级数</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="3.2" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 3 章 矩阵分析及其应用</a><span class="sep" aria-hidden="true">/</span>
+            <span>§3.2 矩阵级数</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 3 章 · 矩阵分析及其应用</div>
+            <h1>§3.2 矩阵级数</h1>
+            <p class="lede">幂级数是建立矩阵函数（\(e^A,\sin A,\cos A\)）的依据。本节把数项级数整套搬到矩阵上：<strong>矩阵级数的收敛 = 部分和矩阵序列的极限</strong>，绝对收敛可由范数级数 \(\sum\|A^{(k)}\|\) 判别；最重要的矩阵幂级数——<strong>Neumann 级数</strong> \(\sum A^k\) 在 \(\rho(A)&lt;1\) 时收敛于 \((I-A)^{-1}\)，它把 §2.3 的范数估计升级为精确等式；最后给出矩阵幂级数 \(\sum c_kA^k\) 与纯量级数收敛半径的关系，为下一节矩阵函数开门。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.142–149</strong></span>
+              <span class="chip">建议 <strong>3 学时</strong></span>
+              <span class="chip">定义 <strong>1 个</strong></span>
+              <span class="chip">定理 <strong>3 个</strong></span>
+              <span class="chip">例题 <strong>1 道</strong></span>
+            </div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>用部分和矩阵序列定义矩阵级数的收敛、和与绝对收敛；</li>
+                  <li>用 \(\sum\|A^{(k)}\|\) 收敛判别绝对收敛，运用四条运算性质；</li>
+                  <li>陈述并证明 Neumann 级数 \(\sum_{k=0}^{\infty}A^k=(I-A)^{-1}\) 的充要条件；</li>
+                  <li>用定理 3.5 估计截断（几何）误差；</li>
+                  <li>根据纯量幂级数收敛半径 \(r\) 与 \(\rho(A)\) 判断 \(\sum c_kA^k\) 的敛散。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>绝对收敛的范数判据；</li>
+                      <li>Neumann 级数求和公式；</li>
+                      <li>截断误差估计；</li>
+                      <li>收敛半径与谱半径比较。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>Cauchy 乘积的排法与和为 AB；</li>
+                      <li>必要性用"通项趋于 0 ⇒ A 收敛矩阵"；</li>
+                      <li>\(\rho(A)&gt;r\) 时用相似形证发散。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 3 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>矩阵级数、绝对收敛与四条性质</td><td class="num">p.142–146</td></tr>
+                    <tr><td class="num">2</td><td>Neumann 级数与截断误差</td><td class="num">p.146–148</td></tr>
+                    <tr><td class="num">3</td><td>矩阵幂级数与收敛半径</td><td class="num">p.148–149</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 200" role="img" aria-label="矩阵级数脉络图">
+                    <defs><marker id="m32" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="30" y="30" width="170" height="48"/><rect x="240" y="30" width="180" height="48"/><rect x="460" y="30" width="170" height="48"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="115" y="52">矩阵级数</text><text x="115" y="68" font-size="11" fill="#666">部分和序列极限</text>
+                      <text x="330" y="52">绝对收敛判据</text><text x="330" y="68" font-size="11" fill="#666">Σ‖Aᵏ‖ 收敛</text>
+                      <text x="545" y="52">Neumann 级数</text><text x="545" y="68" font-size="11" fill="#666">ΣAᵏ=(I−A)⁻¹</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m32)"><line x1="200" y1="54" x2="238" y2="54"/><line x1="420" y1="54" x2="458" y2="54"/></g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="650" y="30" width="170" height="48"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="735" y="52">幂级数 ΣcₖAᵏ</text><text x="735" y="68" font-size="11" fill="#666">ρ(A)&lt;r ⇒ 收敛</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m32)"><line x1="630" y1="54" x2="648" y2="54"/></g>
+                    <g class="fm-node" fill="#f3f0fa" stroke="#6b4e9e"><rect x="330" y="130" width="180" height="44"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="420" y="157">通向 §3.3 矩阵函数 eᴬ, sinA</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m32)"><path d="M735 80 C700 115 520 118 470 128" stroke-dasharray="4 4"/></g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、矩阵级数 ================= -->
+          <section class="section" id="sec-series">
+            <h2 class="sec-title"><span class="cn">一</span>矩阵级数的收敛与绝对收敛</h2>
+            <p>矩阵序列所形成的无穷和 \(A^{(0)}+A^{(1)}+\cdots+A^{(k)}+\cdots\) 称为<strong>矩阵级数</strong>，记为
+              <div class="eq-scroll">\[ \sum_{k=0}^{\infty}A^{(k)}=A^{(0)}+A^{(1)}+A^{(2)}+\cdots+A^{(k)}+\cdots \tag{3.2.1} \]</div>
+            </p>
+            <section class="card def" id="def-3-4-5">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 3.4–3.6</span>
+              </header>
+              <div class="card-body">
+                <p>记部分和
+                  <div class="eq-scroll">\[ S^{(N)}=\sum_{k=0}^{N}A^{(k)}. \tag{部分和} \]</div>
+                  若矩阵序列 \(\{S^{(N)}\}\) 收敛且有极限 \(S\)：
+                  <div class="eq-scroll">\[ \lim_{N\to\infty}S^{(N)}=S, \tag{3.2.2} \]</div>
+                  则称级数 (3.2.1) <strong>收敛</strong>，且其和为 \(S\)：
+                  <div class="eq-scroll">\[ S=\sum_{k=0}^{\infty}A^{(k)}. \tag{3.2.3} \]</div>
+                  "和为 \(S\)"按元素理解为
+                  <div class="eq-scroll">\[ \sum_{k=0}^{\infty}a_{ij}^{(k)}=s_{ij}\quad(i=1,\ldots,m;\ j=1,\ldots,n). \tag{3.2.4} \]</div>
+                  若式 (3.2.4) 左端的 <strong>\(mn\) 个数项级数全部绝对收敛</strong>，则称矩阵级数 <strong>绝对收敛</strong>（定义 3.6）。</p>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-3-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 3.2</span>
+              </header>
+              <div class="card-body">
+                <p>已知 \(A^{(k)}=\begin{pmatrix}\dfrac1{2^k}&\dfrac{\pi}{3\cdot4^k}\\[2pt]0&\dfrac{1}{k(k+1)}\end{pmatrix}\)（\(k=1,2,\ldots\)），研究 \(\sum_{k=1}^{\infty}A^{(k)}\) 的收敛性并求和。</p>
+                <details class="proof">
+                  <summary><span>解：逐元素求部分和（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>三个元素分别用等比级数与裂项求和：
+                      \[ S^{(N)}=\begin{pmatrix}
+                      \sum_{k=1}^N\frac1{2^k} & \frac{\pi}{3}\sum_{k=1}^N\frac1{4^k}\\
+                      0 & \sum_{k=1}^N\frac1{k(k+1)}
+                      \end{pmatrix}
+                      =\begin{pmatrix}
+                      1-\Big(\frac12\Big)^N & \frac{\pi}{9}\Big[1-\Big(\frac14\Big)^N\Big]\\
+                      0 & \frac{N}{N+1}
+                      \end{pmatrix}. \]</p>
+                    <p>令 \(N\to\infty\)，由 \((1/2)^N,(1/4)^N\to0,\ N/(N+1)\to1\)：
+                      \[ S=\lim_{N\to\infty}S^{(N)}=\begin{pmatrix}1&\dfrac{\pi}{9}\\[2pt]0&1\end{pmatrix}. \]</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="abs-conv">绝对收敛的判据与四条性质</h3>
+            <div class="grid2">
+              <div class="mini-card"><div class="mc-title">性质 1（换序不影响）</div><p style="margin:0">绝对收敛的矩阵级数必收敛；任意调换各项次序所得级数仍收敛，且其和不变（数项级数 Dirichlet 定理的矩阵版本）。</p></div>
+              <div class="mini-card"><div class="mc-title">性质 2（范数判据）</div><p style="margin:0">\(\sum A^{(k)}\) 绝对收敛 ⇔ 正项级数 \(\sum_{k=0}^{\infty}\|A^{(k)}\|\) 收敛（任一种矩阵范数）。</p></div>
+            </div>
+            <details class="proof" style="background:var(--surface-alt);border:1px solid var(--rule);border-radius:var(--radius-sm);padding:12px 16px;margin:10px 0">
+              <summary style="cursor:pointer;font-family:var(--font-sans);font-weight:700;color:var(--ink-soft)">性质 2 证明思路（点击展开）</summary>
+              <div class="proof-body" style="padding-top:8px">
+                <p>利用元素绝对值与 \(m_1\)-范数的双向控制：
+                  \[ |a_{ij}^{(k)}|\le\|A^{(k)}\|_{m_1},\qquad
+                     \|A^{(k)}\|_{m_1}=\sum_{i,j}|a_{ij}^{(k)}|, \]
+                  一个方向：元素绝对部分和一致有界（&lt; \(M\)）⇒ \(\sum\|A^{(k)}\|_{m_1}\) 的部分和 &lt; \(mnM\)；反方向由比较判别法。再由有限维矩阵范数等价，对任一种范数结论相同。</p>
+              </div>
+            </details>
+            <div class="grid2">
+              <div class="mini-card"><div class="mc-title">性质 3（左乘右乘可提出）</div><p style="margin:0">若 \(\sum A^{(k)}=S\) 收敛（或绝对收敛），则
+                \[ \sum_{k=0}^{\infty}PA^{(k)}Q=P\Big(\sum_{k=0}^{\infty}A^{(k)}\Big)Q=PSQ. \tag{3.2.5} \]
+                绝对收敛时由 \(\|PA^{(k)}Q\|\le\|P\|\|A^{(k)}\|\|Q\|\) 与性质 2 保证。</p></div>
+              <div class="mini-card"><div class="mc-title">性质 4（Cauchy 乘积）</div><p style="margin:0">两个<strong>都绝对收敛</strong>、和分别为 \(A,B\) 的矩阵级数，按项相乘（Cauchy 乘积）
+                \[ A^{(1)}B^{(1)}+\big(A^{(1)}B^{(2)}+A^{(2)}B^{(1)}\big)+\cdots
+                   =\sum_{k=1}^{\infty}\Big(\sum_{i=1}^{k}A^{(i)}B^{(k+1-i)}\Big) \tag{3.2.6} \]
+                绝对收敛，且和为 \(AB\)。</p></div>
+            </div>
+            <p class="muted">性质 4 的关键：取特殊排法后部分和恰为 \(S_1^{(N)}S_2^{(N)}\)，由 §3.1 极限乘法性质得极限 \(AB\)。它是矩阵指数函数恒等式 \(e^Ae^B=e^{A+B}\)（需可交换）的级数依据。</p>
+          </section>
+
+          <!-- ================= 二、Neumann 级数 ================= -->
+          <section class="section" id="sec-neumann">
+            <h2 class="sec-title"><span class="cn">二</span>方阵的幂级数：Neumann 级数</h2>
+            <section class="card thm" id="thm-3-4">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 3.4（Neumann 级数）</span><span class="card-tag">矩阵版几何级数</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">方阵 \(A\) 的幂级数
+                  <div class="eq-scroll">\[ \sum_{k=0}^{\infty}A^k=I+A+A^2+\cdots+A^k+\cdots \tag{3.2.9} \]</div>
+                  <strong>收敛的充要条件是 \(A\) 为收敛矩阵（\(\rho(A)&lt;1\)）</strong>；收敛时其和为
+                  <div class="eq-scroll">\[ \boxed{\ \sum_{k=0}^{\infty}A^k=(I-A)^{-1}\ }. \]</div></p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p><strong>必要性：</strong>级数收敛则通项趋于 0：\(A^k\to O\)，即 \(A\) 是收敛矩阵（§3.1 定义 3.3），由定理 3.2 知 \(\rho(A)&lt;1\)。</p>
+                    <p><strong>充分性：</strong>\(A^k\to O\) ⇒ \(A\) 的特征值模都小于 1 ⇒ \(I-A\) 的特征值 \(1-\lambda_i\) 都不为 0，故 \(I-A\) 可逆。有限等比求和恒等式
+                      \[ (I+A+A^2+\cdots+A^k)(I-A)=I-A^{k+1}, \]
+                      即
+                      \[ I+A+\cdots+A^k=(I-A)^{-1}-A^{k+1}(I-A)^{-1}. \]
+                      当 \(k\to\infty\) 时 \(A^{k+1}(I-A)^{-1}\to O\)（极限乘法性质），故部分和趋于 \((I-A)^{-1}\)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <p>这个公式把数值代数中三件事统一起来：<strong>线性方程组迭代法</strong>（误差算子 \((I-A)^{-1}\)）、<strong>Markov 链的基本矩阵</strong>、以及 §2.3 定理 2.6 的非奇异性判据（那里只有估计，这里在 \(\rho(A)&lt;1\) 下得到精确的逆）。</p>
+
+            <section class="card thm" id="thm-3-5">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 3.5（截断误差 / 余项估计）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">若 \(\|A\|&lt;1\)，则以 \(I+A+\cdots+A^k\) 近似 \((I-A)^{-1}\) 时，
+                  <div class="eq-scroll">\[
+                  \Big\|(I-A)^{-1}-(I+A+A^2+\cdots+A^k)\Big\|
+                  =\Big\|\sum_{i=k+1}^{\infty}A^i\Big\|
+                  \le\frac{\|A\|^{k+1}}{1-\|A\|}. \tag{误差} \]</div>
+                  这是几何级数余项 \(\sum_{i=k+1}^{\infty}r^i=r^{k+1}/(1-r)\) 的矩阵版本（\(0\le r=\|A\|&lt;1\)），是迭代法先验误差估计的基本公式。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="neumann-lab-title">动手实验：Neumann 部分和收敛查看器</h3>
+            <p>改矩阵或切换预设，逐屏看 \(S_N=I+A+\cdots+A^N\) 如何逼近精确值 \((I-A)^{-1}\)；特别试"ρ&lt;1 但 \(\|A\|_1&gt;1\)"的矩阵（如 \(\begin{pmatrix}0&2\\0&0\end{pmatrix}\)，幂零，级数仍收敛）与发散矩阵。</p>
+            <section class="card lab" data-neumann-lab></section>
+          </section>
+
+          <!-- ================= 三、矩阵幂级数与收敛半径 ================= -->
+          <section class="section" id="sec-power-series">
+            <h2 class="sec-title"><span class="cn">三</span>矩阵幂级数与收敛半径</h2>
+            <section class="card thm" id="thm-3-6">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 3.6</span><span class="card-tag">谱半径对收敛半径</span>
+              </header>
+              <div class="card-body">
+                <p>设纯量幂级数
+                  <div class="eq-scroll">\[ f(z)=\sum_{k=0}^{\infty}c_kz^k \tag{3.2.10} \]</div>
+                  的收敛半径为 \(r\)。对 \(n\) 阶方阵 \(A\)：</p>
+                <ol class="axiom-list" style="list-style:none">
+                  <li><span class="n">1</span>若 \(\rho(A)&lt;r\)，则矩阵幂级数
+                    <div class="eq-scroll">\[ \sum_{k=0}^{\infty}c_kA^k \tag{3.2.11} \]</div>
+                    <strong>绝对收敛</strong>；</li>
+                  <li><span class="n">2</span>若 \(\rho(A)&gt;r\)，则该矩阵幂级数<strong>发散</strong>。</li>
+                </ol>
+                <details class="proof">
+                  <summary><span>证明梗概（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p><strong>(1)</strong> 取 \(\varepsilon&gt;0\) 使 \(\rho(A)+\varepsilon&lt;r\)，由定理 2.10 存在范数使 \(\|A\|\le\rho(A)+\varepsilon\)，于是
+                      \[ \|c_kA^k\|\le|c_k|\,\|A\|^k\le|c_k|(\rho(A)+\varepsilon)^k. \]
+                      右端正是绝对收敛的数项级数 \(\sum c_k(\rho(A)+\varepsilon)^k\)（因 \(\rho(A)+\varepsilon&lt;r\)）的项，比较判别 + 性质 2 给出绝对收敛。</p>
+                    <p><strong>(2)</strong> 若 \(\rho(A)&gt;r\)，取模超过 \(r\) 的特征值 \(\lambda_t\) 与对应特征向量。用相似形 \(P^{-1}AP=B\)（上三角，对角元为特征值），\(\sum c_kB^k\) 的第 \(t\) 个对角元就是数项级数 \(\sum c_k\lambda_t^k\)；因 \(|\lambda_t|&gt;r\) 它发散，故矩阵级数发散；再由性质 3，\(\sum c_kA^k=P(\sum c_kB^k)P^{-1}\) 也发散。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0"><strong>推论：</strong>若纯量幂级数在整个复平面上收敛（\(r=+\infty\)，如 \(e^z,\sin z,\cos z\)），则不论 \(A\) 是什么矩阵，矩阵幂级数 (3.2.11) 总绝对收敛。<strong>\(\rho(A)=r\) 时敛散性不定</strong>，须具体分析（边界情形）。</p>
+              </div>
+            </section>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">承上启下</span>
+              </header>
+              <div class="card-body">
+                <p>Neumann 级数正是定理 3.6 取 \(f(z)=1/(1-z)=1+z+z^2+\cdots\)（收敛半径 \(r=1\)）的特例：\(\rho(A)&lt;1\) 时 \(\sum A^k=(I-A)^{-1}=f(A)\)。下一节把同样的构造用于 \(e^z,\sin z\) 等整函数，得到<strong>矩阵函数</strong> \(e^A,\sin A,\cos A\)。</p>
+              </div>
+            </aside>
+          </section>
+
+          <!-- ================= 本节小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结与自检</h2>
+            <div class="summary-block">
+              <p>矩阵级数 = 矩阵部分和序列；判别绝对收敛用范数级数；幂级数敛散只看 \(\rho(A)\) 与收敛半径 \(r\) 的大小。</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>内容</th><th>结论</th></tr>
+                  <tr><td>收敛与和</td><td>\(\sum A^{(k)}=S\Leftrightarrow\) 每个元素级数 \(\sum a_{ij}^{(k)}=s_{ij}\Leftrightarrow S^{(N)}\to S\)</td></tr>
+                  <tr><td>绝对收敛判据</td><td>所有 \(mn\) 个元素级数绝对收敛 ⇔ \(\sum\|A^{(k)}\|\) 收敛（性质 2）</td></tr>
+                  <tr><td>运算性质</td><td>可换序；可提出 \(P,Q\)（式 3.2.5）；两级数 Cauchy 乘积绝对收敛且和为 \(AB\)（式 3.2.6）</td></tr>
+                  <tr><td>Neumann 级数</td><td>\(\rho(A)&lt;1\Leftrightarrow\sum A^k\) 收敛，和为 \((I-A)^{-1}\)；\(\|A\|&lt;1\) 时余项 \(\le\|A\|^{k+1}/(1-\|A\|)\)</td></tr>
+                  <tr><td>一般幂级数</td><td>\(f(z)=\sum c_kz^k\) 收敛半径 \(r\)：\(\rho(A)&lt;r\) 绝对收敛，\(\rho(A)&gt;r\) 发散；\(r=\infty\) 时任意 \(A\) 总绝对收敛</td></tr>
+                </table>
+              </div>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>为什么"绝对收敛"既能用所有元素级数定义，又能用单个范数级数判别？中间靠什么把两者联系起来？</li>
+                  <li>不看书推导 Neumann 级数求和公式：从有限等比恒等式 \((I+\cdots+A^k)(I-A)=I-A^{k+1}\) 出发，说明两端取极限需要哪些已证结论。</li>
+                  <li>\(\sum c_kA^k\) 的敛散为什么由 \(\rho(A)\) 对收敛半径决定，而不是用 \(\|A\|\)？\(\rho(A)=r\) 时为什么不能下结论？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="3.1-matrix-sequences.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§3.1 矩阵序列</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="3.3-matrix-functions.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§3.3 矩阵函数</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

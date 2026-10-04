@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§5.3 对称矩阵特征值的极性 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §5.3：Rayleigh 商及其极性（定理 5.16）、Courant–Fischer 极小极大原理（定理 5.18）、扰动定理（Weyl 型 5.19）、广义 Rayleigh 商与广义极小极大（定理 5.22–5.23）、奇异值的极小极大（定理 5.24–5.26）">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§5.3 对称矩阵特征值的极性</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="5.3" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 5 章 特征值的估计及对称矩阵的极性</a><span class="sep" aria-hidden="true">/</span>
+            <span>§5.3 对称矩阵特征值的极性</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 5 章 · 特征值的估计及对称矩阵的极性</div>
+            <h1>§5.3 对称矩阵特征值的极性</h1>
+            <p class="lede">实对称矩阵的特征值有一个优美的变分刻画：<strong>Rayleigh 商</strong> \(R(x)=x^{\mathrm T}Ax/x^{\mathrm T}x\) 在单位球面上的最小、最大值恰是最小、最大特征值，取到极值的点恰是对应特征向量。把"在全体子空间上取 min–max"推广，就得到 <strong>Courant–Fischer 极小极大原理</strong>——它逐个给出第 \(k\) 个特征值，是特征值扰动理论（Weyl、Hoffman–Wielandt）与奇异值极性的共同出发点，也是 Rayleigh 商迭代、PCA 的理论根基。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.266–277</strong></span>
+              <span class="chip">建议 <strong>4 学时</strong></span>
+              <span class="chip">定义 <strong>2 个</strong></span>
+              <span class="chip">定理 <strong>9 个</strong></span>
+
+              <span class="chip">推论 <strong>2 个</strong></span></div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>陈述 Rayleigh 商的四条性质，证明 \(\min R=\lambda_1,\ \max R=\lambda_n\)；</li>
+                  <li>陈述并理解 Courant–Fischer 原理 \(\lambda_k=\min_{V_k}\max R\)；</li>
+                  <li>用极小极大原理推出扰动界 \(|\lambda_i-\mu_i|\le\|Q\|_2\)；</li>
+                  <li>写出广义 Rayleigh 商及其驻点与广义特征值的关系；</li>
+                  <li>把极小极大原理搬到奇异值：\(\sigma_k=\min_{V_k}\max\|Ax\|_2/\|x\|_2\)。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>定理 5.16 与推论；</li>
+                      <li>Courant–Fischer 原理；</li>
+                      <li>奇异值极小极大。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>"对一切 k 维子空间取 min"的含义；</li>
+                      <li>维数交论证 \(\dim(V_k\cap W_k)\ge1\)；</li>
+                      <li>扰动证明中 ±γI 的半正定技巧。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 4 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>Rayleigh 商性质与定理 5.16</td><td class="num">p.266–268</td></tr>
+                    <tr><td class="num">2</td><td>Courant–Fischer 与扰动定理</td><td class="num">p.269–271</td></tr>
+                    <tr><td class="num">3</td><td>广义 Rayleigh 商与广义极小极大</td><td class="num">p.271–274</td></tr>
+                    <tr><td class="num">4</td><td>奇异值极小极大、习题</td><td class="num">p.274–277</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 200" role="img" aria-label="Rayleigh 极性脉络图">
+                    <defs><marker id="m53" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="30" y="28" width="190" height="50"/><rect x="320" y="28" width="200" height="50"/><rect x="620" y="28" width="190" height="50"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="125" y="50">Rayleigh 商 R(x)</text><text x="125" y="67" font-size="11" fill="#666">min=λ₁，max=λₙ</text>
+                      <text x="420" y="50">Courant–Fischer</text><text x="420" y="67" font-size="11" fill="#666">λₖ=min max / max min</text>
+                      <text x="715" y="50">扰动与奇异值</text><text x="715" y="67" font-size="11" fill="#666">Weyl 型界 / σₖ 极小极大</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m53)"><line x1="220" y1="53" x2="318" y2="53"/><line x1="520" y1="53" x2="618" y2="53"/></g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="230" y="126" width="380" height="48"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13.5" text-anchor="middle">
+                      <text x="420" y="155">广义 Rayleigh 商 xᵀAx/xᵀBx：驻点 ⇔ 广义特征向量</text>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、Rayleigh 商 ================= -->
+          <section class="section" id="sec-rayleigh">
+            <h2 class="sec-title"><span class="cn">一</span>实对称矩阵的 Rayleigh 商</h2>
+            <section class="card def" id="def-5-7">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 5.7</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\) 是 \(n\) 阶实对称矩阵，\(x\in\R^n\)。称
+                  <div class="eq-scroll">\[ R(x)=\frac{x^{\mathrm T}Ax}{x^{\mathrm T}x}\qquad(x\ne\mathbf0) \tag{5.3.1} \]</div>
+                  为矩阵 \(A\) 的 <strong>Rayleigh 商</strong>。</p>
+              </div>
+            </section>
+            <p>它有四条基本性质：</p>
+            <div class="grid2">
+              <div class="mini-card"><div class="mc-title">性质 1 连续性</div><p style="margin:0">\(R(x)\) 是 \(x\) 的连续函数（分子分母都是多项式，分母非零）。</p></div>
+              <div class="mini-card"><div class="mc-title">性质 2 零次齐次</div><p style="margin:0">\(R(\lambda x)=R(x)=\lambda^0R(x)\)（\(\lambda\ne0\)）：伸缩向量不改变商。</p></div>
+              <div class="mini-card"><div class="mc-title">性质 3 射线上为常数</div><p style="margin:0">\(x\in L(x_0)\)（\(x_0\ne0\)）时 \(R(x)\) 是常数——只看方向，与长度无关。</p></div>
+              <div class="mini-card"><div class="mc-title">性质 4 最值存在</div><p style="margin:0">在单位球面 \(S=\{x:\|x\|_2=1\}\)（闭集、有界）上连续函数必取到最小值与最大值。</p></div>
+            </div>
+            <p>由性质 4，考虑极性时只需在单位球面上讨论。把 \(A\) 的特征值按升序排列
+              <div class="eq-scroll">\[ \lambda_1\le\lambda_2\le\cdots\le\lambda_n, \tag{5.3.2} \]</div>
+              对应标准正交特征向量系 \(p_1,\ldots,p_n\)。</p>
+            <section class="card thm" id="thm-5-16">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 5.16（Rayleigh 商的极值）</span>
+              </header>
+              <div class="card-body">
+                <div class="eq-scroll">\[ \min_{x\ne\mathbf0}R(x)=\lambda_1,\qquad \max_{x\ne\mathbf0}R(x)=\lambda_n. \tag{5.3.3} \]</div>
+                <details class="proof">
+                  <summary><span>证明（按特征基展开，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>任取 \(x=c_1p_1+\cdots+c_np_n\)（系数不全为零），利用 \(Ap_i=\lambda_ip_i\) 与正交性：
+                      \[ Ax=\sum c_i\lambda_ip_i,\quad x^{\mathrm T}Ax=\sum c_i^2\lambda_i,\quad x^{\mathrm T}x=\sum c_i^2. \]</p>
+                    <p>令 \(k_i=c_i^2/\sum c_j^2\)（非负且和为 1），则
+                      \[ R(x)=k_1\lambda_1+\cdots+k_n\lambda_n \tag{5.3.4} \]</p>
+                    <p>是特征值的凸组合，故 \(\lambda_1\le R(x)\le\lambda_n\)；取 \(x=p_1,p_n\) 分别取等，即得 (5.3.3)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p><strong>推论 1（教材式 (5.3.5)）：</strong>在 \(\|x\|_2=1\) 上，\(p_1,p_n\) 分别是 \(R\) 的极小点与极大点：\(R(p_1)=\lambda_1,\ R(p_n)=\lambda_n\)。</p>
+                <p style="margin-bottom:0"><strong>推论 2：</strong>若 \(\lambda_1=\cdots=\lambda_k\)（\(1\le k\le n\)），则在单位球面上 \(R\) 的全体极小点为
+                  <div class="eq-scroll">\[ \beta_1p_1+\cdots+\beta_kp_k,\quad \beta_1^2+\cdots+\beta_k^2=1. \tag{5.3.6} \]</div>
+                  即极小点集是整个特征子空间与单位球面的交。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-5-17">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/></svg></span>
+                <span class="card-label">定理 5.17（限制在特征子空间段上）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(x\in L(p_r,p_{r+1},\ldots,p_s)\)（\(1\le r\le s\le n\)），则
+                  <div class="eq-scroll">\[ \min_{x\ne\mathbf0}R(x)=\lambda_r,\qquad \max_{x\ne\mathbf0}R(x)=\lambda_s. \tag{5.3.7} \]</div>
+                  证明与定理 5.16 相同，只是凸组合 (5.3.4) 中只出现 \(\lambda_r,\ldots,\lambda_s\)。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="rayleigh-lab-title">动手实验：Rayleigh 商曲线</h3>
+            <p>改 2×2 对称矩阵，工具在单位圆上扫出 \(R(\theta)\) 曲线：最低点恰为 \(\lambda_1\)、最高点恰为 \(\lambda_2\)，且取在两个特征方向上——定理 5.16 的直观图。</p>
+            <section class="card lab" data-rayleigh-lab></section>
+          </section>
+
+          <!-- ================= 二、Courant–Fischer ================= -->
+          <section class="section" id="sec-courant">
+            <h2 class="sec-title"><span class="cn">二</span>极小极大原理（Courant–Fischer）</h2>
+            <p>定理 5.16 只给出首尾两个特征值。要逐个刻画第 \(k\) 个，需要在<strong>子空间族</strong>上取极值。</p>
+            <section class="card thm" id="thm-5-18">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></span>
+                <span class="card-label">定理 5.18（Courant–Fischer）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设实对称矩阵 \(A\) 的特征值按 (5.3.2) 排列，则第 \(k\) 个特征值
+                  <div class="eq-scroll">\[ \lambda_k=\min_{V_k}\ \max\{\,x^{\mathrm T}Ax\mid x\in V_k,\ \|x\|_2=1\,\}, \tag{5.3.8} \]</div>
+                  其中 \(V_k\) 取遍 \(\R^n\) 的一切 \(k\) 维子空间（\(1\le k\le n\)）。</p>
+                <details class="proof">
+                  <summary><span>证明（维数交论证，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p><strong>下界（≥）：</strong>对任意 \(k\) 维子空间 \(V_k\)，取 \(W_k=L(p_k,p_{k+1},\ldots,p_n)\)（维数 \(n-k+1\)）。由维数公式
+                      \[ \dim(V_k\cap W_k)\ge k+(n-k+1)-n=1, \]</p>
+                    <p>故存在单位向量 \(x_0\in V_k\cap W_k\)。它在 \(W_k\) 中可写为 \(x_0=c_kp_k+\cdots+c_np_n\)（\(\sum_{i\ge k}c_i^2=1\)），于是
+                      \[ x_0^{\mathrm T}Ax_0=c_k^2\lambda_k+\cdots+c_n^2\lambda_n\ge\lambda_k, \]</p>
+                    <p>从而 \(\max_{x\in V_k,\|x\|=1}x^{\mathrm T}Ax\ge x_0^{\mathrm T}Ax_0\ge\lambda_k\)；由 \(V_k\) 任意性，\(\min_{V_k}\max\ge\lambda_k\)。</p>
+                    <p><strong>上界（≤）：</strong>取 \(V_k^0=L(p_1,\ldots,p_k)\)，其中任一单位向量 \(x=c_1p_1+\cdots+c_kp_k\) 满足 \(x^{\mathrm T}Ax\le\lambda_k\)，故该子空间上的 max 恰为 \(\lambda_k\)，min 不超过它。</p>
+                    <p class="qed">□ 证毕（两个方向合并即 (5.3.8)）</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0">对偶地还有<strong>极大极小</strong>形式 \(\lambda_k=\max_{V_{n-k+1}}\min\{\ldots\}\)。称 (5.3.8) 型为<strong>极小极大原理</strong>，对偶形式为<strong>极大极小原理</strong>。它的价值在于：<strong>不依赖特征向量</strong>就用变分语言定义了第 \(k\) 个特征值，因此可以直接用于扰动分析。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-5-19">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/></svg></span>
+                <span class="card-label">定理 5.19（对称扰动界，Weyl 型）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设实对称矩阵 \(A\) 与 \(A+Q\) 的特征值分别为 \(\lambda_1\le\cdots\le\lambda_n\) 与 \(\mu_1\le\cdots\le\mu_n\)，则
+                  <div class="eq-scroll">\[ |\lambda_i-\mu_i|\le\|Q\|_2\quad(i=1,\ldots,n). \tag{5.3.11} \]</div></p>
+                <details class="proof">
+                  <summary><span>证明思路（±γI 半正定技巧，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>令 \(\gamma=\|Q\|_2\)，则 \(\gamma I-Q\) 与 \(\gamma I+Q\) 都半正定（\(Q\) 的特征值都在 \([-\gamma,\gamma]\) 内）。于是 \(A+Q+\gamma I\) 的特征值为 \(\mu_i+\gamma\)，对它用 Courant–Fischer：
+                      \[ \mu_i+\gamma=\min_{V_i}\max x^{\mathrm T}(A+Q+\gamma I)x\ge\min_{V_i}\max x^{\mathrm T}Ax=\lambda_i, \]</p>
+                    <p>得 \(\lambda_i-\mu_i\le\gamma\)；同理用 \(A+Q-\gamma I\)（特征值 \(\mu_i-\gamma\)）得 \(\mu_i-\lambda_i\le\gamma\)。合并即 (5.3.11)。</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0"><strong>意义：</strong>对称矩阵的特征值对扰动是<strong> Lipschitz 稳定</strong>的——第 \(i\) 个特征值的移动不超过扰动的谱范数。另有两个不加证明的著名加强：<strong>Hoffman–Wielandt 定理</strong>（\(\sum(\lambda_i-\mu_i)^2\le\|Q\|_F^2\) 型）与 <strong>Lidskii–Wielandt 定理</strong>（特征值差向量落在排列凸包中）。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 三、广义 Rayleigh 商 ================= -->
+          <section class="section" id="sec-generalized">
+            <h2 class="sec-title"><span class="cn">三</span>广义特征值的极小极大原理</h2>
+            <section class="card def" id="def-5-8">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 5.8：广义 Rayleigh 商</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A,B\) 为 \(n\) 阶实对称矩阵且 \(B\) 正定，\(x\in\R^n\)。称
+                  <div class="eq-scroll">\[ R(x)=\frac{x^{\mathrm T}Ax}{x^{\mathrm T}Bx}\qquad(x\ne\mathbf0) \tag{5.3.12} \]</div>
+                  为 \(A\) 相对于 \(B\) 的<strong>广义 Rayleigh 商</strong>。它与普通 Rayleigh 商有相同的四条性质，故只需在椭球面 \(S_B=\{x:x^{\mathrm T}Bx=1\}\) 上讨论。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-5-22">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/></svg></span>
+                <span class="card-label">定理 5.22（驻点 ⇔ 广义特征向量）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">非零向量 \(x_0\) 是 \(R(x)\) 的驻点的充要条件是：\(x_0\) 为 \(Ax=\lambda Bx\) 的属于特征值 \(\lambda\) 的特征向量。</p>
+                <details class="proof">
+                  <summary><span>证明（商法则求导，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>把 \((x^{\mathrm T}Bx)R(x)=x^{\mathrm T}Ax\) 两端对 \(x\) 求梯度：
+                      \[ 2BxR(x)+(x^{\mathrm T}Bx)\frac{\mathrm dR}{\mathrm dx}=2Ax
+                         \ \Longrightarrow\
+                         \frac{\mathrm dR}{\mathrm dx}=\frac{2}{x^{\mathrm T}Bx}\big[Ax-R(x)Bx\big]. \tag{5.3.13} \]</p>
+                    <p>驻点处梯度为零 ⇒ \(Ax_0=R(x_0)Bx_0\)，即 \(x_0\) 是属于 \(\lambda=R(x_0)\) 的广义特征向量；反向代入即梯度为零。</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0"><strong>推论：</strong>若 \(\tilde x\) 是 \(Ax=\lambda Bx\) 的特征向量，则 \(R(\tilde x)\) 就是对应的特征值——广义特征值也是广义 Rayleigh 商的驻点值。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-5-23">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></span>
+                <span class="card-label">定理 5.23（广义极小极大）</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(V_k\) 为 \(\R^n\) 中任一 \(k\) 维子空间，则广义特征值问题 (5.2.1) 的第 \(k\) 个与第 \(n-k+1\) 个特征值满足
+                  <div class="eq-scroll">\[ \lambda_k=\min_{V_k}\big[\max_{0\ne x\in V_k}R(x)\big], \tag{5.3.14} \]</div>
+                  <div class="eq-scroll">\[ \lambda_{n-k+1}=\max_{V_k}\big[\min_{0\ne x\in V_k}R(x)\big]. \tag{5.3.15} \]</div>
+                </p>
+                <details class="proof">
+                  <summary><span>证明思路（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>与定理 5.18 完全平行，只需把标准正交基换成<strong>按 \(B\) 标准正交</strong>的特征向量系 \(p_1,\ldots,p_n\)（§5.2），此时 \(x^{\mathrm T}Bx=\sum c_i^2\)、\(x^{\mathrm T}Ax=\sum c_i^2\lambda_i\)，商又化为凸组合之比
+                      \[ R(x)=\frac{l_1^2\lambda_1+\cdots+l_k^2\lambda_k}{l_1^2+\cdots+l_k^2}\le\lambda_k, \]</p>
+                    <p>维数交论证同上。对 \(-A\) 应用 (5.3.14)（其特征值升序为 \(-\lambda_n,\ldots,-\lambda_1\)）即得 (5.3.15)。</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0"><strong>推论 1/2：</strong>取 \(B=I\) 即得普通特征值的极小极大/极大极小形式 (5.3.14)′、(5.3.15)′、(5.3.18)、(5.3.19)；定理 5.18 正是定理 5.23 在 \(B=I\) 时的特例。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 四、奇异值的极小极大 ================= -->
+          <section class="section" id="sec-singular">
+            <h2 class="sec-title"><span class="cn">四</span>矩阵奇异值的极小极大性质</h2>
+            <p>实矩阵 \(A\) 的奇异值与半正定对称阵 \(A^{\mathrm T}A\) 的特征值由
+              <div class="eq-scroll">\[ \sigma(A)=\sqrt{\lambda(A^{\mathrm T}A)} \tag{5.3.20} \]</div>
+              联系，因此把极小极大原理搬到 \(A^{\mathrm T}A\) 上即得奇异值的变分刻画。</p>
+            <section class="card thm" id="thm-5-24">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/></svg></span>
+                <span class="card-label">定理 5.24（奇异值极小极大）</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A\in\R_r^{m\times n}\) 的奇异值升序为
+                  <div class="eq-scroll">\[ 0=\sigma_1=\cdots=\sigma_{n-r}&lt;\sigma_{n-r+1}\le\cdots\le\sigma_n, \tag{5.3.21} \]</div>
+                  则第 \(k\) 个与第 \(n-k+1\) 个奇异值满足
+                  <div class="eq-scroll">\[ \sigma_k=\min_{V_k}\Big(\max_{0\ne x\in V_k}\frac{\|Ax\|_2}{\|x\|_2}\Big), \tag{5.3.22} \]</div>
+                  <div class="eq-scroll">\[ \sigma_{n-k+1}=\max_{V_k}\Big(\min_{0\ne x\in V_k}\frac{\|Ax\|_2}{\|x\|_2}\Big). \tag{5.3.23} \]</div>
+                </p>
+                <details class="proof">
+                  <summary><span>证明思路（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>\(\|Ax\|_2/\|x\|_2=\sqrt{R_{A^{\mathrm T}A}(x)}\)，而 \(A^{\mathrm T}A\) 的特征值升序为 \(0=\lambda_1=\cdots=\lambda_{n-r}&lt;\lambda_{n-r+1}\le\cdots\)，且 \(\sigma_i=\sqrt{\lambda_i}\)。对 \(A^{\mathrm T}A\) 用定理 5.23 推论 1 的 (5.3.14)′ 再开方即 (5.3.22)；(5.3.15)′ 同理得 (5.3.23)。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <section class="card thm" id="thm-5-25">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/></svg></span>
+                <span class="card-label">定理 5.25（奇异值扰动界）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\) 与 \(A+Q\) 的奇异值升序分别为 \(\sigma_1\le\cdots\le\sigma_n\) 与 \(\tau_1\le\cdots\le\tau_n\)，则
+                  <div class="eq-scroll">\[ |\sigma_i-\tau_i|\le\|Q\|_2\quad(i=1,\ldots,n). \tag{5.3.26} \]</div>
+                  证明与定理 5.19 相同：对 \((A+Q)^{\mathrm T}(A+Q)\) 与 \(A^{\mathrm T}A\) 用极小极大，中间夹一个 \(\|Qx\|_2\le\|Q\|_2\|x\|_2\)。<strong>意义：</strong>奇异值的计算数值稳定——扰动只引起同量级的变化，这是 SVD 在数值算法中可靠的根本原因。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-5-26">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></span>
+                <span class="card-label">定理 5.26（奇异值版 Hoffman–Wielandt 型）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">记 \(u=(\sigma_1,\ldots,\sigma_n)^{\mathrm T}\)、\(v=(\tau_1,\ldots,\tau_n)^{\mathrm T}\)、\(w=(\delta_1,\ldots,\delta_n)^{\mathrm T}\)（\(\delta_i\) 为 \(Q\) 的奇异值），则
+                  <div class="eq-scroll">\[ \|u-v\|_2\le\|w\|_2. \]</div>
+                  即奇异值向量之差不超过扰动矩阵的奇异值向量（Frobenius 范数意义下的 Hoffman–Wielandt 不等式）。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 习题 5.3 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 5.3（共 3 题）</h2>
+            <div class="ex-toolbar">
+              <span data-fold-tools="details.solution">
+                <button type="button" data-fold="open">全部展开解答</button>
+                <button type="button" data-fold="close">全部收起</button>
+              </span>
+            </div>
+
+            <article class="card task" id="ex53-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">Rayleigh 差界</span></header>
+              <div class="card-body">
+                <p>设实对称矩阵 \(A,B\) 的特征值分别为 \(\lambda_1\le\cdots\le\lambda_n\) 与 \(\mu_1\le\cdots\le\mu_n\)。若对任何单位向量 \(x\) 恒有 \(|x^{\mathrm T}(B-A)x|\le\varepsilon\)（\(\varepsilon&gt;0\)），证明 \(|\mu_k-\lambda_k|\le\varepsilon\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>令 \(Q=B-A\)，条件即 \(\|Q\|_2=\max_{\|x\|=1}|x^{\mathrm T}Qx|\le\varepsilon\)（实对称矩阵的谱范数等于 Rayleigh 商绝对值的最大值的上界；对称时 \(\|Q\|_2=\max|\lambda(Q)|=\max_{\|x\|=1}|x^{\mathrm T}Qx|\)）。直接套用定理 5.19 即得 \(|\mu_k-\lambda_k|\le\|Q\|_2\le\varepsilon\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex53-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag tag-mid">Weyl 定理</span></header>
+              <div class="card-body">
+                <p>（Weyl）设实对称矩阵 \(A,A+Q,Q\) 的特征值分别为 \(\lambda_1\le\cdots\le\lambda_n\)、\(\mu_1\le\cdots\le\mu_n\)、\(\gamma_1\le\cdots\le\gamma_n\)。证明
+                  \[ \lambda_i+\gamma_1\le\mu_i\le\lambda_i+\gamma_n\quad(i=1,\ldots,n). \]</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>对任意单位 \(x\)：\(\gamma_1\le x^{\mathrm T}Qx\le\gamma_n\)（定理 5.16 应用于 \(Q\)）。由 Courant–Fischer（极小极大）：
+                    \[ \mu_i=\min_{V_i}\max_{x\in V_i,\|x\|=1}x^{\mathrm T}(A+Q)x
+                       \le\min_{V_i}\max\big(x^{\mathrm T}Ax+\gamma_n\big)=\lambda_i+\gamma_n; \]</p>
+                  <p>同理下界用 \(\gamma_1\)：\(\mu_i\ge\lambda_i+\gamma_1\)。即 Weyl 不等式——它比定理 5.19 更细（用 \(Q\) 的首尾特征值而非谱范数）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex53-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag">正定扰动使特征值增大</span></header>
+              <div class="card-body">
+                <p>在第 2 题条件下，再设 \(Q\) 正定，证明 \(\mu_i&gt;\lambda_i\)（\(i=1,\ldots,n\)）。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(Q\) 正定 ⇒ 其最小特征值 \(\gamma_1&gt;0\)。由第 2 题 \(\mu_i\ge\lambda_i+\gamma_1&gt;\lambda_i\)。物理意义：给刚度矩阵加一个正定扰动（加固结构），所有固有频率（特征值）都升高。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 本节小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结与自检</h2>
+            <div class="summary-block">
+              <p>对称矩阵的每个特征值都有一个变分定义，这使扰动分析成为可能：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>结果</th><th>内容</th></tr>
+                  <tr><td>Rayleigh 商 (5.3.1)</td><td>\(R(x)=x^{\mathrm T}Ax/x^{\mathrm T}x\)；连续、零次齐次、射线上常数、球面上取到最值</td></tr>
+                  <tr><td>定理 5.16</td><td>\(\min R=\lambda_1,\ \max R=\lambda_n\)；极值点是特征向量（推论 1、2）</td></tr>
+                  <tr><td>定理 5.17</td><td>限制在 \(L(p_r,\ldots,p_s)\) 上：\(\min R=\lambda_r,\max R=\lambda_s\)</td></tr>
+                  <tr><td><strong>Courant–Fischer (5.3.8)</strong></td><td>\(\lambda_k=\min_{V_k}\max_{\|x\|=1,x\in V_k}x^{\mathrm T}Ax\)；对偶为极大极小</td></tr>
+                  <tr><td>定理 5.19</td><td>\(|\lambda_i(A)-\lambda_i(A+Q)|\le\|Q\|_2\)；Hoffman–Wielandt / Lidskii–Wielandt 更强</td></tr>
+                  <tr><td>广义 (5.3.12)</td><td>\(R(x)=x^{\mathrm T}Ax/x^{\mathrm T}Bx\)；驻点 ⇔ 广义特征向量（5.22）；极小极大 (5.23)</td></tr>
+                  <tr><td>奇异值 (5.3.20–23)</td><td>\(\sigma_k=\min_{V_k}\max\|Ax\|_2/\|x\|_2\)；扰动界 \(|\sigma_i-\tau_i|\le\|Q\|_2\)（数值稳定）</td></tr>
+                </table>
+              </div>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>为什么 Rayleigh 商能"只看方向"？性质 2、3 与"只在单位球面讨论"之间是什么关系？</li>
+                  <li>Courant–Fischer 证明中 \(\dim(V_k\cap W_k)\ge1\) 这一步用的是什么公式？为什么它能保证下界方向的不等式？</li>
+                  <li>定理 5.19 的证明里为什么要同时用 \(+Q+\gamma I\) 和 \(+Q-\gamma I\)？只用一个能得到什么？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="5.2-generalized-eigenproblem.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§5.2 广义特征值问题</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="5.4-kronecker-product.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§5.4 矩阵的直积及其应用（选学）</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§3.3 矩阵函数 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §3.3：矩阵函数的幂级数定义、eA/sinA/cosA、可交换时的指数律、四种求法（Jordan 标准形、待定系数、数项级数、对角形）、矩阵函数的 Jordan 广义定义">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§3.3 矩阵函数</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="3.3" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 3 章 矩阵分析及其应用</a><span class="sep" aria-hidden="true">/</span>
+            <span>§3.3 矩阵函数</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 3 章 · 矩阵分析及其应用</div>
+            <h1>§3.3 矩阵函数</h1>
+            <p class="lede">把一元函数 \(f(z)\) 的自变量从数换成矩阵，就得到<strong>矩阵函数</strong> \(f(A)\)。当 \(f\) 能展开为幂级数（如 \(e^z,\sin z,\cos z\)，收敛半径 \(+\infty\)），直接把 \(z\) 替换成 \(A\) 即可；对 \(1/z,\ln z,\sqrt z\) 这类无法在原点展开的函数，则借助 <strong>Jordan 标准形与各阶导数</strong>给出广义定义。本节给出定义、指数律与四种计算方法，是求解线性微分方程组 \(x'=Ax\) 的直接工具。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.149–163</strong></span>
+              <span class="chip">建议 <strong>4 学时</strong></span>
+              <span class="chip">定义 <strong>2 个</strong></span>
+              <span class="chip">定理 <strong>1 个</strong></span>
+              <span class="chip">例题 <strong>4 道</strong></span>
+
+              <span class="chip">推论 <strong>2 个</strong></span></div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>用幂级数定义 \(e^A,\sin A,\cos A\)，写出三者的级数表达式；</li>
+                  <li>掌握指数律 \(AB=BA\Rightarrow e^Ae^B=e^{A+B}\) 及其推论；</li>
+                  <li>知道 \(e^Ae^B=e^{A+B}\) 一般不成立并能举出反例；</li>
+                  <li>用四种方法计算 \(f(A)\)：Jordan 标准形、待定系数、数项级数、对角形；</li>
+                  <li>掌握 Jordan 块公式 \(f(J_i)\) 中超对角元为 \(\dfrac{1}{l!}f^{(l)}(\lambda_i)\)；</li>
+                  <li>理解广义定义为何能处理 \(1/z,\ln z,\sqrt z\)。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>\(e^A,\sin A,\cos A\) 的级数；</li>
+                      <li>Jordan 块上的函数值；</li>
+                      <li>待定系数法；</li>
+                      <li>指数律条件。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>超对角元要用到导数 \(f'(\lambda)\)；</li>
+                      <li>用首一多项式 \(\psi\)（最小/特征多项式）降次；</li>
+                      <li>不可交换矩阵指数不合并。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 4 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>定义 3.7、三个基本矩阵函数、指数律</td><td class="num">p.149–152</td></tr>
+                    <tr><td class="num">2</td><td>四种求法（Jordan/待定系数/级数/对角形）</td><td class="num">p.153–159</td></tr>
+                    <tr><td class="num">3</td><td>广义定义与例 3.8、3.9</td><td class="num">p.160–162</td></tr>
+                    <tr><td class="num">4</td><td>例题综合与习题</td><td class="num">p.154–163</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 210" role="img" aria-label="矩阵函数脉络图">
+                    <defs><marker id="m33" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="20" y="26" width="170" height="48"/><rect x="230" y="26" width="180" height="48"/><rect x="450" y="26" width="170" height="48"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="105" y="48">整函数幂级数</text><text x="105" y="65" font-size="11" fill="#666">eᶻ, sin z, cos z（r=∞）</text>
+                      <text x="320" y="48">替换 z → A</text><text x="320" y="65" font-size="11" fill="#666">eᴬ, sin A, cos A</text>
+                      <text x="535" y="48">指数律（可交换）</text><text x="535" y="65" font-size="11" fill="#666">AB=BA ⇒ eᴬeᴮ=eᴬ⁺ᴮ</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m33)"><line x1="190" y1="50" x2="228" y2="50"/><line x1="410" y1="50" x2="448" y2="50"/></g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="230" y="128" width="380" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="420" y="150">四种求法：Jordan 形 · 待定系数 · 数项级数 · 对角形</text>
+                      <text x="420" y="169" font-size="11.5" fill="#666">Jordan 块 f(Jᵢ)：超对角元 f⁽ˡ⁾(λᵢ)/l!（广义定义可处理 1/z, ln z, √z）</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m33)"><path d="M320 76 C340 105 380 115 395 126" stroke-dasharray="4 4"/></g>
+                    <g class="fm-node" fill="#f3f0fa" stroke="#6b4e9e"><rect x="650" y="26" width="170" height="48"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="735" y="48">§3.5 应用</text><text x="735" y="65" font-size="11" fill="#666">x′=Ax 的解 eᴬᵗc</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m33)"><line x1="620" y1="50" x2="648" y2="50"/></g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、矩阵函数的定义 ================= -->
+          <section class="section" id="sec-definition">
+            <h2 class="sec-title"><span class="cn">一</span>矩阵函数的定义与性质</h2>
+            <section class="card def" id="def-3-7">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 3.7</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设一元函数 \(f(z)\) 能展开为收敛半径 \(r&gt;0\) 的幂级数
+                  <div class="eq-scroll">\[ f(z)=\sum_{k=0}^{\infty}c_kz^k\qquad(|z|&lt;r). \tag{3.3.1} \]</div>
+                  当 \(n\) 阶矩阵 \(A\) 的谱半径 \(\rho(A)&lt;r\) 时，把收敛的矩阵幂级数的和称为<strong>矩阵函数</strong>，记为 \(f(A)\)：
+                  <div class="eq-scroll">\[ f(A)=\sum_{k=0}^{\infty}c_kA^k. \tag{3.3.2} \]</div></p>
+              </div>
+            </section>
+            <p>下列整函数（在整个复平面收敛，\(r=\infty\)）对<strong>任意</strong>方阵 \(A\) 都定义了矩阵函数：
+              <div class="eq-scroll">\[ e^z=1+\frac{z}{1!}+\frac{z^2}{2!}+\frac{z^3}{3!}+\cdots,\quad
+                 \cos z=1-\frac{z^2}{2!}+\frac{z^4}{4!}-\cdots,\quad
+                 \sin z=z-\frac{z^3}{3!}+\frac{z^5}{5!}-\cdots, \]</div>
+            </p>
+            <div class="eq-scroll">\[
+              e^A=I+A+\frac{1}{2!}A^2+\frac{1}{3!}A^3+\cdots \tag{3.3.3}
+            \]</div>
+            <div class="eq-scroll">\[
+              \cos A=I-\frac{1}{2!}A^2+\frac{1}{4!}A^4-\cdots \tag{3.3.4}
+            \]</div>
+            <div class="eq-scroll">\[
+              \sin A=A-\frac{1}{3!}A^3+\frac{1}{5!}A^5-\cdots \tag{3.3.5}
+            \]</div>
+            <p>式 (3.3.3) 称<strong>矩阵指数函数</strong>，(3.3.4)(3.3.5) 称<strong>矩阵三角函数</strong>。由级数可直接推出 Euler 公式与奇偶性：
+              <div class="eq-scroll">\[
+              \left.
+              \begin{aligned}
+              &amp;e^{\mathrm jA}=\cos A+\mathrm j\sin A,\qquad
+               \cos A=\tfrac12(e^{\mathrm jA}+e^{-\mathrm jA}),\\
+              &amp;\sin A=\tfrac{1}{2\mathrm j}(e^{\mathrm jA}-e^{-\mathrm jA}),\\
+              &amp;\cos(-A)=\cos A,\qquad \sin(-A)=-\sin A
+              \end{aligned}
+              \right\}\tag{3.3.6}
+              \]</div>
+
+            <h3 class="sub-title" id="exp-law">指数律成立的条件（定理 3.7）</h3>
+            <p>数的指数满足 \(e^{z_1}e^{z_2}=e^{z_1+z_2}\)，但<strong>矩阵情形一般不再成立</strong>。</p>
+            <section class="card thm" id="thm-3-7">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 3.7</span><span class="card-tag">可交换 ⇔ 指数可合并</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">如果 \(AB=BA\)，则
+                  <div class="eq-scroll">\[ e^Ae^B=e^Be^A=e^{A+B}. \]</div></p>
+                <details class="proof">
+                  <summary><span>证明（Cauchy 乘积，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>由 §3.2 性质 4，两个绝对收敛级数可按 Cauchy 乘积相乘；当 \(AB=BA\) 时二项式定理成立：
+                      \[ e^Ae^B=\sum_{k=0}^{\infty}\sum_{i=0}^{k}\frac{A^i}{i!}\frac{B^{k-i}}{(k-i)!}
+                         =\sum_{k=0}^{\infty}\frac{1}{k!}\sum_{i=0}^{k}\mathrm C_k^iA^iB^{k-i}
+                         =\sum_{k=0}^{\infty}\frac{(A+B)^k}{k!}=e^{A+B}. \]</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p><strong>推论 1：</strong>\(e^Ae^{-A}=e^{-A}e^A=I\)，即 \((e^A)^{-1}=e^{-A}\)（\(e^A\) 永远可逆）。<br>
+                  <strong>推论 2：</strong>\((e^A)^m=e^{mA}\)（\(m\) 为整数）。</p>
+              </div>
+            </section>
+            <section class="card ex" id="exm-3-3">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 3.3</span><span class="card-tag">三角恒等式（可交换时）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(AB=BA\)，则矩阵也有
+                  <div class="eq-scroll">\[
+                  \left.
+                  \begin{aligned}
+                  \cos(A+B)&amp;=\cos A\cos B-\sin A\sin B,\\
+                  \cos 2A&amp;=\cos^2 A-\sin^2 A,\\
+                  \sin(A+B)&amp;=\sin A\cos B+\cos A\sin B,\\
+                  \sin 2A&amp;=2\sin A\cos A
+                  \end{aligned}
+                  \right\}\tag{3.3.8}
+                  \]</div>
+                  由 Euler 公式 (3.3.6) 与定理 3.7 直接得到。</p>
+              </div>
+            </section>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">反例：eᴬeᴮ ≠ eᴬ⁺ᴮ（教材 p.151）</span>
+              </header>
+              <div class="card-body">
+                <p>取
+                  \[ A=\begin{pmatrix}1&1\\0&0\end{pmatrix},\quad B=\begin{pmatrix}1&-1\\0&0\end{pmatrix}, \]
+                  则 \(A^2=A,\ B^2=B\)，故 \(e^A=I+(e-1)A=\begin{pmatrix}e&e-1\\0&1\end{pmatrix}\)，\(e^B=I+(e-1)B=\begin{pmatrix}e&1-e\\0&1\end{pmatrix}\)，二者乘积与 \(e^{A+B}\) 不相等：
+                  \[ e^Ae^B=\begin{pmatrix}e^2&-(e-1)^2\\0&1\end{pmatrix},\qquad
+                     e^{A+B}=\begin{pmatrix}e^2&0\\0&1\end{pmatrix}. \]
+                  <strong>教训：矩阵指数相加前必须先验证可交换。</strong></p>
+              </div>
+            </aside>
+          </section>
+          <!-- ================= 二、矩阵函数值的求法 ================= -->
+          <section class="section" id="sec-methods">
+            <h2 class="sec-title"><span class="cn">二</span>矩阵函数值的四种求法</h2>
+
+            <h3 class="sub-title" id="jordan-method">1. Jordan 标准形法（最一般）</h3>
+            <p>设 \(A\) 的 Jordan 标准形为 \(J\)，\(P^{-1}AP=J=\diag(J_1,\ldots,J_s)\)，其中
+              \[ J_i=\begin{pmatrix}
+              \lambda_i&1&&\\&\lambda_i&\ddots&\\&&\ddots&1\\&&&\lambda_i
+              \end{pmatrix}_{m_i\times m_i}. \]
+              由 \(A=PJP^{-1}\Rightarrow A^k=PJ^kP^{-1}\)，代入幂级数得
+              <div class="eq-scroll">\[ f(A)=P\,\diag\big(f(J_1),\ldots,f(J_s)\big)\,P^{-1}. \tag{3.3.17} \]</div>
+              关键是单个 Jordan 块上的函数值。由 \(J_i=\lambda_i I+N_i\)（\(N_i\) 超对角为 1，且 \(N_i^{m_i}=O\)），级数截断为有限项：
+              <div class="eq-scroll">\[
+              f(J_i)=\begin{pmatrix}
+              f(\lambda_i)&\dfrac{1}{1!}f'(\lambda_i)&\cdots&\dfrac{1}{(m_i-1)!}f^{(m_i-1)}(\lambda_i)\\
+              &f(\lambda_i)&\ddots&\vdots\\
+              &&\ddots&\dfrac{1}{1!}f'(\lambda_i)\\
+              &&&f(\lambda_i)
+              \end{pmatrix}. \tag{3.3.16}
+              \]</div>
+            </p>
+            <div class="grid2">
+              <div class="mini-card"><div class="mc-title">2 阶 Jordan 块速记</div><p style="margin:0">对 \(J=\begin{pmatrix}\lambda&n\\0&\lambda\end{pmatrix}\)（\(N^2=O\)）：
+                \[ f(J)=\begin{pmatrix}f(\lambda)&nf'(\lambda)\\0&f(\lambda)\end{pmatrix}. \]
+                超对角元恰好是 \(n f'(\lambda)\)——这是本节交互计算器所用的公式。</p></div>
+              <div class="mini-card"><div class="mc-title">对角矩阵退化情形</div><p style="margin:0">\(A=\diag(\lambda_1,\ldots,\lambda_n)\) 时所有 \(m_i=1\)，没有超对角元：
+                \[ f(A)=\diag(f(\lambda_1),\ldots,f(\lambda_n)). \]
+                即"对角元逐个作用函数"。</p></div>
+            </div>
+
+            <h3 class="sub-title" id="undetermined">2. 待定系数法（多项式降次）</h3>
+            <p>取首 1 多项式 \(\psi(\lambda)\)（特征多项式或最小多项式），零点为 \(\lambda_1,\ldots,\lambda_s\)，重数 \(r_i\)，满足 \(\psi(A)=O\) 且
+              <div class="eq-scroll">\[ \psi^{(l)}(\lambda_i)=0\quad(l=0,1,\ldots,r_i-1). \tag{3.3.10} \]</div>
+              把 \(f(z)\) 除以 \(\psi(z)\)：\(f(z)=\psi(z)g(z)+r(z)\)，其中 \(r(z)\) 次数低于 \(m=\sum r_i\)。由带余除法性质
+              <div class="eq-scroll">\[ f^{(l)}(\lambda_i)=r^{(l)}(\lambda_i)\quad(l=0,\ldots,r_i-1), \tag{3.3.11} \]</div>
+              这 \(m\) 个条件唯一确定 \(r(z)\)，而 \(\psi(A)=O\) 给出
+              <div class="eq-scroll">\[ f(A)=\sum_{k=0}^{\infty}c_kA^k=r(A). \tag{3.3.12} \]</div>
+              <strong>做法</strong>：设 \(r(\lambda)=a_0+a_1\lambda+\cdots+a_{m-1}\lambda^{m-1}\)，在每个特征值上对 \(f\) 与各阶导数列方程，解出系数，再代回矩阵。</p>
+            <section class="card ex" id="exm-3-5">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 3.5</span><span class="card-tag">亏损特征值用导数</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A=\begin{pmatrix}2&0&0\\1&1&1\\1&-1&3\end{pmatrix}\)，求 \(e^A\) 与 \(e^{tA}\)。</p>
+                <details class="proof">
+                  <summary><span>解（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>\(\varphi(\lambda)=\det(\lambda I-A)=(\lambda-2)^3\)，但最小多项式 \(m(\lambda)=(\lambda-2)^2\)，取 \(\psi(\lambda)=(\lambda-2)^2\)。</p>
+                    <p><strong>(1)</strong> 令 \(f(\lambda)=e^\lambda=a+b\lambda\)（\(r\) 是一次式），用 \(f(2)=e^2,\ f'(2)=e^2\)：
+                      \[ a+2b=e^2,\quad b=e^2\Rightarrow a=-e^2, \]
+                      故 \(r(\lambda)=e^2(\lambda-1)\)，\(e^A=e^2(A-I)=e^2\begin{pmatrix}1&0&0\\1&0&1\\1&-1&2\end{pmatrix}\)。</p>
+                    <p><strong>(2)</strong> 对 \(f(\lambda)=e^{t\lambda}\)：\(b=te^{2t},\ a=(1-2t)e^{2t}\)，故
+                      \[ e^{tA}=e^{2t}\big[(1-2t)I+tA\big]
+                         =e^{2t}\begin{pmatrix}1&0&0\\t&1-t&t\\t&-t&1+t\end{pmatrix}. \]</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="series-method">3. 数项级数求和法</h3>
+            <p>由 \(\psi(A)=O\) 得到递推关系
+              <div class="eq-scroll">\[ A^m=k_0I+k_1A+\cdots+k_{m-1}A^{m-1}, \tag{3.3.13} \]</div>
+              于是所有高次幂都能降为 \(I,A,\ldots,A^{m-1}\) 的线性组合。代入幂级数后，矩阵系数化为若干个<strong>数项级数</strong>求和：
+              <div class="eq-scroll">\[ f(A)=\Big(c_0+\sum_{l=0}^{\infty}c_{m+l}k_0^{(l)}\Big)I+\Big(c_1+\sum_{l=0}^{\infty}c_{m+l}k_1^{(l)}\Big)A+\cdots. \tag{3.3.14} \]</div>
+              当式 (3.3.13) 只有少数系数非零时（如幂零矩阵），实际只需算极少数项级数。</p>
+            <section class="card ex" id="exm-3-6">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 3.6</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A=\begin{pmatrix}\pi&0&0&0\\0&-\pi&0&0\\0&0&0&1\\0&0&0&0\end{pmatrix}\)，求 \(\sin A\)。</p>
+                <details class="proof">
+                  <summary><span>解（利用 A⁴=π²A² 降次，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>前两个对角元 \(\pm\pi\) 的正弦为 0；右下角 \(\begin{pmatrix}0&1\\0&0\end{pmatrix}\) 平方为零，\(\sin\) 级数只留首项。故
+                      \[ \sin A=\begin{pmatrix}0&0&0&0\\0&0&0&0\\0&0&0&1\\0&0&0&0\end{pmatrix}. \]</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="diagonal-method">4. 对角形法</h3>
+            <p>若 \(A\) 可对角化：\(P^{-1}AP=\Lambda=\diag(\lambda_1,\ldots,\lambda_n)\)，则
+              <div class="eq-scroll">\[
+              f(A)=P\begin{pmatrix}
+              \sum c_k\lambda_1^k&&\\&\ddots&\\&&\sum c_k\lambda_n^k
+              \end{pmatrix}P^{-1}
+              =P\begin{pmatrix}f(\lambda_1)&&\\&\ddots&\\&&f(\lambda_n)\end{pmatrix}P^{-1}. \tag{3.3.15}
+              \]</div>
+              即矩阵幂级数求和化为求变换矩阵。<strong>适用条件：\(A\) 有 \(n\) 个线性无关的特征向量</strong>；亏损矩阵必须用 Jordan 法。</p>
+            <section class="card ex" id="exm-3-7">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 3.7</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A=\begin{pmatrix}4&6&0\\-3&-5&0\\-3&-6&1\end{pmatrix}\)，特征值 \(-2,1,1\) 且有三个线性无关特征向量，取 \(P=(p_1,p_2,p_3)\) 使 \(P^{-1}AP=\diag(-2,1,1)\)，则
+                  \[ e^A=P\,\diag(e^{-2},e,e)\,P^{-1},\quad
+                     e^{tA}=P\,\diag(e^{-2t},e^t,e^t)\,P^{-1},\quad
+                     \cos A=P\,\diag(\cos(-2),\cos1,\cos1)\,P^{-1}. \]</p>
+              </div>
+            </section>
+            <p>另外，例 3.4 是定理 3.4（Neumann 级数）的直接应用：
+              \[ f(z)=\frac1{1-z}=\sum_{k=0}^{\infty}z^k\quad(|z|&lt;1),\qquad
+                 f(A)=\sum_{k=0}^{\infty}A^k=(I-A)^{-1}\quad(\rho(A)&lt;1). \]</p>
+
+            <h3 class="sub-title" id="mfunc-lab-title">动手实验：Jordan 块矩阵函数计算器</h3>
+            <p>改 \(\lambda,n,t\)，实时看 \(e^A,e^{tA},\sin A,\cos A\)。对照公式 (3.3.16)：对角元是 \(f(\lambda)\)，超对角元是 \(n f'(\lambda)\)（对 \(e^A\) 就是 \(ne^\lambda\)，对 \(\sin A\) 是 \(n\cos\lambda\)，对 \(\cos A\) 是 \(-n\sin\lambda\)）。</p>
+            <section class="card lab" data-mfunc-lab></section>
+          </section>
+
+          <!-- ================= 三、矩阵函数的另一（广义）定义 ================= -->
+          <section class="section" id="sec-general-def">
+            <h2 class="sec-title"><span class="cn">三</span>矩阵函数的广义定义</h2>
+            <p>定义 3.7 要求 \(f(z)\) 能展开为收敛幂级数，条件较强——例如 \(f(z)=1/z\) 在 0 处根本不解析。借助 Jordan 公式可以拓宽定义：</p>
+            <section class="card def" id="def-3-8">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 3.8（Jordan 广义定义）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(P^{-1}AP=J=\diag(J_1,\ldots,J_s)\)。若函数 \(f(z)\) 在每个特征值 \(\lambda_i\) 处具有直到 \(m_i-1\) 阶导数（\(m_i\) 为该 Jordan 块阶数），就用式 (3.3.16) 定义 \(f(J_i)\)，再令
+                  <div class="eq-scroll">\[ f(A)=P\,\diag(f(J_1),\ldots,f(J_s))\,P^{-1}, \tag{3.3.19} \]</div>
+                  称为对应于 \(f(z)\) 的矩阵函数。</p>
+              </div>
+            </section>
+            <p>当 \(f\) 确有收敛幂级数时，定义 3.8 与定义 3.7 完全一致。广义定义允许在 <strong>\(A\) 的谱集上</strong>局部有定义且足够光滑的函数（不必在整个圆盘解析）。</p>
+            <div class="grid2">
+              <div class="mini-card"><div class="mc-title">例 3.8：f(z)=1/z</div><p style="margin:0">对单个 4 阶 Jordan 块 \(J_4(2)\)，只需 \(f(2)=1/2,\ f'(2)=-1/4,\ f''(2)=1/4,\ f'''(2)=-3/8\)，便有
+                \[ A^{-1}=\begin{pmatrix}\tfrac12&-\tfrac14&\tfrac18&-\tfrac1{16}\\&\tfrac12&-\tfrac14&\tfrac18\\&&\tfrac12&-\tfrac14\\&&&\tfrac12\end{pmatrix}, \]
+                与直接求逆结果相同。</p></div>
+              <div class="mini-card"><div class="mc-title">例 3.9：f(z)=√z</div><p style="margin:0">\(A=\diag\Big(\begin{pmatrix}1&1\\0&1\end{pmatrix},\,2\Big)\) 两个 Jordan 块：
+                \[ f(J_1)=\begin{pmatrix}1&\tfrac12\\0&1\end{pmatrix},\quad f(J_2)=\sqrt2, \]
+                \[ \sqrt A=\begin{pmatrix}1&\tfrac12&0\\0&1&0\\0&0&\sqrt2\end{pmatrix}. \]</p></div>
+            </div>
+            <p>广义定义还保证：① \(f(A)\) 与 Jordan 块排列次序、变换矩阵 \(P\) 的选取无关；② \(f(z)=f_1(z)+f_2(z)\Rightarrow f(A)=f_1(A)+f_2(A)\)；③ \(f(z)=f_1(z)f_2(z)\Rightarrow f(A)=f_1(A)f_2(A)\)（同一函数在各谱点的 Taylor 数据相乘）。</p>
+          </section>
+
+          <!-- ================= 习题 3.3 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 3.3（共 6 题）</h2>
+            <div class="ex-toolbar">
+              <span data-fold-tools="details.solution">
+                <button type="button" data-fold="open">全部展开解答</button>
+                <button type="button" data-fold="close">全部收起</button>
+              </span>
+            </div>
+
+            <article class="card task" id="ex33-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">Euler 公式</span></header>
+              <div class="card-body">
+                <p>证明 \(e^{\mathrm jA}=\cos A+\mathrm j\sin A\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>把三个级数按定义写出：
+                    \[ e^{\mathrm jA}=\sum_{k=0}^{\infty}\frac{(\mathrm jA)^k}{k!}
+                       =\sum_{r=0}^{\infty}\frac{(-1)^r A^{2r}}{(2r)!}
+                        +\mathrm j\sum_{r=0}^{\infty}\frac{(-1)^r A^{2r+1}}{(2r+1)!}
+                       =\cos A+\mathrm j\sin A. \]
+                    用到 \(\mathrm j^{2r}=(-1)^r,\ \mathrm j^{2r+1}=\mathrm j(-1)^r\)。这是矩阵版 Euler 公式 (3.3.6)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex33-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag">周期性</span></header>
+              <div class="card-body">
+                <p>证明 \(e^{A+2\pi\mathrm j I}=e^A\)，\(\sin(A+2\pi I)=\sin A\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>因 \(A\) 与数量矩阵 \(2\pi\mathrm j I\) 可交换，定理 3.7 给
+                    \[ e^{A+2\pi\mathrm j I}=e^Ae^{2\pi\mathrm j I}=e^A\cdot e^{2\pi\mathrm j}I=e^A\cdot I=e^A. \]
+                    第二式由 \(\sin z\) 的周期 \(2\pi\)：数量矩阵可与 \(A\) 交换，\(\sin(A+2\pi I)\) 在每个特征值/Jordan 块上的 \(f,f',\ldots\) 数据与 \(\sin A\) 相同（\(\sin(\lambda+2\pi)=\sin\lambda,\ \cos(\lambda+2\pi)=\cos\lambda\)），由广义定义二者相等。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex33-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag">反对称 → 正交</span></header>
+              <div class="card-body">
+                <p>若 \(A\) 为实反对称矩阵（\(A^{\mathrm T}=-A\)），证明 \(e^A\) 是正交矩阵。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\((e^A)^{\mathrm T}=\sum (A^k)^{\mathrm T}/k!=\sum (A^{\mathrm T})^k/k!=e^{A^{\mathrm T}}=e^{-A}\)（级数逐项转置）。因 \(A\) 与 \(-A\) 可交换，\(e^Ae^{-A}=e^O=I\)，故
+                    \[ (e^A)^{\mathrm T}e^A=e^{-A}e^A=I, \]
+                    即 \(e^A\) 是正交矩阵。这是 Lie 群中"反对称李代数指数映射到正交群"的标准结论。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex33-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag">Hermite → 酉</span></header>
+              <div class="card-body">
+                <p>若 \(A\) 是 Hermite 矩阵（\(A^{\mathrm H}=A\)），证明 \(e^{\mathrm jA}\) 是酉矩阵。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\((e^{\mathrm jA})^{\mathrm H}=\sum (\mathrm jA)^{k\,\mathrm H}/k!=\sum(-\mathrm j A^{\mathrm H})^k/k!=e^{-\mathrm j A}\)（用了 \(\overline{\mathrm j}=-\mathrm j\) 与 \(A^{\mathrm H}=A\)）。于是
+                    \[ (e^{\mathrm jA})^{\mathrm H}e^{\mathrm jA}=e^{-\mathrm jA}e^{\mathrm jA}=I, \]
+                    故为酉矩阵。量子力学中时间演化算符 \(e^{-\mathrm iHt/\hbar}\)（\(H\) Hermite）的酉正性正源于此。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex33-5">
+              <header class="card-head"><span class="card-label">第 5 题</span><span class="tag tag-mid">综合计算</span></header>
+              <div class="card-body">
+                <p>设 \(A=\begin{pmatrix}2&1&0\\0&0&1\\0&1&0\end{pmatrix}\)，求 \(e^A,\ e^{tA},\ \sin A\)。</p>
+                <details class="solution"><summary><span>解法提示（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(\det(\lambda I-A)=(\lambda-2)(\lambda^2-1)=(\lambda-2)(\lambda-1)(\lambda+1)\)，三个互异特征值 \(2,1,-1\)，\(A\) 可对角化。求出对应特征向量拼成 \(P\)，用对角形法 (3.3.15)：
+                    \[ e^A=P\,\diag(e^2,e,e^{-1})\,P^{-1},\quad
+                       e^{tA}=P\,\diag(e^{2t},e^t,e^{-t})\,P^{-1},\quad
+                       \sin A=P\,\diag(\sin2,\sin1,-\sin1)\,P^{-1}. \]</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex33-6">
+              <header class="card-head"><span class="card-label">第 6 题</span><span class="tag tag-hard">广义定义 ln</span></header>
+              <div class="card-body">
+                <p>设 \(f(z)=\ln z\)，求 \(f(A)\)，其中
+                  \[ (1)\ A=\begin{pmatrix}1&0&0&0\\1&1&0&0\\0&1&1&0\\0&0&1&1\end{pmatrix};\qquad
+                     (2)\ A=\begin{pmatrix}2&1&0&0\\0&2&0&0\\0&0&1&1\\0&0&0&1\end{pmatrix}. \]</p>
+                <details class="solution"><summary><span>解法提示（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>(1) 是<strong>下三角形式</strong>的 4 阶 Jordan 块 \(J_4(1)\)（与教材 (3.3.16) 的上三角写法互为转置），(2) 已是标准 Jordan 标准形（\(\ln1=0,\ (\ln z)'|_{z=1}=1\)；\(\ln2,\ 1/2\)）。按式 (3.3.16)：</p>
+                  <p><strong>(1)</strong> 单个 4 阶块 \(J_4(1)\)：超对角依次为 \(f'(1)=1,\ f''(1)/2!=-1/2,\ f'''(1)/3!=1/3\)（1 在副对角线下方，矩阵为下三角），
+                    \[ \ln A=\begin{pmatrix}0&0&0&0\\1&0&0&0\\-\tfrac12&1&0&0\\\tfrac13&-\tfrac12&1&0\end{pmatrix}. \]</p>
+                  <p><strong>(2)</strong> 两个 2 阶块：
+                    \[ \ln A=\begin{pmatrix}\ln2&\tfrac12&0&0\\0&\ln2&0&0\\0&0&0&1\\0&0&0&0\end{pmatrix}. \]</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 本节小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结与自检</h2>
+            <div class="summary-block">
+              <p>矩阵函数把"数的函数"提升为"矩阵的函数"，幂级数定义与 Jordan 广义定义在整函数上一致：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>内容</th><th>结论</th></tr>
+                  <tr><td>幂级数定义</td><td>\(\rho(A)&lt;r\) 时 \(f(A)=\sum c_kA^k\)；\(e^z,\sin z,\cos z\) 对任意 \(A\) 收敛</td></tr>
+                  <tr><td>三个基本函数</td><td>\(e^A=\sum A^k/k!\)，\(\sin A=\sum(-1)^rA^{2r+1}/(2r+1)!\)，\(\cos A=\sum(-1)^rA^{2r}/(2r)!\)</td></tr>
+                  <tr><td>指数律</td><td>\(AB=BA\Rightarrow e^Ae^B=e^{A+B}\)；\((e^A)^{-1}=e^{-A}\)；不可交换时一般不成立</td></tr>
+                  <tr><td>Jordan 块</td><td>对角 \(f(\lambda_i)\)，超对角第 \(l\) 条 \(f^{(l)}(\lambda_i)/l!\)（式 3.3.16）</td></tr>
+                  <tr><td>四种求法</td><td>① Jordan 标准形（普适）②待定系数 \(r(A)\)（最小多项式降次）③数项级数求和（教材用幂级数部分和逐项求和，幂零矩阵为其特例）④对角形（可对角化时）</td></tr>
+                  <tr><td>广义定义</td><td>只需 \(f\) 在谱点有足够阶导数；可定义 \(A^{-1},\ln A,\sqrt A\)，且与 \(P\) 选择无关</td></tr>
+                </table>
+              </div>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>为什么 Jordan 块 \(J_i\) 上的矩阵函数，超对角元出现的是导数 \(f'(\lambda_i)/1!\) 而不是别的？从 \(f(\lambda I+N)\) 的幂级数截断推导一次。</li>
+                  <li>四种求法各自的前提是什么？为什么亏损矩阵不能用对角形法、却仍能用待定系数法（取最小多项式）？</li>
+                  <li>不用定义而用定理 3.7 快速判断：\(A\) 实对称时 \(e^{\mathrm jA}\) 是什么矩阵？为什么它一定可逆，逆是什么？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="3.2-matrix-series.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§3.2 矩阵级数</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="3.4-differentiation-integration.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§3.4 矩阵的微分和积分</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

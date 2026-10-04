@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§7.6 其他特殊矩阵（选学） · 矩阵论</title>
+  <meta name="description" content="矩阵论 §7.6（选学）：Vandermonde 矩阵（插值、O(n²) 快速求解、L_k/D_k 递推）、Hilbert 矩阵（最小二乘法方程、显式逆、严重病态与条件数表）、Hadamard 矩阵（正交 ±1、det、n 为 4 倍数、Sylvester 构造）">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§7.6 其他特殊矩阵（选学）</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="7.6" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 7 章 若干特殊矩阵类介绍</a><span class="sep" aria-hidden="true">/</span>
+            <span>§7.6 其他特殊矩阵（选学）</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 7 章 · 收官（选学）</div>
+            <h1>§7.6 其他特殊矩阵</h1>
+            <p class="lede">本节介绍三个既有理论价值又有实际应用的经典名矩阵：<strong>Vandermonde 矩阵</strong>——多项式插值的系数矩阵，互异节点时非奇异并有 \(O(n^2)\) 快速解法；<strong>Hilbert 矩阵</strong>——最小二乘法方程的标准形态，有显式逆却以<strong>严重病态</strong>著称，是检验数值算法的标准试矩阵；<strong>Hadamard 矩阵</strong>——元素仅 ±1 的正交阵，与纠错码、信号处理、试验设计密切相关。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.417–426</strong></span>
+              <span class="chip">建议 <strong>2 学时</strong></span>
+              <span class="chip">名矩阵 <strong>V / Hₙ / Hadamard</strong></span>
+              <span class="chip">主题 <strong>插值 · 病态 · 正交</strong></span>
+            </div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>写出 Vandermonde 行列式与插值条件的矩阵形式，会用牛顿插值（差商）\(O(n^2)\) 求解；</li>
+                  <li>知道 Hilbert 矩阵的来源（\([0,1]\) 上加权最小二乘）、显式逆元公式与行列式公式；</li>
+                  <li>记住 Hilbert 条件数随 \(n\) 指数增长的现象与工程含义；</li>
+                  <li>陈述 Hadamard 矩阵定义 \(HH^{\mathrm T}=nI\) 与四条性质，知道阶数必为 1、2 或 4 的倍数；</li>
+                  <li>会用 Sylvester 法递归构造 \(2^k\) 阶 Hadamard 矩阵。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>三个矩阵的定义与来历；</li>
+                      <li>Hilbert 显式逆；</li>
+                      <li>Hadamard 性质。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>差商递推与 \(O(n^2)\) 解法；</li>
+                      <li>条件数增长的理解；</li>
+                      <li>阶数 4 倍数的证明。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 2 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>Vandermonde 矩阵：插值、线性泛函逼近、\(O(n^2)\) 快速解法</td><td class="num">p.417–422</td></tr>
+                    <tr><td class="num">2</td><td>Hilbert 矩阵（逆、条件数）与 Hadamard 矩阵（性质、Sylvester 构造）、实验、全课总结</td><td class="num">p.422–426</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 190" role="img" aria-label="三名矩阵脉络图">
+                    <defs><marker id="m76" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b"><rect x="40" y="30" width="200" height="60"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="140" y="55">Vandermonde V</text><text x="140" y="75" font-size="11" fill="#666">多项式插值，det=∏(αᵢ−αⱼ)</text>
+                    </g>
+                    <g class="fm-node" fill="#f4f0e2" stroke="#a06a17"><rect x="320" y="30" width="200" height="60"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="420" y="55">Hilbert Hₙ</text><text x="420" y="75" font-size="11" fill="#666">hᵢⱼ=1/(i+j−1)，严重病态</text>
+                    </g>
+                    <g class="fm-node" fill="#eef7f0" stroke="#3d7a4e"><rect x="600" y="30" width="200" height="60"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="700" y="55">Hadamard H</text><text x="700" y="75" font-size="11" fill="#666">元素 ±1，HHᵀ=nI</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m76)"><line x1="240" y1="60" x2="318" y2="60"/></g>
+                    <g class="fm-edge" marker-end="url(#m76)"><line x1="520" y1="60" x2="598" y2="60"/></g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="250" y="120" width="340" height="50"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12" text-anchor="middle">
+                      <text x="420" y="142">共同价值：数值算法的标准测试矩阵</text><text x="420" y="160" font-size="11" fill="#666">插值/逼近 → 病态检验 → 正交设计</text>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、Vandermonde ================= -->
+          <section class="section" id="sec-vander">
+            <h2 class="sec-title"><span class="cn">一</span>Vandermonde 矩阵</h2>
+            <p>如下形式的 \(n\) 阶矩阵</p>
+            <div class="eq-scroll">\[
+            V=\begin{pmatrix}
+            1&1&\cdots&1\\
+            \alpha_1&\alpha_2&\cdots&\alpha_n\\
+            \alpha_1^2&\alpha_2^2&\cdots&\alpha_n^2\\
+            \vdots&\vdots&&\vdots\\
+            \alpha_1^{n-1}&\alpha_2^{n-1}&\cdots&\alpha_n^{n-1}
+            \end{pmatrix}, \tag{7.6.1}
+            \]</div>
+            <p style="margin-bottom:0">称 <strong>Vandermonde 矩阵</strong>，其行列式为</p>
+            <div class="eq-scroll">\[ \det V=\prod_{n\ge i>j\ge1}(\alpha_i-\alpha_j). \]</div>
+            <p>故当节点 \(\alpha_1,\cdots,\alpha_n\) 两两互异时 V 总非奇异。</p>
+
+            <h3 class="sub-title" id="interp">多项式插值</h3>
+            <p>已知函数在 \(n\) 个互异点的值 \(f(\alpha_i)=f_i\)，求次数不超过 \(n-1\) 的多项式</p>
+            <div class="eq-scroll">\[ p(x)=c_0+c_1x+\cdots+c_{n-1}x^{n-1} \tag{7.6.2} \]</div>
+            <p>使 \(p(\alpha_i)=f_i\)（7.6.3）。写成矩阵式（注意教材用 \(V^{\mathrm T}c=f\)，即节点按列、幂次按行）：</p>
+            <div class="eq-scroll">\[ V^{\mathrm T}c=f. \tag{7.6.4} \]</div>
+            <p style="margin-bottom:0">V 非奇异，故插值多项式唯一存在。</p>
+
+            <h3 class="sub-title" id="functional">线性泛函的逼近</h3>
+            <p>用插值多项式近似求线性泛函 \(\mathscr L[f]\)（如定积分）：令 \(b_k=\mathscr L[x^{k-1}]\)，则</p>
+            <div class="eq-scroll">\[ \mathscr L[f]\approx\mathscr L[p]=\sum c_kb_k=c^{\mathrm T}b=(V^{-\mathrm T}f)^{\mathrm T}b=f^{\mathrm T}(V^{-1}b)=\sum_{j=1}^{n}f_jy_j, \]</div>
+            <p>问题化为解 <strong>\(Vy=b\)</strong>（7.6.5），可在 \(O(n^2)\) 内完成（普通 Gauss 消元为 \(O(n^3)\)）。</p>
+
+            <h3 class="sub-title" id="newton-fast">O(n²) 快速解法（差商递推）</h3>
+            <p>把插值多项式写成 <strong>Newton 形式</strong>（7.6.6）：</p>
+            <div class="eq-scroll">\[ p(x)=d_1^{(1)}+\sum_{k=2}^{n}d_k^{(k)}\prod_{j=1}^{k-1}(x-\alpha_j), \]</div>
+            <p>其中 \(d_k^{(k)}=f[\alpha_1,\cdots,\alpha_k]\) 是 <strong>\(k-1\) 阶差商</strong>，递推定义为</p>
+            <div class="eq-scroll">\[
+            d_j^{(1)}=f_j;\qquad d_j^{(k+1)}=\frac{d_j^{(k)}-d_{j-1}^{(k)}}{\alpha_j-\alpha_{j-k}}\quad(k=1,\cdots,n-1;\ j=k+1,\cdots,n). \tag{7.6.7}
+            \]</div>
+            <p>再由 \(p_k(x)=d_k^{(k)}+(x-\alpha_k)p_{k+1}(x)\) 逐级回代，比较系数即得线性方程组 (7.6.4) 的系数 \(c_j=c_j^{(1)}\)，全部计算量为 <strong>\(O(n^2)\)</strong>。解 \(Vy=b\) 有完全平行的反向递推（以同样的初等矩阵 \(L_k(\alpha)\)、对角阵 \(D_k\) 表达，见 (7.6.10) 及教材 p.420–421 的未编号分量递推）。教材还给出用 Lagrange 基多项式 \(L_k(x)\) 直接构造 \(V^{-1}\) 的方法（7.6.11–7.6.19），其中关键归一化系数为</p>
+            <div class="eq-scroll">\[ \beta_k=\frac1{u_{k1}},\qquad \beta_k\pi_k(\alpha_j)=\begin{cases}1,&j=k\\0,&j\ne k\end{cases}. \tag{7.6.16–17} \]</div>
+            <p style="margin-bottom:0">Vandermonde 矩阵求逆的计算量同样为 \(O(n^2)\)。</p>
+          </section>
+
+          <!-- ================= 二、Hilbert ================= -->
+          <section class="section" id="sec-hilbert">
+            <h2 class="sec-title"><span class="cn">二</span>Hilbert 矩阵</h2>
+            <p>在区间 \([a,b]\) 上给定连续函数 \(f(x)\)，要求用 \(n-1\) 次多项式 \(\sum_{i=1}^{n}c_i x^{i-1}\) 在加权最小二乘意义下逼近它：</p>
+            <div class="eq-scroll">\[ F(c)=\int_a^b\omega(x)\Big[f(x)-\sum_{i=1}^{n}c_i x^{i-1}\Big]^2\,\mathrm dx=\min. \]</div>
+            <p>令极值必要条件 \(\partial F/\partial c_i=0\)，得法方程（7.6.21）</p>
+            <div class="eq-scroll">\[ \sum_{j=1}^{n}\Big[\int_a^b\omega(x)x^{i+j-2}\,\mathrm dx\Big]c_j=\int_a^b \omega(x)f(x)x^{i-1}\,\mathrm dx. \]</div>
+            <p>取标准情形 \(\omega(x)\equiv1,\ [a,b]=[0,1]\)，则系数矩阵为</p>
+            <div class="eq-scroll">\[
+            H_n=\left(\frac1{i+j-1}\right)_{i,j=1}^{n}=
+            \begin{pmatrix}
+            1&\frac12&\frac13&\cdots&\frac1n\\
+            \frac12&\frac13&\frac14&\cdots&\frac1{n+1}\\
+            \vdots&\vdots&\vdots&\ddots&\vdots\\
+            \frac1n&\frac1{n+1}&\frac1{n+2}&\cdots&\frac1{2n-1}
+            \end{pmatrix}, \tag{7.6.22}
+            \]</div>
+            <p style="margin-bottom:0">称 <strong>Hilbert 矩阵</strong>。它是特殊的 Hankel 矩阵、对称正定矩阵、正矩阵与正稳定矩阵。</p>
+
+            <section class="card thm" id="thm-hilbert">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">行列式、显式逆与病态性</span>
+              </header>
+              <div class="card-body">
+                <p><strong>行列式：</strong></p>
+                <div class="eq-scroll">\[ \det H_n=\frac{[1!\,2!\,\cdots\,(n-1)!]^3}{n!(n+1)!\cdots(2n-1)!}. \]</div>
+                <p><strong>逆矩阵</strong> \(H_n^{-1}=(v_{ij})\) 有整数显式表达式：</p>
+                <div class="eq-scroll">\[
+                v_{ij}=\frac{(-1)^{i+j}(n+i-1)!(n+j-1)!}{(i+j-1)[(i-1)!(j-1)!]^2(n-i)!(n-j)!}\quad(i,j=1,\cdots,n).
+                \]</div>
+                <p>例如</p>
+                <div class="eq-scroll">\[ H_3^{-1}=\begin{pmatrix}9&-36&30\\-36&192&-180\\30&-180&180\end{pmatrix}. \]</div>
+                <p style="margin-bottom:0"><strong>严重病态。</strong>Hilbert 矩阵的条件数随 \(n\) 极快增大（\(\mathrm{cond}_2(H_n)=\lambda_{\max}/\lambda_{\min}\)，教材表 7.1）：</p>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>\(n\)</th><th>cond₂(\(H_n\))</th><th>\(n\)</th><th>cond₂(\(H_n\))</th></tr>
+                    <tr><td>3</td><td>\(5.24\times10^2\)</td><td>7</td><td>\(4.75\times10^8\)</td></tr>
+                    <tr><td>4</td><td>\(1.55\times10^4\)</td><td>8</td><td>\(1.53\times10^{10}\)</td></tr>
+                    <tr><td>5</td><td>\(4.77\times10^5\)</td><td>9</td><td>\(4.93\times10^{11}\)</td></tr>
+                    <tr><td>6</td><td>\(1.50\times10^7\)</td><td>10</td><td>\(1.60\times10^{13}\)</td></tr>
+                  </table>
+                </div>
+                <p style="margin-bottom:0">\(n=10\) 时条件数已达 \(10^{13}\) 量级，双精度求解约损失 13 位有效数字。因此 Hilbert 矩阵被广泛用来<strong>论证和检验数值计算过程的稳健性</strong>；实际逼近问题应改用正交多项式基（使法方程接近对角）以规避病态。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 三、Hadamard ================= -->
+          <section class="section" id="sec-hadamard">
+            <h2 class="sec-title"><span class="cn">三</span>Hadamard 矩阵</h2>
+            <p>若 \(n\) 阶矩阵 H 的元素全为 \(1\) 或 \(-1\)，且满足</p>
+            <div class="eq-scroll">\[ HH^{\mathrm T}=nI, \tag{7.6.23} \]</div>
+            <p>则称 <strong>H 为 Hadamard 矩阵</strong>（即行向量两两正交、每行长度 \(\sqrt n\)）。</p>
+
+            <section class="card thm" id="thm-hadamard">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">性质</span>
+              </header>
+              <div class="card-body">
+                <p><strong>(1) 行列式。</strong>\(\det H=n^{n/2}\) 或 \(-n^{n/2}\)（达到 Hadamard 行列式不等式上界）。</p>
+                <p><strong>(2) 转置封闭。</strong>\(H^{\mathrm T}\) 也是 Hadamard 矩阵：由 (7.6.23) 左乘 \(H^{\mathrm T}\) 并右乘 \((H^{\mathrm T})^{-1}\) 得 \(H^{\mathrm T}H=nI\)。</p>
+                <p style="margin-bottom:0"><strong>(3) 阶数限制：\(n&gt;2\) 时 \(n\) 必为 4 的倍数。</strong></p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">取前三行，由行正交 \(\sum_k h_{ik}h_{jk}=0\ (i\ne j)\)。令 \((h_{1k}+h_{2k})(h_{1k}+h_{3k})\)，其值或 0 或 ±4；利用 \(h_{1k}^2=1\) 与三个两两正交关系展开求和，可知该和既是 4 的倍数又恰为 \(n\)，故 \(4\mid n\)。这说明大于 2 而不为 4 倍数阶的 Hadamard 矩阵不存在。</p>
+                </details>
+                <p style="margin-bottom:0"><strong>(4) 封闭变换。</strong>交换任意两行（列）、用 \(-1\) 乘任意一行（列），仍得 Hadamard 矩阵。由此总可把第 1 行、第 1 列全化为 1，称<strong>正规（标准）Hadamard 矩阵</strong>。但同阶 Hadamard 矩阵不唯一。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="sylvester">Sylvester 构造法</h3>
+            <p>低阶与递归构造：</p>
+            <div class="eq-scroll">\[
+            H_1=(1),\qquad H_2=\begin{pmatrix}1&1\\1&-1\end{pmatrix},
+            \]</div>
+            <p>一般地，\(2^k\) 阶（正规）Hadamard 矩阵由 Kronecker 型递归给出</p>
+            <div class="eq-scroll">\[ H_{2^k}=\begin{pmatrix}H_{2^{k-1}}&H_{2^{k-1}}\\H_{2^{k-1}}&-H_{2^{k-1}}\end{pmatrix}\quad(k=1,2,\cdots). \]</div>
+            <p>验证：若 \(HH^{\mathrm T}=nI\)，则分块乘积为 \(\begin{pmatrix}2HH^{\mathrm T}&0\\0&2HH^{\mathrm T}\end{pmatrix}=2n I_{2n}\)。这给出所有 2 的幂阶；12、20、24、28 等非 2 幂阶（4 的倍数）的构造也已具体给出，但<strong>一般阶数的 Hadamard 猜想</strong>（每个 4 的倍数阶都存在）仍是开放问题。</p>
+            <p><strong>应用：</strong>Hadamard 矩阵在网络、逻辑电路、编码（纠错码/遥测码）、数字信号处理、试验设计中有重要应用。例如 1969 年美国水手号火星探测的遥测系统就采用以 \(H_{2^5}=H_{32}\) 的行向量为基础的纠错码（Reed–Muller 码的一阶形式）。</p>
+
+            <h3 class="sub-title" id="name-lab-title">动手实验：三名矩阵展示台</h3>
+            <p><strong>Vandermonde</strong>：输入互异节点，显示矩阵、行列式并对给定右端做插值；<strong>Hilbert</strong>：选阶数 \(n=2\sim10\)，显示矩阵、行列式、条件数与显式逆；<strong>Hadamard</strong>：选阶数 \(1,2,4,8\)，用 Sylvester 递归构造并验证 \(HH^{\mathrm T}=nI\)、\(\det H\) 与正交性。</p>
+            <section class="card lab" data-name-lab></section>
+          </section>
+
+          <!-- ================= 全书总结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">终</span>全课程总结</h2>
+            <div class="summary-block">
+              <p>本课程以程云鹏《矩阵论》第 3 版为底本，共完成 <strong>7 章 31 节（含全部选学标 * 内容）</strong>、36 个交互组件：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>章</th><th>主线</th></tr>
+                  <tr><td>第 1 章 线性空间与线性变换</td><td>空间、基与坐标、内积空间（欧氏/酉）、线性变换矩阵表示、正交补</td></tr>
+                  <tr><td>第 2 章 范数理论及应用</td><td>向量/矩阵范数、相容、谱半径、矩阵函数与扰动分析初步</td></tr>
+                  <tr><td>第 3 章 矩阵分析及应用</td><td>序列/级数收敛、矩阵函数（多种定义）、微分积分、微分方程组、Neumann 展式</td></tr>
+                  <tr><td>第 4 章 矩阵分解</td><td>LU/LDU、QR（Givens/Householder）、满秩分解、SVD</td></tr>
+                  <tr><td>第 5 章 特征值估计与对称阵极性</td><td>Gerschgorin 圆盘、广义特征值、Rayleigh 商与极小极大、Kronecker 积</td></tr>
+                  <tr><td>第 6 章 广义逆矩阵</td><td>投影矩阵、Penrose 四方程与 \(A^+\)、七类算法、方程组应用、约束/加权逆、Drazin/群逆</td></tr>
+                  <tr><td>第 7 章 特殊矩阵类</td><td>正定/正稳定、对角占优、非负/单调、M 矩阵（40 等价条件）、Toeplitz/循环、V/H/Hadamard</td></tr>
+                </table>
+              </div>
+              <p style="margin-top:10px">一条暗线贯穿全书：<strong>"把不好算的矩阵变成好算的形式"</strong>——消元（LU）、正交化（QR/SVD）、对角化（谱/Kronecker/循环 DFT）、单位矩阵的替代物（幂等投影 → 广义逆）、以及结构化矩阵（占优/M/Toeplitz）带来的免费性质。</p>
+              <div class="self-check">
+                <h3>三个收束问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>Vandermonde、Hilbert、Toeplitz/Hankel 三类矩阵的结构分别把什么运算"免费化"了？它们的求逆各有什么专门算法？</li>
+                  <li>Hilbert 矩阵同时是 Hankel、对称正定、正稳定、M 矩阵吗？它的病态与 §7.4 最小二乘的法方程病态如何统一理解？</li>
+                  <li>Hadamard 矩阵与第 4 章的正交矩阵、SVD 中的正交因子是什么关系？为什么它的行列式达到上界？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="7.5-toeplitz.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§7.5 Toeplitz 矩阵及其有关矩阵（选学）</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="../../index.html"><span class="ln-dir">全课完结</span><span class="ln-ttl">返回课程主页</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§3.1 矩阵序列 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §3.1：矩阵序列按元素收敛、极限的线性/乘法/逆性质、按范数收敛的等价性、有界矩阵序列、收敛矩阵 Aᵏ→O 的判据">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§3.1 矩阵序列</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="3.1" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 3 章 矩阵分析及其应用</a><span class="sep" aria-hidden="true">/</span>
+            <span>§3.1 矩阵序列</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 3 章 · 矩阵分析及其应用</div>
+            <h1>§3.1 矩阵序列</h1>
+            <p class="lede">第 3 章以极限理论为基础：先讨论<strong>矩阵序列</strong>及其收敛定理，再介绍矩阵级数与矩阵函数（如 \(e^A,\sin A\)），最后讲矩阵的微分积分及其在微分方程组中的应用。本节把数列极限搬到矩阵上——<strong>按元素收敛</strong>，并证明它与"按范数收敛"等价；矩阵幂 \(A^k\to O\) 的收敛判据（定理 3.2）以 §2.3 的定理 2.10 为工具，是本节最重要的特殊序列结论。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.139–142</strong></span>
+              <span class="chip">建议 <strong>2 学时</strong></span>
+              <span class="chip">定义 <strong>3 个</strong></span>
+              <span class="chip">定理 <strong>1 个</strong></span>
+              <span class="chip">例题 <strong>1 道</strong></span>
+            </div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>用元素极限定义矩阵序列的收敛，判别简单序列；</li>
+                  <li>运用极限的线性性质、乘法性质、逆矩阵性质；</li>
+                  <li>陈述并运用<strong>按范数收敛 ⇔ 按元素收敛</strong>（定理 3.1）；</li>
+                  <li>知道有界矩阵序列必有收敛子列；</li>
+                  <li>熟练判断 \(A\) 是否为收敛矩阵（\(A^k\to O\Leftrightarrow\rho(A)&lt;1\)，某范数 &lt;1 是充分条件）。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>定义 3.1 按元素收敛；</li>
+                      <li>极限三性质；</li>
+                      <li>定理 3.1 范数等价；</li>
+                      <li>收敛矩阵判据。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>\(A^{(k)}\to A,B^{(k)}\to B\) 才能推出乘积极限；</li>
+                      <li>逆序列收敛要求极限矩阵可逆；</li>
+                      <li>\(\rho(A)&lt;1\) 与 \(\|A\|&lt;1\) 的区别（§2.3 定理 2.10）。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 2 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>矩阵序列收敛定义与极限三性质</td><td class="num">p.139–140</td></tr>
+                    <tr><td class="num">2</td><td>按范数收敛、有界序列、收敛矩阵与例 3.1</td><td class="num">p.140–142</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 190" role="img" aria-label="矩阵序列脉络图">
+                    <defs><marker id="m31" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="30" y="30" width="180" height="48"/><rect x="250" y="30" width="180" height="48"/><rect x="470" y="30" width="180" height="48"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="120" y="52">矩阵序列</text><text x="120" y="68" font-size="11" fill="#666">按元素 aᵢⱼ⁽ᵏ⁾→aᵢⱼ</text>
+                      <text x="340" y="52">极限三性质</text><text x="340" y="68" font-size="11" fill="#666">线性·乘法·逆</text>
+                      <text x="560" y="52">按范数收敛</text><text x="560" y="68" font-size="11" fill="#666">‖A⁽ᵏ⁾−A‖→0（等价）</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m31)"><line x1="210" y1="54" x2="248" y2="54"/><line x1="430" y1="54" x2="468" y2="54"/></g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="580" y="126" width="200" height="46"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="680" y="148">收敛矩阵 Aᵏ→O</text><text x="680" y="165" font-size="11" fill="#666">⇔ ρ(A)&lt;1</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m31)"><path d="M600 80 C620 105 650 112 665 124" stroke-dasharray="4 4"/></g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、矩阵序列及其收敛 ================= -->
+          <section class="section" id="sec-convergence">
+            <h2 class="sec-title"><span class="cn">一</span>矩阵序列的收敛</h2>
+            <p>向量序列可视为矩阵序列的特例。把数（元素）序列的极限逐元素推广：</p>
+
+            <section class="card def" id="def-3-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 3.1</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设有矩阵序列 \(\{A^{(k)}\}\)，其中 \(A^{(k)}=(a_{ij}^{(k)})_{m\times n}\in\C^{m\times n}\)。当每个元素序列都有极限
+                  <div class="eq-scroll">\[ a_{ij}^{(k)}\to a_{ij}\quad(k\to\infty;\ i=1,\ldots,m;\ j=1,\ldots,n), \]</div>
+                  且 \(A=(a_{ij})_{m\times n}\)，则称 \(\{A^{(k)}\}\) <strong>收敛</strong>，\(A\) 为其极限，记为
+                  <div class="eq-scroll">\[ \lim_{k\to\infty}A^{(k)}=A\quad\text{或}\quad A^{(k)}\to A. \]</div>
+                  不收敛的序列称<strong>发散</strong>。</p>
+              </div>
+            </section>
+            <p>矩阵序列收敛有许多与数列收敛相类似的性质。</p>
+
+            <h3 class="sub-title" id="limit-props">极限的三个性质</h3>
+            <section class="card thm" id="limit-props-card">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">性质 1–3</span>
+              </header>
+              <div class="card-body">
+                <p><strong>性质 1（线性）：</strong>设 \(A^{(k)}\to A_{m\times n}\)、\(B^{(k)}\to B_{m\times n}\)，则
+                  <div class="eq-scroll">\[ \lim_{k\to\infty}\big(\alpha A^{(k)}+\beta B^{(k)}\big)=\alpha A+\beta B\qquad(\forall\alpha,\beta\in\C). \tag{3.1.1} \]</div>
+                  这是数列极限线性性质逐元素相加的直接结果。</p>
+                <p><strong>性质 2（乘法）：</strong>设 \(A^{(k)}\to A_{m\times n}\)、\(B^{(k)}\to B_{n\times l}\)，则
+                  <div class="eq-scroll">\[ \lim_{k\to\infty}A^{(k)}B^{(k)}=AB. \tag{3.1.2} \]</div></p>
+                <details class="proof">
+                  <summary><span>证明思路（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>乘积第 \((i,j)\) 元为 \(\sum_{t=1}^n a_{it}^{(k)}b_{tj}^{(k)}\)，这是<strong>有限个</strong>收敛数列乘积之和：当 \(a_{it}^{(k)}\to a_{it},\ b_{tj}^{(k)}\to b_{tj}\) 时，每一项趋于 \(a_{it}b_{tj}\)，求和即趋于 \(\sum_t a_{it}b_{tj}\)——恰为 \(AB\) 的第 \((i,j)\) 元。</p>
+                  </div>
+                </details>
+                <p><strong>性质 3（逆）：</strong>设 \(A^{(k)}\) 与 \(A\) 都是可逆矩阵，且 \(A^{(k)}\to A\)，则
+                  <div class="eq-scroll">\[ (A^{(k)})^{-1}\to A^{-1}. \tag{3.1.3} \]</div></p>
+                <details class="proof">
+                  <summary><span>证明思路（伴随矩阵法，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>\((A^{(k)})^{-1}=\dfrac{\operatorname{adj}A^{(k)}}{\det A^{(k)}}\)。伴随矩阵的元素是 \(A^{(k)}\) 元素的多项式（代数余子式），故 \(\operatorname{adj}A^{(k)}\to\operatorname{adj}A\)，行列式也是元素的多项式，\(\det A^{(k)}\to\det A\ne0\)。由商的极限：
+                      \[ \frac{\operatorname{adj}A^{(k)}}{\det A^{(k)}}\to\frac{\operatorname{adj}A}{\det A}=A^{-1}. \]</p>
+                    <p class="muted" style="font-size:.9em">注意两个条件缺一不可：每个 \(A^{(k)}\) 都要可逆，且极限 \(A\) 也要可逆（如 \(A^{(k)}=1/k\) 可逆但极限 0 不可逆，逆序列发散）。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 二、按范数收敛 ================= -->
+          <section class="section" id="sec-by-norm">
+            <h2 class="sec-title"><span class="cn">二</span>按范数收敛与有界序列</h2>
+            <section class="card thm" id="thm-3-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 3.1</span><span class="card-tag">元素收敛 ⇔ 范数收敛</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A^{(k)}\in\C^{m\times n}\)，\(\|\cdot\|\) 是 <strong>\(\C^{m\times n}\) 上的任一种矩阵范数</strong>，则</p>
+                <ol class="axiom-list" style="list-style:none;margin-top:8px">
+                  <li><span class="n">1</span>\(A^{(k)}\to O\) 的充要条件是 \(\|A^{(k)}\|\to0\)；</li>
+                  <li><span class="n">2</span>\(A^{(k)}\to A\) 的充要条件是 \(\|A^{(k)}-A\|\to0\)。</li>
+                </ol>
+                <details class="proof">
+                  <summary><span>证明要点（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>有限维空间上所有矩阵范数等价（§2.1），且每种范数都与元素的最大值互相控制，例如
+                      \[ \max_{i,j}|a_{ij}^{(k)}|\le\|A^{(k)}\|_{m_1},\qquad
+                         \|A^{(k)}\|_{m_\infty}=n\max_{i,j}|a_{ij}^{(k)}|. \]
+                      故元素一致趋于 0 与任一范数趋于 0 等价；(2) 把 \(A^{(k)}-A\) 用于 (1) 即得。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0">这给极限判定带来极大方便：以后可以直接用 \(\|A^{(k)}-A\|\to0\) 代替逐个元素验证。</p>
+              </div>
+            </section>
+
+            <section class="card def" id="def-3-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 3.2：有界矩阵序列</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">若存在常数 \(M&gt;0\)，使对一切 \(k\) 都有
+                  \[ |a_{ij}^{(k)}|&lt;M\quad(i=1,\ldots,m;\ j=1,\ldots,n), \]
+                  则称 \(\{A^{(k)}\}\) <strong>有界</strong>。与数列一样：<strong>有界的矩阵序列必有收敛的子序列</strong>（有界数列必有收敛子列，逐元素、有限维地使用即得）。</p>
+              </div>
+            </section>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意：收敛必有界，反之不然</span>
+              </header>
+              <div class="card-body"><p>收敛序列必有界（极限与前有限项都有界）；但有界序列只保证有收敛子列，本身未必收敛（如 \(A^{(k)}=\begin{pmatrix}(-1)^k&0\\0&0\end{pmatrix}\) 有界却振荡发散）。</p></div>
+            </aside>
+          </section>
+
+          <!-- ================= 三、收敛矩阵 ================= -->
+          <section class="section" id="sec-convergent-matrix">
+            <h2 class="sec-title"><span class="cn">三</span>收敛矩阵</h2>
+            <p>矩阵序列中最常见的是由一个方阵的幂构成的序列 \(\{A^k\}\)。</p>
+            <section class="card def" id="def-3-3">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 3.3</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\) 为方阵，且当 \(k\to\infty\) 时 \(A^k\to O\)，则称 \(A\) 为<strong>收敛矩阵</strong>。</p>
+              </div>
+            </section>
+            <div class="grid2">
+              <div class="mini-card"><div class="mc-title">定理 3.2（充要条件）</div><p style="margin:0">\(A^k\to O\Longleftrightarrow\rho(A)&lt;1\)。充分性用 §2.3 定理 2.10 构造范数使 \(\|A\|_M\le\tfrac12[1+\rho(A)]&lt;1\)，于是 \(\|A^k\|_M\le\|A\|_M^k\to0\)；必要性由特征向量 \(A^kx=\lambda^kx\to\mathbf0\) 推出 \(|\lambda|&lt;1\)。</p></div>
+              <div class="mini-card"><div class="mc-title">定理 3.3（充分条件）</div><p style="margin:0">只要存在<strong>某一种</strong>矩阵范数使 \(\|A\|&lt;1\)，则 \(A^k\to O\)（因为 \(\rho(A)\le\|A\|&lt;1\)）。它好用但非必要：\(\rho(A)&lt;1\) 时常用范数可能都不小于 1。</p></div>
+            </div>
+            <section class="card ex" id="exm-3-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 3.1</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">判断 \(A=\begin{pmatrix}\frac12&\frac13\\[2pt]\frac14&\frac15\end{pmatrix}\) 是否为收敛矩阵。</p>
+                <p><strong>解：</strong>计算列和范数
+                  \[ \|A\|_1=\max\Big(\frac12+\frac14,\ \frac13+\frac15\Big)=\max\Big(\frac34,\frac{8}{15}\Big)=\frac34=0.75&lt;1, \]
+                  由定理 3.3 立即判定 \(A\) 是收敛矩阵（无需计算特征值）。作为验证，\(\tr A=0.7,\ \det A=0.1-\tfrac1{12}=\tfrac1{60}\approx0.0167\)，两个特征值的模都小于 1。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="seq-lab-title">动手实验：矩阵幂序列查看器</h3>
+            <p>改一改 2×2 矩阵或切换预设，右侧逐屏显示 \(I=A^0,A^1,A^2,\ldots,A^{20}\) 的元素：绿色卡片表示元素正趋于 0（收敛），红色表示发散。这正是定义 3.1"按元素收敛"的直接可视化。</p>
+            <section class="card lab" data-sequence-lab></section>
+          </section>
+
+          <!-- ================= 习题 3.1 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 3.1（共 2 题）</h2>
+            <div class="ex-toolbar">
+              <span data-fold-tools="details.solution">
+                <button type="button" data-fold="open">全部展开解答</button>
+                <button type="button" data-fold="close">全部收起</button>
+              </span>
+            </div>
+
+            <article class="card task" id="ex31-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">极限线性性质</span></header>
+              <div class="card-body">
+                <p>证明式 (3.1.1)：若 \(A^{(k)}\to A,\ B^{(k)}\to B\)，则 \(\alpha A^{(k)}+\beta B^{(k)}\to\alpha A+\beta B\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>对任意位置 \((i,j)\)，矩阵 \(\alpha A^{(k)}+\beta B^{(k)}\) 的该元素为 \(\alpha a_{ij}^{(k)}+\beta b_{ij}^{(k)}\)。由数列极限的线性运算法则（数乘与加法保持极限）：
+                    \[ \lim_{k\to\infty}\big(\alpha a_{ij}^{(k)}+\beta b_{ij}^{(k)}\big)=\alpha a_{ij}+\beta b_{ij}, \]
+                    右端正是 \(\alpha A+\beta B\) 的第 \((i,j)\) 元。每个元素都收敛，由定义 3.1 矩阵序列收敛。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex31-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag tag-mid">收敛矩阵参数讨论</span></header>
+              <div class="card-body">
+                <p>设 \(A=\begin{pmatrix}0&c&c\\c&0&c\\c&c&0\end{pmatrix}\)（\(c\in\R\)），讨论 \(c\) 取何值时 \(A\) 为收敛矩阵。</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>矩阵可写为 \(A=c(J-I)\)，其中 \(J\) 是全 1 矩阵。\(J\) 的特征值为 \(3,0,0\)（全 1 向量 \((1,1,1)\) 对应 3，零空间维数 2），故 \(A=cJ-cI\) 的特征值为
+                    \[ 3c-c=2c,\qquad 0-c=-c,\qquad -c. \]
+                    谱半径 \(\rho(A)=\max(|2c|,|-c|)=2|c|\)。由定理 3.2，\(A\) 为收敛矩阵当且仅当
+                    \[ \rho(A)=2|c|&lt;1\quad\Longleftrightarrow\quad \boxed{-\tfrac12&lt;c&lt;\tfrac12}. \]</p>
+                  <p class="muted">也可用范数验证：\(\|A\|_1=\|A\|_\infty=2|c|\)，在此恰好与谱半径相等，所以 \(2|c|&lt;1\) 也可直接由定理 3.3 判定。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 本节小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结与自检</h2>
+            <div class="summary-block">
+              <p>矩阵序列的极限就是"逐元素的数列极限"，而范数让它获得统一的代数表达：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>内容</th><th>结论</th></tr>
+                  <tr><td>收敛定义</td><td>\(A^{(k)}\to A\Leftrightarrow a_{ij}^{(k)}\to a_{ij}\) 对所有 \(i,j\) 成立</td></tr>
+                  <tr><td>极限性质</td><td>线性 (3.1.1)、乘法 \(A^{(k)}B^{(k)}\to AB\) (3.1.2)、逆 \((A^{(k)})^{-1}\to A^{-1}\) (3.1.3，要求 \(A^{(k)}\) 与 \(A\) 均可逆)</td></tr>
+                  <tr><td>范数刻画</td><td>\(A^{(k)}\to A\Leftrightarrow\|A^{(k)}-A\|\to0\)（任一种矩阵范数，定理 3.1）</td></tr>
+                  <tr><td>有界序列</td><td>有界 ⇒ 存在收敛子列；收敛 ⇒ 有界；有界本身不一定收敛</td></tr>
+                  <tr><td>收敛矩阵</td><td>\(A^k\to O\Leftrightarrow\rho(A)&lt;1\)（定理 3.2）；某范数 \(\|A\|&lt;1\) 是充分条件（定理 3.3，例 3.1）</td></tr>
+                </table>
+              </div>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>为什么"按每个元素收敛"与"按任意一种矩阵范数收敛"在矩阵空间里等价？关键用到了第 2 章的什么结论？</li>
+                  <li>使用性质 3（逆序列也收敛）时必须满足哪两个条件？试举一个 \(A^{(k)}\) 都可逆但极限不可逆的反例。</li>
+                  <li>判断收敛矩阵时，算 \(\rho(A)&lt;1\) 与找一种范数 \(\|A\|&lt;1\)，哪个是充要条件、哪个是充分条件？例 3.1 为什么直接用列和范数就够了？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="../ch2/2.3-norm-applications.html"><span class="ln-dir">上一章</span><span class="ln-ttl">第 2 章 §2.3 范数的一些应用</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="3.2-matrix-series.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§3.2 矩阵级数</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

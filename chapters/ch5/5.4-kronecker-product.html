@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§5.4 矩阵的直积及其应用（选学） · 矩阵论</title>
+  <meta name="description" content="矩阵论 §5.4：Kronecker 直积定义与十条性质、二元矩阵多项式的特征值（定理 5.27）、线性矩阵方程 AX+XB=F 与 ΣAᵢXBᵢ=F 的可解性（定理 5.28–5.31）、vec 算子、Lyapunov 方程积分解">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§5.4 矩阵的直积及其应用（选学）</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="5.4" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 5 章 特征值的估计及对称矩阵的极性</a><span class="sep" aria-hidden="true">/</span>
+            <span>§5.4 矩阵的直积及其应用（选学）</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 5 章 · 收官（选学）</div>
+            <h1>§5.4 矩阵的直积及其应用</h1>
+            <p class="lede">Kronecker 直积 \(A\otimes B\) 把"两个线性变换作用在分量乘积向量上"的变换矩阵统一成一个分块矩阵。它有两个决定性用途：把<strong>二元矩阵多项式</strong> \(f(A,B)=\sum c_{ij}A^i\otimes B^j\) 的特征值写成 \(f(\lambda_i,\mu_j)\)；把<strong>矩阵方程</strong> \(AX+XB=F\)（Sylvester/Lyapunov 方程）拉直成普通线性方程组 \((A\otimes I+I\otimes B^{\mathrm T})\,\overline{\mathrm{vec}}(X)=\overline{\mathrm{vec}}(F)\)，从而得到可解性判据与积分解公式。控制系统稳定性分析全靠它。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.277–289</strong></span>
+              <span class="chip">建议 <strong>3 学时</strong></span>
+              <span class="chip">定义 <strong>1 个</strong></span>
+              <span class="chip">定理 <strong>5 个</strong></span>
+              <span class="chip">例题 <strong>2 道</strong></span>
+
+              <span class="chip">推论 <strong>2 个</strong></span></div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>写出 \(A\otimes B=(a_{ij}B)\) 的分块结构，知道 \(A\otimes B\ne B\otimes A\)；</li>
+                  <li>运用十条性质（数乘、分配、结合、乘积、逆、三角、共轭转置、正交、秩、相似交换）；</li>
+                  <li>陈述定理 5.27：\(f(A,B)\) 的特征值为 \(f(\lambda_i,\mu_j)\)，及三个推论（特征值积、行列式、迹）；</li>
+                  <li>用 vec 算子把 \(AX+XB=F\) 拉直，陈述可解性与唯一解判据 \(\lambda_i+\mu_j\ne0\)；</li>
+                  <li>写出 Lyapunov 方程 \(A^{\mathrm T}X+XA=-F\) 的积分解及其正定性结论。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>直积定义与性质 (4)(5)；</li>
+                      <li>定理 5.27 与推论；</li>
+                      <li>vec 拉直与 Sylvester 判据。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>分块索引 \([A\otimes B]_{ij块}=a_{ij}B\)；</li>
+                      <li>\(\overline{\mathrm{vec}}(AXB)=(A\otimes B^{\mathrm T})\overline{\mathrm{vec}}(X)\)；</li>
+                      <li>积分解的存在性论证。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 3 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>直积定义、例 5.12、性质 (1)–(10)</td><td class="num">p.277–284</td></tr>
+                    <tr><td class="num">2</td><td>二元多项式特征值（定理 5.27 及推论）</td><td class="num">p.281–283</td></tr>
+                    <tr><td class="num">3</td><td>矩阵方程可解性、积分解、习题</td><td class="num">p.284–289</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 200" role="img" aria-label="直积脉络图">
+                    <defs><marker id="m54" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="30" y="28" width="190" height="50"/><rect x="320" y="28" width="200" height="50"/><rect x="620" y="28" width="190" height="50"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="125" y="50">A⊗B = (aᵢⱼB)</text><text x="125" y="67" font-size="11" fill="#666">mp×nq 分块矩阵</text>
+                      <text x="420" y="50">f(A,B)=ΣcᵢAⁱ⊗Bʲ</text><text x="420" y="67" font-size="11" fill="#666">特征值 f(λᵢ,μⱼ)</text>
+                      <text x="715" y="50">vec 拉直</text><text x="715" y="67" font-size="11" fill="#666">矩阵方程 → 线性方程组</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m54)"><line x1="220" y1="53" x2="318" y2="53"/><line x1="520" y1="53" x2="618" y2="53"/></g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="230" y="126" width="380" height="48"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13.5" text-anchor="middle">
+                      <text x="420" y="155">AX+XB=F：唯一解 ⇔ λᵢ+μⱼ≠0；Lyapunov 积分解</text>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、直积的概念 ================= -->
+          <section class="section" id="sec-definition">
+            <h2 class="sec-title"><span class="cn">一</span>直积的概念与性质</h2>
+            <p><strong>动机：</strong>设二元向量 \((\xi_1,\xi_2)^{\mathrm T}\) 经 \(A\) 变换、三元向量 \((\eta_1,\eta_2,\eta_3)^{\mathrm T}\) 经 \(B\) 变换。考察以<strong>分量乘积</strong> \(\xi_i\eta_j\) 为分量的六元向量 \(u\)：它经怎样的线性变换变成变换后分量乘积构成的六元向量 \(v\)？把 \(\xi_i'=a_{i1}\xi_1+a_{i2}\xi_2\)、\(\eta_j'=\sum_k b_{jk}\eta_k\) 代入 \(\xi_i'\eta_j'\) 展开，可见变换矩阵恰为六阶分块阵
+              <div class="eq-scroll">\[ \begin{pmatrix}a_{11}B&a_{12}B\\a_{21}B&a_{22}B\end{pmatrix}. \]</div>
+            </p>
+            <section class="card def" id="def-5-9">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 5.9：Kronecker 直积</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A=(a_{ij})_{m\times n}\in\C^{m\times n}\)，\(B=(b_{ij})_{p\times q}\in\C^{p\times q}\)，称分块矩阵
+                  <div class="eq-scroll">\[
+                  A\otimes B=\begin{pmatrix}
+                  a_{11}B&a_{12}B&\cdots&a_{1n}B\\
+                  a_{21}B&a_{22}B&\cdots&a_{2n}B\\
+                  \vdots&\vdots&&\vdots\\
+                  a_{m1}B&a_{m2}B&\cdots&a_{mn}B
+                  \end{pmatrix}\in\C^{mp\times nq} \tag{5.4.1}
+                  \]</div>
+                  为 \(A\) 与 \(B\) 的<strong>直积（Kronecker 积）</strong>，简记 \(A\otimes B=(a_{ij}B)\)。</p>
+              </div>
+            </section>
+            <section class="card ex" id="exm-5-12">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 5.12：直积不可交换</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">\(A=\begin{pmatrix}1&2\\3&4\end{pmatrix},\ B=\begin{pmatrix}0&0&1\\0&1&0\\1&0&0\end{pmatrix}\)：
+                  \[ A\otimes B=\begin{pmatrix}B&2B\\3B&4B\end{pmatrix}\ (6\times6),\qquad
+                     B\otimes A=\begin{pmatrix}0A&0A&A\\0A&A&0A\\A&0A&0A\end{pmatrix}. \]
+                  两矩阵不同，故 <strong>\(A\otimes B\ne B\otimes A\)</strong>（但由性质 (10) 它们相似）。</p>
+              </div>
+            </section>
+            <h3 class="sub-title" id="properties">十条性质</h3>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>#</th><th>性质</th></tr>
+                <tr><td>(1)</td><td>\(k(A\otimes B)=(kA)\otimes B=A\otimes(kB)\)</td></tr>
+                <tr><td>(2)</td><td>\((A_1+A_2)\otimes B=A_1\otimes B+A_2\otimes B\)；\(B\otimes(A_1+A_2)=B\otimes A_1+B\otimes A_2\)</td></tr>
+                <tr><td>(3)</td><td>\((A\otimes B)\otimes C=A\otimes(B\otimes C)\)（结合律）</td></tr>
+                <tr><td>(4)</td><td>\((A_1\otimes B_1)(A_2\otimes B_2)=(A_1A_2)\otimes(B_1B_2)\)（尺寸匹配时）——<strong>最常用的乘积规则</strong></td></tr>
+                <tr><td>(5)</td><td>\(A,B\) 可逆 ⇒ \((A\otimes B)^{-1}=A^{-1}\otimes B^{-1}\)</td></tr>
+                <tr><td>(6)</td><td>上（下）三角 ⊗ 上（下）三角仍上（下）三角</td></tr>
+                <tr><td>(7)</td><td>\((A\otimes B)^{\mathrm H}=A^{\mathrm H}\otimes B^{\mathrm H}\)</td></tr>
+                <tr><td>(8)</td><td>正交（酉）⊗ 正交（酉）仍正交（酉）</td></tr>
+                <tr><td>(9)</td><td>\(\operatorname{rank}(A\otimes B)=(\operatorname{rank}A)(\operatorname{rank}B)\)</td></tr>
+                <tr><td>(10)</td><td>\(A\otimes B\) 相似于 \(B\otimes A\)（用行列对换的置换阵 \(P\)：\(P^{-1}(A\otimes I_n)P=I_n\otimes A\)）</td></tr>
+              </table>
+            </div>
+          </section>
+
+          <!-- ================= 二、二元矩阵多项式 ================= -->
+          <section class="section" id="sec-poly">
+            <h2 class="sec-title"><span class="cn">二</span>二元矩阵多项式的特征值</h2>
+            <p>对二元多项式 \(f(x,y)=\sum_{i,j=0}^{l}c_{ij}x^iy^j\) 及方阵 \(A_{m\times m},B_{n\times n}\)，定义 \(mn\) 阶矩阵
+              <div class="eq-scroll">\[ f(A,B)=\sum_{i,j=0}^{l}c_{ij}A^i\otimes B^j,\qquad A^0=I_m,\ B^0=I_n. \tag{5.4.4} \]</div>
+            </p>
+            <section class="card thm" id="thm-5-27">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 5.27</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\) 的特征值为 \(\lambda_1,\ldots,\lambda_m\)，\(B\) 的特征值为 \(\mu_1,\ldots,\mu_n\)，则 \(f(A,B)\) 的全体特征值为
+                  <div class="eq-scroll">\[ f(\lambda_i,\mu_j)\quad(i=1,\ldots,m;\ j=1,\ldots,n). \]</div></p>
+                <details class="proof">
+                  <summary><span>证明（同时上三角化，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>由 Schur/定理 1.17 取可逆 \(P,Q\) 使 \(P^{-1}AP=T_1\)、\(Q^{-1}BQ=T_2\) 为上三角（对角元即特征值）。由性质 (4)(5)(6)，\(P\otimes Q\) 可逆且
+                      \[ (P\otimes Q)^{-1}(A^i\otimes B^j)(P\otimes Q)=(P^{-1}A^iP)\otimes(Q^{-1}B^jQ)=T_1^i\otimes T_2^j, \]</p>
+                    <p>而 \(T_1^i\otimes T_2^j\) 仍上三角，对角元为 \(\lambda_k^i\mu_s^j\)。逐项叠加得 \((P\otimes Q)^{-1}f(A,B)(P\otimes Q)=f(T_1,T_2)\) 上三角，对角元即 \(f(\lambda_k,\mu_s)\)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <div class="grid3">
+              <div class="mini-card"><div class="mc-title">推论 1（特征值积）</div><p style="margin:0">\(A\otimes B\) 的全体特征值为 \(\lambda_i\mu_j\)（取 \(f(x,y)=xy\)）。</p></div>
+              <div class="mini-card"><div class="mc-title">推论 2（行列式）</div><p style="margin:0">\(\det(A\otimes B)=(\det A)^n(\det B)^m\)（全部 \(\lambda_i\mu_j\) 之积）。</p></div>
+              <div class="mini-card"><div class="mc-title">推论 3（迹）</div><p style="margin:0">\(\operatorname{tr}(A\otimes B)=(\operatorname{tr}A)(\operatorname{tr}B)\)（\(\sum_i\sum_j\lambda_i\mu_j\) 分解）。</p></div>
+            </div>
+
+            <h3 class="sub-title" id="kron-lab-title">动手实验：Kronecker 积演示器（2×2 ⊗ 2×2）</h3>
+            <p>改 \(A,B\)，实时给出 4×4 的 \(A\otimes B\)，并验证：特征值为 \(\lambda_i\mu_j\)、\(\det(A\otimes B)=(\det A)^2(\det B)^2\)、\(\operatorname{tr}=(\operatorname{tr}A)(\operatorname{tr}B)\)、秩为两秩之积。</p>
+            <section class="card lab" data-kron-lab></section>
+          </section>
+
+          <!-- ================= 三、线性矩阵方程 ================= -->
+          <section class="section" id="sec-equations">
+            <h2 class="sec-title"><span class="cn">三</span>线性矩阵方程的可解性</h2>
+            <p>系统控制中常见矩阵方程（Sylvester 方程）
+              <div class="eq-scroll">\[ AX+XB=F, \tag{5.4.5} \]</div>
+              一般形式为
+              <div class="eq-scroll">\[ \sum_{i=1}^{l}A_iXB_i=F. \tag{5.4.6} \]</div>
+              其中 \(A_i\in\C^{m\times p},B_i\in\C^{q\times n},F\in\C^{m\times n}\) 已知，\(X\in\C^{p\times q}\) 未知。</p>
+            <h3 class="sub-title" id="vec">vec 算子：把矩阵方程拉直</h3>
+            <p>记 \(X\in\C^{p\times q}\) 的第 \(i\) 行为 \(x_i^{\mathrm T}\)，定义<strong>行拉直</strong>
+              <div class="eq-scroll">\[ \overline{\mathrm{vec}}(X)=(x_1^{\mathrm T},x_2^{\mathrm T},\ldots,x_p^{\mathrm T})^{\mathrm T}. \]</div>
+              逐行展开 \(AXB\) 可得关键恒等式
+              <div class="eq-scroll">\[ \overline{\mathrm{vec}}(AXB)=(A\otimes B^{\mathrm T})\,\overline{\mathrm{vec}}(X). \]</div>
+              于是方程 (5.4.6) 等价于普通线性方程组
+              <div class="eq-scroll">\[ \Big(\sum_{i=1}^{l}A_i\otimes B_i^{\mathrm T}\Big)\overline{\mathrm{vec}}(X)=\overline{\mathrm{vec}}(F). \]</div>
+            </p>
+            <section class="card thm" id="thm-5-28">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/></svg></span>
+                <span class="card-label">定理 5.28（可解性）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">方程 (5.4.6) 有解的充要条件是
+                  <div class="eq-scroll">\[ \overline{\mathrm{vec}}(F)\in R\Big(\sum_{i=1}^{l}A_i\otimes B_i^{\mathrm T}\Big) \]</div>
+                  （右端属于系数矩阵的列空间）——即普通线性方程组有解的判据搬过来。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-5-29">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/></svg></span>
+                <span class="card-label">定理 5.29（Sylvester 唯一解判据）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A_{m\times m}\) 特征值 \(\lambda_i\)、\(B_{n\times n}\) 特征值 \(\mu_j\)，则方程 (5.4.5) 有<strong>唯一解</strong>的充要条件是
+                  <div class="eq-scroll">\[ \lambda_i+\mu_j\ne0\quad(i=1,\ldots,m;\ j=1,\ldots,n). \]</div>
+                  <strong>推论 1：</strong>齐次方程 \(AX+XB=O\) 有非零解 ⇔ 存在 \(i_0,j_0\) 使 \(\lambda_{i_0}+\mu_{j_0}=0\)。<br>
+                  <strong>推论 2：</strong>\(AX-XA=O\)（取 \(B=-A\)）<strong>一定有非零解</strong>（\(\lambda_i+(-\lambda_i)=0\) 总成立）——例如 \(X=I\) 就是非零解。</p>
+                <details class="proof">
+                  <summary><span>证明思路（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>拉直后系数矩阵为 \(A\otimes I_n+I_m\otimes B^{\mathrm T}\)。取 \(f(x,y)=x+y\)，由定理 5.27 其特征值为 \(\lambda_i+\mu_j\)（注意 \(B^{\mathrm T}\) 与 \(B\) 特征值相同）。唯一解 ⇔ 系数矩阵非奇异 ⇔ 所有 \(\lambda_i+\mu_j\ne0\)。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <section class="card ex" id="exm-5-13">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 5.13（无公共特征值 ⇒ 块三角相似于块对角）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">若 \(A,B\) 无公共特征值，则 \(\begin{pmatrix}A&F\\O&B\end{pmatrix}\) 相似于 \(\begin{pmatrix}A&O\\O&B\end{pmatrix}\)。证明取 \(P=\begin{pmatrix}I_m&X\\O&I_n\end{pmatrix}\)，其中 \(X\) 是 \(AX+X(-B)=F\) 的唯一解（由定理 5.29，\(\lambda_i(A)+\mu_j(-B)=\lambda_i-\lambda_j(B)\ne0\)），直接验证 \(P\begin{pmatrix}A&F\\O&B\end{pmatrix}P^{-1}=\begin{pmatrix}A&O\\O&B\end{pmatrix}\)（逐块展开：\((1,2)\) 块为 \(F-(AX-XB)=O\)）。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-5-30">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/></svg></span>
+                <span class="card-label">定理 5.30（多项式型方程）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">(1) \(\sum_{k=0}^{l}A^kXB^k=F\) 有唯一解 ⇔ \(1+(\lambda_i\mu_j)+\cdots+(\lambda_i\mu_j)^l\ne0\)（对所有 \(i,j\)）；<br>(2) 齐次方程有非零解 ⇔ 存在 \(i_0,j_0\) 使该几何级数和为零。即取 \(f(x,y)=\sum_k(xy)^k\) 用定理 5.27/5.29。</p>
+              </div>
+            </section>
+            <h3 class="sub-title" id="integral">积分解与 Lyapunov 方程</h3>
+            <section class="card thm" id="thm-5-31">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></span>
+                <span class="card-label">定理 5.31（积分表示唯一解）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A,B\) 特征值之和均不为零，且积分 \(\int_0^{+\infty}e^{At}Fe^{Bt}\,\mathrm dt\) 存在，则 (5.4.5) 的唯一解为
+                  <div class="eq-scroll">\[ X=-\int_0^{+\infty}e^{At}Fe^{Bt}\,\mathrm dt. \]</div></p>
+                <details class="proof">
+                  <summary><span>证明（对 Y(t)=e^{At}Fe^{Bt} 求导积分，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>\(\frac{\mathrm dY}{\mathrm dt}=AY+YB\)，\(Y(0)=F\)。积分存在 ⇒ \(Y(t)\to O\)（\(t\to+\infty\)）。两端从 0 到 \(+\infty\) 积分：
+                      \[ -F=A\Big(\int_0^{+\infty}Y\Big)+\Big(\int_0^{+\infty}Y\Big)B, \]</p>
+                    <p>即 \(AX+XB=F\)，其中 \(X=-\int_0^{+\infty}Y\)；唯一性由定理 5.29 保证。</p>
+                  </div>
+                </details>
+                <p><strong>推论 1：</strong>若 \(\operatorname{Re}\lambda_i(A)&lt;0,\ \operatorname{Re}\mu_j(B)&lt;0\)（Hurwitz 稳定），积分必存在，唯一解即该积分。<br>
+                  <strong>推论 2（Lyapunov 方程）：</strong>若 \(\operatorname{Re}\lambda_i(A)&lt;0\)，则 \(A^{\mathrm T}X+XA=-F\) 的唯一解为
+                  <div class="eq-scroll">\[ X=\int_0^{+\infty}e^{A^{\mathrm T}t}Fe^{At}\,\mathrm dt; \]</div>
+                  且当 \(F\) 正定时 \(X\) 也正定（被积函数 \((e^{At}x)^{\mathrm T}F(e^{At}x)&gt;0\) 积分仍正）。这是控制理论中判断稳定性的 Lyapunov 方法核心。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 习题 5.4 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 5.4（共 8 题）</h2>
+            <div class="ex-toolbar">
+              <span data-fold-tools="details.solution">
+                <button type="button" data-fold="open">全部展开解答</button>
+                <button type="button" data-fold="close">全部收起</button>
+              </span>
+            </div>
+
+            <article class="card task" id="ex54-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">幂等保持</span></header>
+              <div class="card-body">
+                <p>设 \(A^2=A,\ B^2=B\)，证明 \((A\otimes B)^2=A\otimes B\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由性质 (4)：\((A\otimes B)^2=(A\otimes B)(A\otimes B)=(AA)\otimes(BB)=A^2\otimes B^2=A\otimes B\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex54-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag">正定保持</span></header>
+              <div class="card-body">
+                <p>设 \(A,B\) 都是（半）正定矩阵，证明 \(A\otimes B\) 也是（半）正定矩阵。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(A,B\) 对称 ⇒ \((A\otimes B)^{\mathrm T}=A^{\mathrm T}\otimes B^{\mathrm T}=A\otimes B\) 对称。特征值：由推论 1，\(A\otimes B\) 的特征值为 \(\lambda_i\mu_j\)，两因子均 &gt;0（半正定时 ≥0）故积亦 &gt;0（≥0），实对称矩阵特征值全正（非负）即正定（半正定）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex54-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag tag-mid">特征向量</span></header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{m\times m},B\in\C^{n\times n}\) 的特征向量分别为 \(\xi,\eta\)，证明 \(\xi\otimes\eta\) 是 \(A\otimes B\) 的特征向量。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>设 \(A\xi=\lambda\xi,\ B\eta=\mu\eta\)。由分块定义 \((A\otimes B)(\xi\otimes\eta)=(A\xi)\otimes(B\eta)=(\lambda\xi)\otimes(\mu\eta)=\lambda\mu(\xi\otimes\eta)\)（数可提出），且 \(\xi\otimes\eta\ne0\)。故 \(\xi\otimes\eta\) 是属于 \(\lambda\mu\) 的特征向量。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex54-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag tag-hard">重数分析</span></header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{m\times m}\) 特征值为 \(\lambda_1,\ldots,\lambda_m\)，证明 \(B=(u_nu_n^{\mathrm T})\otimes A\) 的特征值是 \(n\lambda_1,\ldots,n\lambda_m\) 和 \(m(n-1)\) 重零。这里 \(u_n=(1,\ldots,1)^{\mathrm T}\in\R^n\)。</p>
+                <details class="solution"><summary><span>查看提示</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(u_nu_n^{\mathrm T}\) 是全 1 矩阵：秩 1，特征值为 \(n\)（对应 \(u_n\)）与 0（重数 \(n-1\)）。由推论 1，\(B\) 的特征值为两因子特征值之积：\(n\cdot\lambda_i\)（\(m\) 个）与 \(0\cdot\lambda_i\)（共 \((n-1)m\) 个零）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex54-5">
+              <header class="card-head"><span class="card-label">第 5 题</span><span class="tag">反 Hermite 的直积</span></header>
+              <div class="card-body">
+                <p>证明：两个反 Hermite 矩阵的直积是 Hermite 矩阵。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(A^{\mathrm H}=-A,\ B^{\mathrm H}=-B\) ⇒ \((A\otimes B)^{\mathrm H}=A^{\mathrm H}\otimes B^{\mathrm H}=(-A)\otimes(-B)=(-1)(-1)(A\otimes B)=A\otimes B\)（性质 (1)(7)）。故 \(A\otimes B\) Hermite。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex54-6">
+              <header class="card-head"><span class="card-label">第 6 题</span><span class="tag tag-mid">半正定唯一解</span></header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{m\times m}\) 与 \(B\in\C^{n\times n}\) 都是半正定矩阵，证明方程 \(\sum_{k=0}^{l}A^kXB^k=F\) 存在唯一解。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>半正定 ⇒ 特征值 \(\lambda_i,\mu_j\ge0\)（Hermite 故为实数）。几何级数和 \(1+(\lambda_i\mu_j)+\cdots+(\lambda_i\mu_j)^l\ge1&gt;0\) 恒不为零。由定理 5.30(1) 唯一解存在。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex54-7">
+              <header class="card-head"><span class="card-label">第 7 题</span><span class="tag tag-mid">实特征值情形</span></header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{m\times m}\) 与 \(B\in\C^{n\times n}\) 的特征值都是实数，证明方程 \(X+AXB+A^2XB^2=F\) 存在唯一解。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>取 \(f(x,y)=1+xy+x^2y^2=1+t+t^2\)（\(t=xy\) 为实数）。二次式 \(1+t+t^2\) 的判别式 \(-3&lt;0\) 且首项正，故对一切实 \(t\) 有 \(1+t+t^2\ge3/4&gt;0\)。由定理 5.27/5.30，系数矩阵特征值 \(f(\lambda_i,\mu_j)&gt;0\) 全非零 ⇒ 唯一解。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex54-8">
+              <header class="card-head"><span class="card-label">第 8 题</span><span class="tag tag-hard">矩阵函数法求解</span></header>
+              <div class="card-body">
+                <p>使用矩阵函数方法求解矩阵方程 \(AX+XA=I\)，其中 \(A=\begin{pmatrix}-1&0&0\\0&-1&0\\-1&2&-2\end{pmatrix}\)。</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(A\) 的特征值为 \(-1,-1,-2\)（下三角块），实部均负，故由定理 5.31（取 \(B=A,\ F=I\)）唯一解为</p>
+                  <div class="eq-scroll">\[ X=-\int_0^{+\infty}e^{At}Ie^{At}\,\mathrm dt=-\int_0^{+\infty}e^{2At}\,\mathrm dt=-(2A)^{-1}\big(e^{2A\cdot\infty}-I\big)=\tfrac12A^{-1}. \]</div>
+                  <p>其中用了 \(\int_0^\infty e^{2At}\mathrm dt=(2A)^{-1}(e^{2A\cdot\infty}-I)=-(2A)^{-1}\)（\(\frac{\mathrm d}{\mathrm dt}e^{2At}=2Ae^{2At}\)，且 \(A\) 的特征值实部为负保证 \(e^{2A\cdot\infty}=O\)，于是外层 \(-\int\) 给出正号）。代入 \(A^{-1}=\begin{pmatrix}-1&0&0\\0&-1&0\\\frac12&-1&-\frac12\end{pmatrix}\)（\(A\) 下三角，易求）即得 \(X=\frac12A^{-1}=\begin{pmatrix}-\frac12&0&0\\0&-\frac12&0\\\frac14&-\frac12&-\frac14\end{pmatrix}\)，可直接验证 \(AX+XA=I\)。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 本节小结 / 第5章总结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结（兼第 5 章总结）</h2>
+            <div class="summary-block">
+              <p>Kronecker 积是把"矩阵方程"降维成"线性方程组"的通用翻译器：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>对象</th><th>结论</th></tr>
+                  <tr><td>定义</td><td>\(A\otimes B=(a_{ij}B)\)，\(mp\times nq\)；一般 \(A\otimes B\ne B\otimes A\) 但相似</td></tr>
+                  <tr><td>性质</td><td>双线性、结合、乘积规则 (4)、逆 (5)、三角/共轭/正交保持、秩相乘 (9)</td></tr>
+                  <tr><td>定理 5.27</td><td>\(f(A,B)\) 的特征值 \(=f(\lambda_i,\mu_j)\)；推论：特征值积、\(\det\)、\(\operatorname{tr}\)</td></tr>
+                  <tr><td>vec 拉直</td><td>\(\overline{\mathrm{vec}}(AXB)=(A\otimes B^{\mathrm T})\overline{\mathrm{vec}}(X)\)</td></tr>
+                  <tr><td>Sylvester (5.29)</td><td>\(AX+XB=F\) 唯一解 ⇔ \(\lambda_i+\mu_j\ne0\)；\(AX-XA=O\) 必有非零解</td></tr>
+                  <tr><td>积分解 (5.31)</td><td>Hurwitz 条件下 \(X=-\int_0^\infty e^{At}Fe^{Bt}\mathrm dt\)；Lyapunov：\(F\) 正定 ⇒ \(X\) 正定</td></tr>
+                </table>
+              </div>
+              <p style="margin-top:12px"><strong>第 5 章总回顾：</strong>§5.1 用元素圈定特征值（Gerschgorin/Ostrowski/Bauer–Fike）→ §5.2 广义特征值问题（Cholesky 对称化、B-正交）→ §5.3 Rayleigh 商与极小极大原理（变分刻画 + 扰动稳定）→ §5.4 Kronecker 积（矩阵方程可解性与积分解）。四节合起来构成"特征值定位—变分—扰动—方程"的完整工具链。</p>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>为什么 \(A\otimes B\) 与 \(B\otimes A\) 不相等却相似？性质 (10) 的置换阵做了什么行列表换？</li>
+                  <li>不看书写出 \(\overline{\mathrm{vec}}(AXB)\) 的拉直公式，并说明为什么 Sylvester 方程的唯一解条件是 \(\lambda_i+\mu_j\ne0\) 而不是 \(\lambda_i\ne\mu_j\)。</li>
+                  <li>Lyapunov 方程 \(A^{\mathrm T}X+XA=-F\) 中，为什么"\(A\) 的特征值实部全负"同时保证了积分存在和解的正定性？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="5.3-rayleigh-extremum.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§5.3 对称矩阵特征值的极性</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="../ch6/6.1-projection-matrices.html"><span class="ln-dir">下一章</span><span class="ln-ttl">第 6 章 §6.1 投影矩阵</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

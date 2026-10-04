@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§7.3 非负矩阵（选学） · 矩阵论</title>
+  <meta name="description" content="矩阵论 §7.3（选学）：非负矩阵 A≥O 与非负向量、Perron-Frobenius 定理（不可约/一般非负）、单调矩阵 A⁻¹≥O 与解的夹逼估计、Collatz 判据、正则分裂与弱正则分裂、迭代收敛、半单调与单调矩阵家族">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§7.3 非负矩阵（选学）</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="7.3" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 7 章 若干特殊矩阵类介绍</a><span class="sep" aria-hidden="true">/</span>
+            <span>§7.3 非负矩阵（选学）</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 7 章 · Perron–Frobenius 理论</div>
+            <h1>§7.3 非负矩阵</h1>
+            <p class="lede">元素全非负的矩阵出现在 Markov 链、投入产出、概率转移、微分方程正解等问题中。它们享有线性代数中最美的定理之一——<strong>Perron–Frobenius 理论</strong>：谱半径本身必是特征值，并配有非负（不可约时为正）特征向量。由此引出<strong>单调矩阵</strong>（逆非负）与解的上下界夹逼，以及把 §3.3/§6.3 迭代收敛性与"逆非负"统一起来的<strong>正则分裂</strong>理论——它们共同通向 §7.4 的 M 矩阵。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.387–394</strong></span>
+              <span class="chip">建议 <strong>2 学时</strong></span>
+              <span class="chip">定理 <strong>2.1–7.2（P-F）</strong></span>
+              <span class="chip">核心概念 <strong>单调 / 正则分裂</strong></span>
+              <span class="chip">习题 <strong>3 题</strong></span>
+
+              <span class="chip">例题 <strong>2 道</strong></span></div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>准确使用记号 \(A\ge O,\ A&gt;O,\ x\ge0,\ x&gt;0\)，知道 \(\rho(A)\le\rho(|A|)\)；</li>
+                  <li>陈述 Perron–Frobenius 定理对不可约非负阵与一般非负阵的两种版本；</li>
+                  <li>掌握单调矩阵定义 \(A^{-1}\ge O\) 与 Collatz 判据 \(Ax\ge0\Rightarrow x\ge0\)；</li>
+                  <li>会用 \(Ax'\le b\le Ax''\) 夹逼方程的解；</li>
+                  <li>陈述正则/弱正则分裂及 \(\rho(Q^{-1}S)&lt;1\) 与逆非负、迭代收敛的等价性。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>P-F 定理结论；</li>
+                      <li>单调矩阵与夹逼；</li>
+                      <li>正则分裂。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>不可约在 P-F 中的作用；</li>
+                      <li>谱半径单调不减；</li>
+                      <li>各单调矩阵类的关系。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 2 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>非负矩阵与 Perron–Frobenius 定理（定理 7.1–7.2 及例题）</td><td class="num">p.387–389</td></tr>
+                    <tr><td class="num">2</td><td>单调矩阵、解的夹逼、正则/弱正则分裂、实验与习题</td><td class="num">p.389–394</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 200" role="img" aria-label="非负矩阵脉络图">
+                    <defs><marker id="m73" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b"><rect x="40" y="24" width="180" height="54"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="130" y="46">非负矩阵 A≥O</text><text x="130" y="64" font-size="11" fill="#666">ρ(A)≤ρ(|A|)</text>
+                    </g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="280" y="24" width="200" height="54"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="380" y="46">Perron–Frobenius</text><text x="380" y="64" font-size="11" fill="#666">ρ(A) 是特征值，配有非负向量</text>
+                    </g>
+                    <g class="fm-node" fill="#f4f0e2" stroke="#a06a17"><rect x="540" y="24" width="180" height="54"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="630" y="46">单调矩阵 A⁻¹≥O</text><text x="630" y="64" font-size="11" fill="#666">Ax≥0 ⇒ x≥0；解夹逼</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m73)"><line x1="220" y1="51" x2="278" y2="51"/><line x1="480" y1="51" x2="538" y2="51"/></g>
+                    <g class="fm-node" fill="#eef7f0" stroke="#3d7a4e"><rect x="250" y="126" width="340" height="54"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="420" y="148">正则分裂 A=Q−S：Q⁻¹≥O, S≥O</text><text x="420" y="166" font-size="11" fill="#666">ρ(Q⁻¹S)&lt;1 ⇔ A⁻¹≥O ⇔ 迭代 x⁽ᵏ⁺¹⁾=Q⁻¹Sx⁽ᵏ⁾+Q⁻¹b 收敛</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m73)"><line x1="630" y1="78" x2="500" y2="124"/></g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、非负矩阵与 P-F ================= -->
+          <section class="section" id="sec-nonneg">
+            <h2 class="sec-title"><span class="cn">一</span>非负矩阵</h2>
+            <p>若 \(n\) 阶实矩阵 \(A=(a_{ij})\) 满足 \(a_{ij}\ge0\)，则称 <strong>\(A\) 为非负矩阵</strong>，记 \(A\ge O\)；若 \(a_{ij}&gt;0\)，称 <strong>正矩阵</strong>，记 \(A&gt;O\)。零矩阵是非负矩阵；非零的非负矩阵 \(A\ge O\) 同时不是零矩阵时单独记为 \(A\gneqq O\)。若 \(B=(b_{ij})\)，以 \(|B|=(|b_{ij}|)\) 为元素的矩阵也是非负阵，记为 \(|B|\)。向量同理：\(x\ge0\)（非负）、\(x\gneqq0\)（非零非负）、\(x&gt;0\)（正向量）。</p>
+            <div class="card note">
+              <header class="card-head"><span class="card-label">为什么重要</span></header>
+              <div class="card-body"><p style="margin-bottom:0">非负矩阵是 <strong>M 矩阵</strong>（主对角线外 \(a_{ij}\le0\) 且逆非负，§7.4）三角分解与特征值问题的基础，也来自 Markov 转移矩阵。对任意矩阵恒有谱半径估计</p>
+              <div class="eq-scroll">\[ \rho(A)\le\rho(|A|). \]</div></div>
+            </div>
+
+            <section class="card thm" id="thm-7-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 7.1：不可约非负矩阵的 Perron–Frobenius</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\R^{n\times n}\) 是<strong>非负不可约</strong>矩阵，则：</p>
+                <div class="table-wrap">
+                  <table class="book">
+                    <tr><th class="num" scope="row">(1)</th><td>\(A\) 有一个<strong>正实特征值</strong>恰等于谱半径 \(\rho(A)\)（且按模等于 \(\rho(A)\) 的特征值呈单位根分布，个数等于周期）；</td></tr>
+                    <tr><th class="num" scope="row">(2)</th><td>属于 \(\rho(A)\) 有一个<strong>正特征向量</strong>（在相差正倍数意义下唯一）；</td></tr>
+                    <tr><th class="num" scope="row">(3)</th><td>当 \(A\) 的任意元素（一个或多个）增加时，谱半径 <strong>\(\rho(A)\) 严格增加</strong>（单调性）。</td></tr>
+                  </table>
+                </div>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-7-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 7.2：一般非负矩阵</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\ge O\)（允许可约），则：(1) \(A\) 有一个<strong>非负</strong>特征值等于 \(\rho(A)\)；(2) 属于它有一个<strong>非负</strong>特征向量；(3) 元素增加时 \(\rho(A)\) <strong>不减</strong>（不可约时加强为严格增）。可约情形可对每个不可约对角块分别应用定理 7.1 后取并集得到。</p>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-pf">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例：谱半径即特征值</span>
+              </header>
+              <div class="card-body">
+                <p>对非负不可约矩阵</p>
+                <div class="eq-scroll">\[ A=\begin{pmatrix}1&2&0\\2&1&3\\0&2&1\end{pmatrix}, \]</div>
+                <p>特征值为 \(1+\sqrt{10}\approx4.1623,\ 1,\ 1-\sqrt{10}\approx-2.1623\)，故谱半径 \(\rho(A)=1+\sqrt{10}\) 就是它的一个特征值。</p>
+                <div class="card note" style="margin-top:8px">
+                  <header class="card-head"><span class="card-label">教材勘误</span></header>
+                  <div class="card-body"><p style="margin-bottom:0">教材称"属于 \(\rho(A)\) 的正特征向量是 \((1,\sqrt{10},2)^{\mathrm T}\)"。核验可知正确向量为 \(\big(1,\frac{\sqrt{10}}2,1\big)^{\mathrm T}\)（或同比例的 \((2,\sqrt{10},2)^{\mathrm T}\)）：由 \(-\sqrt{10}\,x_1+2x_2=0\) 得 \(x_2=\frac{\sqrt{10}}2x_1\)，由 \(2x_2-\sqrt{10}\,x_3=0\) 得 \(x_3=x_1\)。教材向量第一分量 \(1\) 应为 \(2\)。</p></div>
+                </div>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 二、单调矩阵 ================= -->
+          <section class="section" id="sec-monotone">
+            <h2 class="sec-title"><span class="cn">二</span>单调矩阵</h2>
+            <p>若 \(n\) 阶实矩阵 \(A\) 的逆矩阵 <strong>\(A^{-1}\ge O\)</strong>，则称 \(A\) 为<strong>单调矩阵</strong>。单调矩阵必非奇异。例：</p>
+            <div class="eq-scroll">\[ A=\begin{pmatrix}1&-\tfrac12&\tfrac18\\0&1&-\tfrac12\\0&0&1\end{pmatrix},\qquad A^{-1}=\begin{pmatrix}1&\tfrac12&\tfrac18\\0&1&\tfrac12\\0&0&1\end{pmatrix}\ge O. \tag{7.3.1} \]</div>
+
+            <section class="card thm" id="thm-bracket">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">解的夹逼估计</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\) 单调，\(\widetilde x=A^{-1}b\) 是 \(Ax=b\) 的唯一解。若能找到 \(x',x''\) 使</p>
+                <div class="eq-scroll">\[ Ax'\le b,\qquad Ax''\ge b, \]</div>
+                <p style="margin-bottom:0">则</p>
+                <div class="eq-scroll">\[ x'\le\widetilde x\le x''\quad\text{即}\quad \xi_i'\le\widetilde\xi_i\le\xi_i''\quad(i=1,\cdots,n). \tag{7.3.2} \]</div>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">\(Ax'\le b\Rightarrow A(x'-\widetilde x)=Ax'-b\le0\)，左乘 \(A^{-1}\ge O\)（非负矩阵保不等号）得 \(x'-\widetilde x\le0\)。上界同理。意义：找到"下残差向量"与"上残差向量"即可不解方程而框定解的范围，是区间分析与误差估计的基本工具。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-733">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 (7.3.3)：下界估计</span>
+              </header>
+              <div class="card-body">
+                <p>方程组（右端 \(b=(0.6,0.6,0.6,0.66)^{\mathrm T}\)）为</p>
+                <div class="eq-scroll">\[
+                \xi_1-\tfrac14\xi_2-\tfrac14\xi_3=0.6,\quad
+                -\tfrac14\xi_1+\xi_2-\tfrac14\xi_4=0.6,\quad
+                -\tfrac14\xi_1+\xi_3-\tfrac14\xi_4=0.6,\quad
+                -\tfrac14\xi_2-\tfrac14\xi_3+\xi_4=0.66.
+                \]</div>
+                <p>其系数矩阵的逆是元素全正的矩阵（对角 \(\tfrac76\)，其余 \(\tfrac16\) 或 \(\tfrac26\) 或 \(\tfrac36\) 型），故单调。取 \(x'=(1.2,1.2,1.2,1.2)^{\mathrm T}\)，则 \(Ax'=(0.6,0.6,0.6,0.6)^{\mathrm T}\le b\)，于是每个 \(\widetilde\xi_i\ge1.2\)。精确解为</p>
+                <div class="eq-scroll">\[ \widetilde x=A^{-1}b=(1.21,\ 1.22,\ 1.22,\ 1.27)^{\mathrm T}, \]</div>
+                <p style="margin-bottom:0">下界 1.2 确实成立。</p>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-collatz">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">Collatz 判据（单调矩阵的充要条件）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">矩阵 \(A\) 单调的充要条件是：<strong>可由 \(Ax\ge0\) 推出 \(x\ge0\)</strong>（逆正性，inverse-positivity）。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>单调时 \(Ax\ge0\) 左乘 \(A^{-1}\ge O\) 即得 \(x\ge0\)。反之设该蕴含成立：取 \(Ax=0\)，则 \(Ax\ge0\) 与 \(A(-x)\ge0\) 同时成立，推出 \(x\ge0\) 与 \(-x\ge0\)，故 \(x=0\)，齐次方程只有零解、\(A\) 非奇异；再取 \(A^{-1}\) 的第 \(j\) 列 \(a_j^{-1}\)，由 \(Aa_j^{-1}=e_j\ge0\) 及假设知每列非负，即 \(A^{-1}\ge O\)。</p>
+                </details>
+                <p style="margin-bottom:0">Mangasarian(1968) 还给出长方阵版本：\(m\times n\) 矩阵 \(A\) 单调的充要条件之一是存在非负左逆 \(BA=I\)（\(B\ge O\)）；另一个是锥包含 \(K(A)\supseteq\R_+^n\)，其中 \(K(A)=\{A^{\mathrm T}u:u\ge0\}\)。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 三、正则分裂 ================= -->
+          <section class="section" id="sec-splitting">
+            <h2 class="sec-title"><span class="cn">三</span>矩阵的正则分裂及弱正则分裂</h2>
+            <p>若矩阵 \(A\) 可表示为</p>
+            <div class="eq-scroll">\[ A=Q-S,\qquad Q^{-1}\ge O,\qquad S\ge O, \tag{7.3.4} \]</div>
+            <p>则称其为 \(A\) 的<strong>正则分裂</strong>；若更有迭代阵 \(Q^{-1}S\) 收敛，即</p>
+            <div class="eq-scroll">\[ \rho(Q^{-1}S)&lt;1, \]</div>
+            <p>则称 <strong>\(A\) 有收敛的正则分裂</strong>。与之相联的基本迭代是</p>
+            <div class="eq-scroll">\[ x^{(k+1)}=Q^{-1}S\,x^{(k)}+Q^{-1}b. \tag{7.3.5} \]</div>
+            <p>因 \(\rho(Q^{-1}S)&lt;1\)，迭代收敛到 \(Ax=b\) 的唯一解——这与 §3.3 的矩阵幂级数、§6.3 的 Neumann 展式是同一收敛条件。</p>
+            <section class="card thm" id="thm-regular">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">逆非负 ⇔ 有收敛正则分裂</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">矩阵 \(A\) 为逆非负（\(A^{-1}\ge O\)）的另一等价条件是 \(A\) 有收敛的正则分裂。事实上收敛时 Neumann 级数直接给出</p>
+                <div class="eq-scroll">\[ A^{-1}=(I-Q^{-1}S)^{-1}Q^{-1}=\sum_{k=0}^{\infty}(Q^{-1}S)^kQ^{-1}\ge O. \]</div>
+              </div>
+            </section>
+            <p><strong>弱正则分裂</strong>（Varga, 1960）：\(A=Q-S\)，\(Q^{-1}\ge O\) 且 \(Q^{-1}S\ge O\)（不要求 \(S\ge O\)）；若再有 \(\rho(Q^{-1}S)&lt;1\) 称收敛的弱正则分裂。矩阵具有收敛正则分裂与具有收敛弱正则分裂是等价的。</p>
+            <p><strong>长方阵推广</strong>（Plemmons, 1972）：列满秩 \(A\in\R^{m\times n}\) 的 Moore–Penrose 逆 \(A^+\ge O\) 的充要条件是存在 \(S\) 使 \(Q=A+S\) 满足 \(R(S)\subseteq R(Q)\)、\(Q^+\ge O\)、\(Q^+S\ge O\)、\(\rho(Q^+S)&lt;1\) 三（四）个条件。1975 年 Poole 称满足 \(A^+\ge O\) 的矩阵为<strong>半单调矩阵</strong>。</p>
+
+            <h3 class="sub-title" id="monotone-family">单调矩阵家族（图 7.1）</h3>
+            <p>沿不同方向推广"由 \(Ax\ge0\) 推出什么"，得到一族概念：</p>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>名称</th><th>定义要点</th></tr>
+                <tr><td>（普通）单调</td><td>\(Ax\ge0\Rightarrow x\ge0\)，即 \(A^{-1}\ge O\)</td></tr>
+                <tr><td>Mangasarian 单调</td><td>存在非负左逆 \(BA=I\)</td></tr>
+                <tr><td>半单调</td><td>由 \(Ax\in\R_+^n+N(A^{\mathrm T})\) 与 \(x\in R(A^{\mathrm T})\) 可推 \(x\ge0\)；等价 \(A^+\ge O\)</td></tr>
+                <tr><td>行单调</td><td>在 \(R(A^{\mathrm T})\) 上单调；充要条件是存在广义逆 \(A^{(1,4)}\ge O\)</td></tr>
+                <tr><td>T-单调</td><td>\(A\) 在子空间 \(T\)（\(N(A)\) 的余子空间）上单调</td></tr>
+                <tr><td>几乎单调</td><td>对 \(N(A)\) 的每个余子空间 \(T\) 均 \(T\)-单调（教材 p.393）</td></tr>
+                <tr><td>弱单调</td><td>由 \(Ax\ge0\) 可推 \(x\in\R_+^n+N(A)\)（长方/一般形式）</td></tr>
+                <tr><td>群单调</td><td>\(AA^{(1,2)}=A^{(1,2)}A\) 且 \(A^{(1,2)}\ge O\)</td></tr>
+              </table>
+            </div>
+            <p style="margin-bottom:0">其包含关系为教材图 7.1：单调居于顶端，分别蕴含 Mangasarian 单调、半单调、群单调；半单调通向行单调、Mangasarian 单调通向 T-单调、群单调通向弱单调，行单调与 T-单调最终也汇入弱单调。它们与 §6.4–6.6 的 \(\{1,4\}\)-逆、\(\{1,3\}\)-逆、群逆一一呼应。</p>
+
+            <h3 class="sub-title" id="perron-lab-title">动手实验：Perron–Frobenius / 单调矩阵台</h3>
+            <p><strong>Perron 模式</strong>：输入非负 3×3 矩阵，幂法求 \(\rho(A)\) 与 Perron 向量，检查不可约性（有向图强连通），对照完整谱验证"\(\rho\) 是特征值、配有非负向量"，并可增大一个元素观察 \(\rho\) 单调变化。<strong>单调模式</strong>：输入 \(A,b\) 与试探上下界 \(x',x''\)，工具检查 \(A^{-1}\ge O\)、计算精确解并验证夹逼 \(x'\le A^{-1}b\le x''\)。</p>
+            <section class="card lab" data-perron-lab></section>
+          </section>
+
+          <!-- ================= 习题 7.3 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 7.3（教材 p.393–394）</h2>
+            <div class="fold-bar no-print" data-fold-tools=".card.task">
+              <button type="button" data-fold="open">全部展开</button>
+              <button type="button" data-fold="close">全部收起</button>
+            </div>
+
+            <article class="card task" id="ex73-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">逆的符号结构</span></header>
+              <div class="card-body">
+                <p>设 \(n\) 阶非负矩阵 \(A=(a_{ij})\) 非奇异，问逆矩阵 \(A^{-1}=B=(b_{ij})\) 满足</p>
+                <div class="eq-scroll">\[ b_{ij}\ge0\ (i\ne j),\qquad B\ge O \]</div>
+                <p>的条件是什么？</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>第二个条件 \(B\ge O\)（全部元素非负）就是 \(A\) 为<strong>单调矩阵</strong>本身，对非负的 \(A\ge O\) 而言这是很强的条件：由 \(AB=I\)，非负阵乘非负阵等于单位阵，逐列考察可知只有当 \(A\) 为<strong>单项矩阵（monomial matrix）</strong>——即每行每列恰有一个正元素、其余为 0（正对角阵与置换阵之积）——时才能做到。事实上若 \(A,B\ge O\) 且 \(AB=I\)，则 \(\sum_k a_{ik}b_{kj}=\delta_{ij}\)：非负和为 0 迫使 \(i\ne j\) 时所有项为 0，支撑集结构迫使 \(A\) 每行恰有一个非零元且不同行位置不同，再由非奇异知每列也恰一个，故 \(A=DP\)（\(D\) 正对角、\(P\) 置换），此时 \(B=P^{\mathrm T}D^{-1}\ge O\)。</p>
+                  <p>第一个条件 \(b_{ij}\ge0\ (i\ne j)\)（只要求逆的非对角元非负，允许对角元任意符号）单独刻画的是另一类矩阵，它与 \(A\ge O\) 非奇异<strong>并不能</strong>推出单项矩阵：反例 \(A=\begin{pmatrix}1&2\\3&4\end{pmatrix}\ge O\) 非奇异，而 \(A^{-1}=\begin{pmatrix}-2&1\\3/2&-1/2\end{pmatrix}\) 的非对角元 \(1,\,3/2\ge0\) 满足条件 (1)，但 \(A\) 显然不是单项矩阵。只有当两个条件合取（即 \(B\ge O\)，亦即 \(A\) 单调）时，才由上段论证得 \(A\) 为单项矩阵。该题是 §7.4"M 矩阵"符号结构讨论的引子。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex73-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag">逆的逆</span></header>
+              <div class="card-body">
+                <p>设矩阵 \(A\) 的逆矩阵 \(A^{-1}\) 是单调矩阵，问 \(A\) 是怎样的矩阵？</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(A^{-1}\) 单调意味着 \((A^{-1})^{-1}\ge O\)，即 <strong>\(A\ge O\)</strong>，同时 \(A^{-1}\) 非奇异（因单调矩阵必非奇异）故 \(A\) 本身非奇异。所以条件等价于：<strong>\(A\) 是非奇异非负矩阵且其逆也非奇异</strong>，直白说就是 \(A\ge O\) 且 \(A^{-1}\) 存在。结合第 1 题，若题意还要求 \(A\) 本身单调（即 \(A^{-1}\ge O\)），则 \(A\) 与 \(A^{-1}\) 同时非负，\(A\) 必为单项矩阵。仅按字面"\(A^{-1}\) 单调"，答案即 \(A\ge O\) 且非奇异。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex73-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag">夹逼的上界</span></header>
+              <div class="card-body">
+                <p>设 \(A\) 单调，\(\widetilde x\) 是 \(Ax=b\) 的唯一解，若有 \(x''\ge\widetilde x\)，问是否有 \(Ax''\ge b\)？</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p><strong>不一定。</strong>由 \(x''\ge\widetilde x\) 得 \(x''-\widetilde x\ge0\)。\(A\) 单调只保证 \(A^{-1}\ge O\)，<strong>并不意味着 \(A\) 本身非负</strong>，所以不能直接用 \(A\) 乘不等号；但可写 \(Ax''-b=A(x''-\widetilde x)\)。这里需注意方向：单调矩阵的定义只给"逆非负"，\(A\) 乘非负向量未必非负（典型单调阵恰是 \(a_{ij}\le0\ (i\ne j)\) 的 M 矩阵！）。因此严格说：</p>
+                  <p>题目结论成立需要 <strong>\(A\ge O\)</strong>（元素非负）这一附加条件；在 \(A\ge O\) 时 \(x''-\widetilde x\ge0\Rightarrow A(x''-\widetilde x)\ge0\)，即 \(Ax''\ge b\)。仅 \(A^{-1}\ge O\) 时反例：取 M 矩阵 \(A=\begin{pmatrix}1&-1\\0&1\end{pmatrix}\)（\(A^{-1}=\begin{pmatrix}1&1\\0&1\end{pmatrix}\ge O\)），令 \(\widetilde x=0,\ x''=(0,1)^{\mathrm T}\ge0\)，则 \(Ax''=(-1,1)^{\mathrm T}\not\ge0=b\)。故答案为：<strong>当 \(A\) 还是非负矩阵时成立；一般单调矩阵不成立</strong>。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结</h2>
+            <div class="summary-block">
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>对象</th><th>结论</th></tr>
+                  <tr><td>记号</td><td>\(A\ge O\) 非负、\(A&gt;O\) 正；向量 \(x\ge0,\ x&gt;0\)；\(\rho(A)\le\rho(|A|)\)</td></tr>
+                  <tr><td>P-F（不可约，定理 7.1）</td><td>\(\rho(A)&gt;0\) 是正特征值；正特征向量；元素增 \(\rho\) 严格增</td></tr>
+                  <tr><td>P-F（一般，定理 7.2）</td><td>\(\rho(A)\) 是非负特征值、配非负向量；元素增 \(\rho\) 不减</td></tr>
+                  <tr><td>单调矩阵</td><td>\(A^{-1}\ge O\Leftrightarrow Ax\ge0\Rightarrow x\ge0\)（Collatz）</td></tr>
+                  <tr><td>解的夹逼</td><td>\(Ax'\le b\le Ax''\Rightarrow x'\le A^{-1}b\le x''\)（\(A^{-1}\ge O\) 保号）</td></tr>
+                  <tr><td>正则分裂</td><td>\(A=Q-S,\ Q^{-1}\ge O,\ S\ge O\)；\(\rho(Q^{-1}S)&lt;1\Leftrightarrow A^{-1}\ge O\Leftrightarrow\) 迭代收敛</td></tr>
+                  <tr><td>弱正则分裂</td><td>\(Q^{-1}\ge O,\ Q^{-1}S\ge O\)；与正则分裂的收敛性等价</td></tr>
+                </table>
+              </div>
+              <p style="margin-top:12px"><strong>承上启下：</strong>非负 + 逆非负的对偶直接生成 §7.4 的 <strong>M 矩阵</strong>（\(a_{ij}\le0\ (i\ne j),\ A^{-1}\ge O\)）——它是偏微分方程差分法、有限元、投入产出与 Markov 过程的核心矩阵类，并有著名的 40 个充要条件。下一节将看到本节的正则分裂、单调判据如何成为那 40 条中的骨干。</p>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>不可约性在 P-F 定理中把哪些结论从"非负"加强为"正"、从"不减"加强为"严格增"？</li>
+                  <li>单调矩阵为什么能做解的夹逼？夹逼时乘不等号的是 \(A\) 还是 \(A^{-1}\)？习题 3 的反例说明了什么陷阱？</li>
+                  <li>正则分裂的三个条件如何通过 Neumann 级数同时推出 \(A^{-1}\ge O\) 与迭代收敛？这与 §6.3 式 (6.3.55) 是什么关系？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="7.2-diagonally-dominant.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§7.2 对角占优矩阵（选学）</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="7.4-m-matrices.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§7.4 M 矩阵与广义 M 矩阵（选学）</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

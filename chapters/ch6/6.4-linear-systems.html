@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§6.4 广义逆矩阵与线性方程组求解 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §6.4：矩阵方程 AXB=D 相容判据与通解（定理6.26）、A{1} 通式、Ax=b 相容判据 AA⁽¹⁾b=b 与通解（定理6.27、例6.9）、极小范数解与 {1,4}-逆（引理6–7、定理6.29–6.30）、最小二乘解与 {1,3}-逆（引理8、定理6.31–6.32、法方程）、极小范数最小二乘解 x=A⁺b（定理6.33、例6.10）、矩阵方程解 X=A⁺DB⁺（定理6.34）">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§6.4 广义逆矩阵与线性方程组求解</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="6.4" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 6 章 广义逆矩阵</a><span class="sep" aria-hidden="true">/</span>
+            <span>§6.4 广义逆矩阵与线性方程组求解</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 6 章 · 应用高潮</div>
+            <h1>§6.4 广义逆矩阵与线性方程组求解</h1>
+            <p class="lede">普通逆只能解"非奇异方阵且右端合适"的方程；广义逆把<strong>一切</strong>线性方程组的求解统一成一句话。对方程组 \(Ax=b\)，工程上有四个经典问题：① 是否相容？② 相容时通解是什么？③ 矛盾时如何做最小二乘？④ 解不唯一时哪个范数最小？答案分别由 \(\{1\}\)-逆、\(\{1,4\}\)-逆、\(\{1,3\}\)-逆和 \(A^+\) 给出。最后矩阵方程 \(AXB=D\) 的极小范数最小二乘解是干净的 \(X=A^+DB^+\)。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.334–346</strong></span>
+              <span class="chip">建议 <strong>3 学时</strong></span>
+              <span class="chip">定理 <strong>9.26–6.34（9 个）</strong></span>
+              <span class="chip">引理 <strong>3–8</strong></span>
+              <span class="chip">例题 <strong>2 道</strong></span>
+
+              <span class="chip">推论 <strong>2 个</strong></span></div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>用 \(AA^{(1)}b=b\) 判定 \(Ax=b\) 相容，并写出通解 \(x=A^{(1)}b+(I-A^{(1)}A)y\)；</li>
+                  <li>陈述矩阵方程 \(AXB=D\) 的相容条件 (6.4.6) 与通解 (6.4.7)，写出 \(A\{1\}\) 通式；</li>
+                  <li>区分极小范数解（\(\{1,4\}\)-逆）、最小二乘解（\(\{1,3\}\)-逆）、极小范数最小二乘解（\(A^+\)）；</li>
+                  <li>写出法方程 \(A^{\mathrm H}Ax=A^{\mathrm H}b\) 并说明与最小二乘的等价性；</li>
+                  <li>用 \(x=A^+b\) 与 \(X=A^+DB^+\) 计算唯一最佳解。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>相容判据与通解；</li>
+                      <li>三类最佳解与三类逆；</li>
+                      <li>\(x=A^+b\) 与法方程。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>引理 6 的唯一性几何（\(R(A^{\mathrm H})\perp N(A)\)）；</li>
+                      <li>勾股分解 (6.4.16)；</li>
+                      <li>四个定理"反之"部分的逆命题逻辑。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 3 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>四类问题、相容性与通解（定理 6.26–6.28、例 6.9）</td><td class="num">p.334–339</td></tr>
+                    <tr><td class="num">2</td><td>极小范数解与 \{1,4\}-逆、最小二乘解与 \{1,3\}-逆（引理 6–8、定理 6.29–6.32）</td><td class="num">p.338–342</td></tr>
+                    <tr><td class="num">3</td><td>极小范数最小二乘解（定理 6.33、例 6.10）、矩阵方程（定理 6.34）、实验与习题</td><td class="num">p.342–346</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 210" role="img" aria-label="线性方程组求解脉络图">
+                    <defs><marker id="m64" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="30" y="20" width="170" height="52"/><rect x="235" y="20" width="170" height="52"/><rect x="440" y="20" width="170" height="52"/><rect x="645" y="20" width="165" height="52"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="115" y="42">① 相容？</text><text x="115" y="60" font-size="11" fill="#666">AA⁽¹⁾b=b（定理6.27）</text>
+                      <text x="320" y="42">② 通解</text><text x="320" y="60" font-size="11" fill="#666">A⁽¹⁾b+(I−A⁽¹⁾A)y</text>
+                      <text x="525" y="42">③ 矛盾 ⇒ 最小二乘</text><text x="525" y="60" font-size="11" fill="#666">{1,3}-逆 / 法方程</text>
+                      <text x="727" y="42">④ 极小范数</text><text x="727" y="60" font-size="11" fill="#666">{1,4}-逆</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m64)"><line x1="200" y1="46" x2="233" y2="46"/><line x1="405" y1="46" x2="438" y2="46"/><line x1="610" y1="46" x2="643" y2="46"/></g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="240" y="126" width="360" height="54"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13.5" text-anchor="middle">
+                      <text x="420" y="148">合流：唯一的极小范数最小二乘解</text><text x="420" y="166">x = A⁺ b（定理 6.33）；矩阵版 X = A⁺ D B⁺（定理 6.34）</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m64)"><line x1="525" y1="72" x2="525" y2="124"/><line x1="727" y1="72" x2="560" y2="126"/></g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 引言：四类问题 ================= -->
+          <section class="section" id="sec-intro">
+            <h2 class="sec-title"><span class="cn">引</span>四类求解问题</h2>
+            <p>考虑非齐次线性方程组</p>
+            <div class="eq-scroll">\[ Ax=b, \tag{6.4.1} \]</div>
+            <p>其中 \(A\in\C^{m\times n},\ b\in\C^m\) 给定，\(x\in\C^n\) 待定。若存在 \(x\) 使方程组成立则称<strong>相容</strong>，否则称<strong>不相容（矛盾方程组）</strong>。求解问题常见四种情形：</p>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>情形</th><th>问题</th><th>极值形式</th><th>解的名称</th></tr>
+                <tr><td class="num">(1)</td><td>相容条件？相容时求通解</td><td>—</td><td>通解</td></tr>
+                <tr><td class="num">(2)</td><td>相容但解不唯一，求欧氏范数最小者</td><td>\(\displaystyle\min_{Ax=b}\|x\|\)（6.4.2）</td><td><strong>极小范数解</strong>（唯一）</td></tr>
+                <tr><td class="num">(3)</td><td>矛盾方程组求残差最小者</td><td>\(\displaystyle\min_{x\in\C^n}\|Ax-b\|\)（6.4.3）</td><td><strong>最小二乘解</strong>（一般不唯一）</td></tr>
+                <tr><td class="num">(4)</td><td>在最小二乘解中再求范数最小者</td><td>\(\displaystyle\min_{\min\|Ax-b\|}\|x\|\)（6.4.4）</td><td><strong>极小范数最小二乘解</strong>（唯一）</td></tr>
+              </table>
+            </div>
+            <p>当 \(A\) 非奇异时 \(x=A^{-1}b\) 是唯一解；当 \(A\) 奇异或长方时，广义逆正好回答这四类问题。反之，由方程组的解也可以反推出广义逆——这是本节定理普遍带"反之"的原因。</p>
+          </section>
+
+          <!-- ================= 一、相容性与通解 ================= -->
+          <section class="section" id="sec-consistent">
+            <h2 class="sec-title"><span class="cn">一</span>线性方程组的相容性、通解与广义 {1}-逆</h2>
+            <p>先证明更一般的矩阵方程结果。考虑</p>
+            <div class="eq-scroll">\[ AXB=D, \tag{6.4.5} \]</div>
+            <p>其中 \(A\in\C^{m\times n},\ B\in\C^{p\times q},\ D\in\C^{m\times q}\)。</p>
+
+            <section class="card thm" id="thm-6-26">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.26：矩阵方程 AXB=D 的相容性与通解</span>
+              </header>
+              <div class="card-body">
+                <p>矩阵方程 (6.4.5) 相容的充要条件是（其中 \(A^{(1)}\in A\{1\},\ B^{(1)}\in B\{1\}\)）</p>
+                <div class="eq-scroll">\[ AA^{(1)}DB^{(1)}B=D, \tag{6.4.6} \]</div>
+                <p>相容时其通解为</p>
+                <div class="eq-scroll">\[ X=A^{(1)}DB^{(1)}+Y-A^{(1)}AYBB^{(1)},\qquad Y\in\C^{n\times p}\text{ 任意}. \tag{6.4.7} \]</div>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p><strong>充分性。</strong>若 (6.4.6) 成立，显然 \(X=A^{(1)}DB^{(1)}\) 就是解。<strong>必要性。</strong>若 \(X\) 是任意解，则 \(D=AXB=AA^{(1)}(AX B)B^{(1)}B=AA^{(1)}DB^{(1)}B\)。</p>
+                  <p><strong>通解。</strong>相容时易验证 (6.4.7) 是解；另一方面，设 \(X\) 是任意解，则 \(X=A^{(1)}DB^{(1)}+X-A^{(1)}(AXB)B^{(1)}\)，即取 \(Y=X\) 时恰为 (6.4.7) 的形式，故 (6.4.7) 穷尽所有解。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card cor" id="cor-a1-set">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></span>
+                <span class="card-label">推论：A{1} 的通式</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A^{(1)}\in A\{1\}\)，则</p>
+                <div class="eq-scroll">\[ A\{1\}=\{A^{(1)}+Z-A^{(1)}AZAA^{(1)}\mid Z\in\C^{n\times m}\}. \tag{6.4.8} \]</div>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">在定理 6.26 中取 \(B=D=A\)，方程 \(AXA=A\) 的通解为 \(X=A^{(1)}AA^{(1)}+Y-A^{(1)}AYAA^{(1)}\)；令 \(Y=A^{(1)}+Z\) 即得 (6.4.8)。这给出了由一个 \(\{1\}\)-逆生成全体 \(\{1\}\)-逆的参数化方法。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-6-27">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.27：Ax=b 的相容性与通解</span>
+              </header>
+              <div class="card-body">
+                <p>线性方程组 (6.4.1) 相容的充要条件是</p>
+                <div class="eq-scroll">\[ AA^{(1)}b=b, \tag{6.4.9} \]</div>
+                <p>且其通解为</p>
+                <div class="eq-scroll">\[ x=A^{(1)}b+(I-A^{(1)}A)y,\qquad y\in\C^n\text{ 任意}. \tag{6.4.10} \]</div>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">在定理 6.26 中取 \(B=I_p\)（\(p=q=n,\ B=I_n\)）即得 (6.4.9)；通解 (6.4.7) 化为 \(x=A^{(1)}b+y-A^{(1)}Ay=A^{(1)}b+(I-A^{(1)}A)y\)。</p>
+                </details>
+                <div class="card note" style="margin-top:10px">
+                  <header class="card-head"><span class="card-label">注意</span></header>
+                  <div class="card-body">
+                    <p>(1) 相容方程组的通解在线性代数中写为 \(x=x_0+z\ (z\in N(A))\)。对照式 (6.4.10)：<strong>\(A^{(1)}b\) 正是一个特解 \(x_0\)</strong>，而 \((I-A^{(1)}A)y\in N(A)\) 扫过整个零空间（由定理 6.5(6)：\(N(A^{(1)}A)=N(A)\)），即它是 \(Ax=0\) 的通解。</p>
+                    <p style="margin-bottom:0">(2) 由式 (6.4.9) 也可直接看出相容的充要条件是 \(b\in R(A)\)——因为 \(AA^{(1)}\) 就是到 \(R(A)\) 上的（斜）投影（定理 6.5(5)(6)：它幂等且值域为 \(R(A)\)）。</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-6-9">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 6.9：复方程组的相容性与通解</span>
+              </header>
+              <div class="card-body">
+                <p>取例 6.4 的矩阵 \(A\)（\(3\times6\)，秩 2）和 \(b=(14+5\mathrm j,\,-15+3\mathrm j,\,10-15\mathrm j)^{\mathrm T}\)，求解 \(Ax=b\)。</p>
+                <p><strong>解</strong>　取例 6.4 中参数全为 0 的那个 \(\{1\}\)-逆（只保留 \(-\tfrac12\mathrm j\) 与 \(-\tfrac13\) 两个元素）。验证 \(AA^{(1)}b=b\) 成立，故方程组相容，通解为 \(x=A^{(1)}b+(I-A^{(1)}A)y\)：</p>
+                <div class="eq-scroll">\[
+                x=\begin{pmatrix}0\\[2pt]\tfrac52-7\mathrm j\\0\\5-\mathrm j\\0\\0\end{pmatrix}
+                +\begin{pmatrix}
+                1&0&0&0&0&0\\
+                0&0&-\tfrac12&0&-1+2\mathrm j&\tfrac12\mathrm j\\
+                0&0&1&0&0&0\\
+                0&0&0&0&-2&-1-\mathrm j\\
+                0&0&0&0&1&0\\
+                0&0&0&0&0&1
+                \end{pmatrix}
+                \begin{pmatrix}\xi_1\\\xi_2\\\xi_3\\\xi_4\\\xi_5\\\xi_6\end{pmatrix},
+                \]</div>
+                <p style="margin-bottom:0">其中 \(\xi_1,\cdots,\xi_6\in\C\) 任意（矩阵 \(I-A^{(1)}A\) 的秩为 \(6-\operatorname{rank}A=4\)，故真正独立的自由参数有 4 个）。</p>
+              </div>
+            </section>
+
+            <p>式 (6.4.10) 表明利用某个 \(\{1\}\)-逆就能解一切相容方程组。反向的结论同样成立：</p>
+            <section class="card thm" id="thm-6-28">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.28：由求解性质反推 {1}-逆</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\C^{m\times n},\ X\in\C^{n\times m}\)。若对于使 (6.4.1) 相容的<strong>所有</strong> \(b\)，\(x=Xb\) 都是解，则 \(X\in A\{1\}\)。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">记 \(a_j\) 为 \(A\) 的第 \(j\) 列。方程 \(Ax=a_j\) 恒相容（\(e_j\) 就是解），由假设 \(x=Xa_j\) 是解，即 \(AXa_j=a_j\ (j=1,\cdots,n)\)，合起来得 \(AXA=A\)。</p>
+                </details>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 二、极小范数解 ================= -->
+          <section class="section" id="sec-minnorm">
+            <h2 class="sec-title"><span class="cn">二</span>相容方程组的极小范数解与 {1,4}-逆</h2>
+
+            <section class="card thm" id="lem-6-6">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 3v18"/><path d="M5 8l7-5 7 5"/><path d="M5 16l7 5 7-5"/></svg></span>
+                <span class="card-label">引理 6：极小范数解唯一且在 R(A^H) 中</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">相容方程组 (6.4.1) 的极小范数解唯一，且这个唯一解在 \(R(A^{\mathrm H})\) 中。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p><strong>先证 \(x_0\in R(A^{\mathrm H})\)。</strong>反证。设 \(x_0\) 是极小范数解而 \(x_0\notin R(A^{\mathrm H})\)。由正交直和分解 \(\C^n=R(A^{\mathrm H})\oplus R^\perp(A^{\mathrm H})=R(A^{\mathrm H})\oplus N(A)\)，可写 \(x_0=y_0+y_1\)，其中 \(y_0\in R(A^{\mathrm H}),\ y_1\in N(A)\) 且 \(y_1\ne0\)。由正交性（勾股定理）\(\|x_0\|^2=\|y_0\|^2+\|y_1\|^2&gt;\|y_0\|^2\)，而 \(b=Ax_0=Ay_0+Ay_1=Ay_0\)，即 \(y_0\) 也是解且范数更小，矛盾。</p>
+                  <p><strong>再证唯一。</strong>若还有 \(y_0\in R(A^{\mathrm H})\) 且 \(Ay_0=b\)，则 \(A(x_0-y_0)=0\)，即 \(x_0-y_0\in N(A)=R^\perp(A^{\mathrm H})\)；同时 \(x_0-y_0\in R(A^{\mathrm H})\)，故 \(x_0-y_0\in R(A^{\mathrm H})\cap R^\perp(A^{\mathrm H})=\{0\}\)。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card thm" id="lem-6-7">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 3v18"/><path d="M5 8l7-5 7 5"/><path d="M5 16l7 5 7-5"/></svg></span>
+                <span class="card-label">引理 7：A{1,4} 的矩阵方程刻画</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">集合 \(A\{1,4\}\) 由矩阵方程</p>
+                <div class="eq-scroll">\[ XA=A^{(1,4)}A \tag{6.4.11} \]</div>
+                <p style="margin-bottom:0">的所有解 \(X\) 组成，其中 \(A^{(1,4)}\in A\{1,4\}\)。即：<strong>对任意 \(X\in A\{1,4\}\)，乘积 \(XA\) 是一个不变量</strong>（等于 \(A^+A=P_{R(A^{\mathrm H})}\)）。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>若 \(X\) 满足 (6.4.11)：\(AXA=AA^{(1,4)}A=A\)，\((XA)^{\mathrm H}=(A^{(1,4)}A)^{\mathrm H}=A^{(1,4)}A=XA\)，故 \(X\in A\{1,4\}\)。反之，若 \(X\in A\{1,4\}\)，则 \(A^{(1,4)}A=A^{(1,4)}AXA=(A^{(1,4)}A)^{\mathrm H}(XA)^{\mathrm H}=A^{\mathrm H}(A^{(1,4)})^{\mathrm H}A^{\mathrm H}X^{\mathrm H}=(AA^{(1,4)}A)^{\mathrm H}X^{\mathrm H}=A^{\mathrm H}X^{\mathrm H}=(XA)^{\mathrm H}=XA\)。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-6-29">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.29：A{1,4} 的通式</span>
+              </header>
+              <div class="card-body">
+                <div class="eq-scroll">\[ A\{1,4\}=\{A^{(1,4)}+Z(I-AA^{(1,4)})\mid Z\in\C^{n\times m}\}. \tag{6.4.12} \]</div>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">方程 (6.4.11) 是 (6.4.5) 型矩阵方程，由定理 6.26 写其通解，再令 \(Y=A^{(1,4)}+Z\)，由引理 7 即得。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-6-30">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.30：极小范数解 ⇔ {1,4}-逆</span>
+              </header>
+              <div class="card-body">
+                <p>设方程组 (6.4.1) 相容，则</p>
+                <div class="eq-scroll">\[ x=A^{(1,4)}b \]</div>
+                <p>是极小范数解，其中 \(A^{(1,4)}\) 是 \(A\) 的任意一个 \(\{1,4\}\)-逆（结果与选取无关）。反之，设 \(X\in\C^{n\times m}\)，若对所有 \(b\in R(A)\)，\(x=Xb\) 都是 (6.4.1) 的极小范数解，则 \(X\in A\{1,4\}\)。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>若 \(Ax=b\) 相容，则 \(b\in R(A)\)，写 \(b=Au\)。对任意 \(A^{(1,4)}\in A\{1,4\}\)：\(A^{(1,4)}b=A^{(1,4)}Au=(A^{(1,4)}A)^{\mathrm H}u=A^{\mathrm H}(A^{(1,4)})^{\mathrm H}u\in R(A^{\mathrm H})\)。由引理 6，它就是唯一极小范数解。反之，若对所有 \(b\in R(A)\)，\(Xb\) 都是极小范数解，则 \(Xb=A^{(1,4)}b\)；依次取 \(b\) 为 \(A\) 的各列得 \(XA=A^{(1,4)}A\)，由引理 7 知 \(X\in A\{1,4\}\)。</p>
+                </details>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 三、最小二乘解 ================= -->
+          <section class="section" id="sec-ls">
+            <h2 class="sec-title"><span class="cn">三</span>矛盾方程组的最小二乘解与 {1,3}-逆</h2>
+
+            <section class="card thm" id="lem-6-8">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 3v18"/><path d="M5 8l7-5 7 5"/><path d="M5 16l7 5 7-5"/></svg></span>
+                <span class="card-label">引理 8：A{1,3} 的矩阵方程刻画</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">集合 \(A\{1,3\}\) 由矩阵方程</p>
+                <div class="eq-scroll">\[ AX=AA^{(1,3)} \tag{6.4.13} \]</div>
+                <p style="margin-bottom:0">的所有解 \(X\) 组成，其中 \(A^{(1,3)}\in A\{1,3\}\)。即：<strong>对任意 \(X\in A\{1,3\}\)，乘积 \(AX\) 是不变量</strong>（等于 \(AA^+=P_{R(A)}\)）。证明与引理 7 类似。</p>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-6-31">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.31：A{1,3} 的通式</span>
+              </header>
+              <div class="card-body">
+                <div class="eq-scroll">\[ A\{1,3\}=\{A^{(1,3)}+(I-A^{(1,3)}A)Z\mid Z\in\C^{n\times m}\}. \tag{6.4.14} \]</div>
+                <p style="margin-bottom:0">由定理 6.26 写方程 (6.4.13) 的通解，令 \(Y=A^{(1,3)}+Z\)，由引理 8 即得。</p>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-6-32">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.32：最小二乘解 ⇔ {1,3}-逆</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{m\times n},\ b\in\C^m,\ A^{(1,3)}\in A\{1,3\}\)，则</p>
+                <div class="eq-scroll">\[ x=A^{(1,3)}b \tag{6.4.15} \]</div>
+                <p>是方程组 (6.4.1) 的一个最小二乘解。反之，若对所有 \(b\in\C^m\)，\(x=Xb\) 都是最小二乘解，则 \(X\in A\{1,3\}\)。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>把残差按正交直和 \(\C^m=R(A)\oplus R^\perp(A)\) 作勾股分解：</p>
+                  <div class="eq-scroll">\[ Ax-b=(Ax-P_{R(A)}b)+(P_{R(A)}b-b), \]</div>
+                  <p>其中 \(Ax-P_{R(A)}b\in R(A)\)，\(P_{R(A)}b-b=-(I-P_{R(A)})b=-P_{R^\perp(A)}b\in R^\perp(A)\)，故</p>
+                  <div class="eq-scroll">\[ \|Ax-b\|^2=\|Ax-P_{R(A)}b\|^2+\|P_{R(A)}b-b\|^2. \tag{6.4.16} \]</div>
+                  <p>第二项与 \(x\) 无关，故取得最小值的充要条件是第一项为零：</p>
+                  <div class="eq-scroll">\[ Ax=P_{R(A)}b. \tag{6.4.17} \]</div>
+                  <p>由定理 6.5(6) 有 \(R(AA^{(1,3)})=R(A)\)、\(N(AA^{(1,3)})=R^\perp(A)\)，且 \(AA^{(1,3)}\) 幂等 Hermite，故 \(AA^{(1,3)}=P_{R(A)}\)。于是 \(x=A^{(1,3)}b\) 时 \(Ax=AA^{(1,3)}b=P_{R(A)}b\)，即 (6.4.17) 成立。反之，若对所有 \(b\)，\(x=Xb\) 满足 (6.4.17)，则 \(AXb=P_{R(A)}b\)，即 \(AX=P_{R(A)}=AA^{(1,3)}\)，由引理 8 得 \(X\in A\{1,3\}\)。</p>
+                </details>
+                <div class="card note" style="margin-top:10px">
+                  <header class="card-head"><span class="card-label">最小二乘解何时唯一</span></header>
+                  <div class="card-body"><p style="margin-bottom:0">若 \(x_0\) 是最小二乘解，则 \(x_0+y\ (y\in N(A))\) 也是。故一般不唯一；<strong>仅当 \(A\) 列满秩时 \(N(A)=\{0\}\)，最小二乘解唯一</strong>（统计回归中常见此情形），此时由定理 6.5(7) 知 \(A^{(1,3)}A=I\)，\(A\{1,3\}\) 只有一个元素。</p></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="card cor" id="cor-normal-eq">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></span>
+                <span class="card-label">推论：法方程（正规方程）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">\(x\) 是方程组 (6.4.1) 的最小二乘解的充要条件是，\(x\) 为</p>
+                <div class="eq-scroll">\[ A^{\mathrm H}Ax=A^{\mathrm H}b \tag{6.4.18} \]</div>
+                <p style="margin-bottom:0">的解。式 (6.4.18) 称为矛盾方程组 (6.4.1) 的<strong>法方程（正规方程，normal equations）</strong>。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">把 \(b\) 分解为 \(b=P_{R(A)}b+P_{N(A^{\mathrm H})}b\)。由 (6.4.17)，\(x\) 是最小二乘解 ⇔ \(Ax-b=-P_{N(A^{\mathrm H})}b\in N(A^{\mathrm H})\)，两边左乘 \(A^{\mathrm H}\)（取内积）即 \(A^{\mathrm H}(Ax-b)=0\)，也就是 (6.4.18)。</p>
+                </details>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 四、极小范数最小二乘解 ================= -->
+          <section class="section" id="sec-aplus-ls">
+            <h2 class="sec-title"><span class="cn">四</span>极小范数最小二乘解与 A⁺</h2>
+            <p>最小二乘解一般不唯一，但在所有最小二乘解中欧氏范数最小的那个是唯一的，它就是 \(A^+b\)。</p>
+
+            <section class="card thm" id="thm-6-33">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.33：极小范数最小二乘解 ⇔ A⁺</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{m\times n},\ b\in\C^m\)，则</p>
+                <div class="eq-scroll">\[ x=A^+b \tag{6.4.19'} \]</div>
+                <p>是方程组 (6.4.1) 的<strong>唯一</strong>极小范数最小二乘解。反之，若对所有 \(b\in\C^m\)，\(x=Xb\) 都是极小范数最小二乘解，则 \(X=A^+\)。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">取 \(A^{(1,3)}\in A\{1,3\}\)，由定理 6.32 的证明与 (6.4.17) 知最小二乘解恰是相容方程</p>
+                  <div class="eq-scroll">\[ Ax=AA^{(1,3)}b \tag{6.4.19} \]</div>
+                  <p style="margin-bottom:0">的解；其极小范数解由定理 6.30 给出：\(x=A^{(1,4)}(AA^{(1,3)}b)=A^{(1,4)}AA^{(1,3)}b=A^+b\)（定理 6.9）。反之，若对所有 \(b\)，\(Xb\) 都是极小范数最小二乘解，则 \(Xb=A^+b\)，故 \(X=A^+\)。</p>
+                </details>
+                <div class="card note" style="margin-top:10px">
+                  <header class="card-head"><span class="card-label">相容性退化</span></header>
+                  <div class="card-body"><p style="margin-bottom:0">若方程组 (6.4.1) 相容，则其最小二乘解与通常意义下的解一致（残差可取 0），因而<strong>极小范数最小二乘解就是极小范数解</strong>，仍由 \(x=A^+b\) 给出。一个公式统一了四种情形。</p></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-6-10">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 6.10：矛盾复方程组的最佳解</span>
+              </header>
+              <div class="card-body">
+                <p>取例 6.4 的矩阵 \(A\) 和 \(b=(-\mathrm j,1,1)^{\mathrm T}\)，求方程组 \(Ax=b\) 的极小范数最小二乘解。</p>
+                <p><strong>解</strong>　由例 6.5 已求得的 \(A^+\)（\(\tfrac1{1748}\) 矩阵），\(x=A^+b\) 为</p>
+                <div class="eq-scroll">\[
+                x=A^+b=\frac1{874}
+                \begin{pmatrix}0\\26-36\mathrm j\\13-18\mathrm j\\-55-9\mathrm j\\-12-2\mathrm j\\-46+59\mathrm j\end{pmatrix}.
+                \]</div>
+                <p style="margin-bottom:0">（分母由 1748 与 \(A^+b\) 各项的公因子约去而来。）该 \(x\) 不一定使 \(Ax=b\) 精确成立，但它在所有 \(x\in\C^6\) 中使 \(\|Ax-b\|_2\) 最小，并在这些最小二乘解中范数最小。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="ls-lab-title">动手实验：最小二乘工作台（R² 几何）</h3>
+            <p>改 2×2 实矩阵 \(A\) 与右端 \(b\)。左图画 \(b\) 空间：值域直线 \(R(A)\)、正交投影 \(Ax^*=P_{R(A)}b\) 与残差（勾股分解 (6.4.16)）；右图画 \(x\) 空间：秩 1 时最小二乘解是一条直线 \(x^*+N(A)\)，而 \(x^*=A^+b\) 恰是原点到该直线的垂足。工具同时报告相容性、法方程残差与三类解。</p>
+            <section class="card lab" data-ls-lab></section>
+          </section>
+
+          <!-- ================= 五、矩阵方程 ================= -->
+          <section class="section" id="sec-matrix-eq">
+            <h2 class="sec-title"><span class="cn">五</span>矩阵方程 AXB = D 的极小范数最小二乘解</h2>
+            <p>把向量的结果搬到矩阵上。定义矩阵的 Frobenius 范数（§2.2）</p>
+            <div class="eq-scroll">\[ \|A\|^2=\sum_{i=1}^{m}\sum_{j=1}^{n}|a_{ij}|^2, \tag{6.4.20} \]</div>
+            <p>又设 \(\overline{\mathrm{vec}}(A)\) 是把 \(A\) <strong>按行拉直</strong>所得的列向量：</p>
+            <div class="eq-scroll">\[ \overline{\mathrm{vec}}(A)=(a_{11},\cdots,a_{1n},a_{21},\cdots,a_{2n},\cdots,a_{m1},\cdots,a_{mn})^{\mathrm T}. \tag{6.4.21} \]</div>
+            <p>显然 \(\|A\|=\|\overline{\mathrm{vec}}(A)\|_2\)。利用 §5.4 的直积与拉直关系 \(\overline{\mathrm{vec}}(AXB)=(A\otimes B^{\mathrm T})\overline{\mathrm{vec}}(X)\)，矩阵方程 (6.4.5) 化为线性方程组</p>
+            <div class="eq-scroll">\[ (A\otimes B^{\mathrm T})\,\overline{\mathrm{vec}}(X)=\overline{\mathrm{vec}}(D). \tag{6.4.22} \]</div>
+
+            <section class="card thm" id="thm-6-34">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.34：X = A⁺DB⁺</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">若矩阵方程 (6.4.5) 不相容，则它的极小范数最小二乘解，即满足</p>
+                <div class="eq-scroll">\[ \min_{\min\|AXB-D\|}\|X\| \]</div>
+                <p style="margin-bottom:0">的唯一解为</p>
+                <div class="eq-scroll">\[ X=A^+DB^+. \]</div>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">由定理 6.33 并利用习题 6.2 第 14 题 \((A\otimes B)^+=A^+\otimes B^+\)（转置下 \(B^+\) 对应 \((B^{\mathrm T})^+=(B^+)^{\mathrm T}\)），线性方程组 (6.4.22) 的唯一极小范数最小二乘解为 \(\overline{\mathrm{vec}}(X)=(A^+\otimes(B^+)^{\mathrm T})\overline{\mathrm{vec}}(D)\)，拉直回去正是 \(X=A^+DB^+\)。</p>
+                </details>
+                <div class="card note" style="margin-top:10px">
+                  <header class="card-head"><span class="card-label">逼近论含义</span></header>
+                  <div class="card-body"><p style="margin-bottom:0">当 \(B=D=I\) 时 \(X=A^+\)：它给出了单位矩阵 \(I\) 写成 \(AX\) 形式的最佳平方逼近。广义逆因此还有<strong>最佳逼近</strong>的含义。</p></div>
+                </div>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 习题 6.4 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 6.4（教材 p.344–346）</h2>
+            <div class="fold-bar no-print" data-fold-tools=".card.task">
+              <button type="button" data-fold="open">全部展开</button>
+              <button type="button" data-fold="close">全部收起</button>
+            </div>
+
+            <article class="card task" id="ex64-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">增广方程组</span></header>
+              <div class="card-body">
+                <p>证明向量 \(x\) 是方程组 \(Ax=b\) 的最小二乘解的充要条件是，存在向量 \(y\) 使得向量 \(\begin{pmatrix}y\\x\end{pmatrix}\) 为</p>
+                <div class="eq-scroll">\[ \begin{pmatrix}I&A\\A^{\mathrm H}&O\end{pmatrix}\begin{pmatrix}y\\x\end{pmatrix}=\begin{pmatrix}b\\0\end{pmatrix} \]</div>
+                <p>的解。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>若 \(\begin{pmatrix}y\\x\end{pmatrix}\) 满足该方程组，则 \(y+Ax=b\) 即 \(y=b-Ax\)，且 \(A^{\mathrm H}y=0\)，代入得 \(A^{\mathrm H}(b-Ax)=0\)，即法方程 \(A^{\mathrm H}Ax=A^{\mathrm H}b\)；由推论，\(x\) 是最小二乘解。</p>
+                  <p>反之，若 \(x\) 是最小二乘解，令 \(y=b-Ax\)，则第一式自动成立；由法方程 \(A^{\mathrm H}(b-Ax)=0\) 得 \(A^{\mathrm H}y=0\)，第二式成立。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex64-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag">同系数多右端</span></header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{m\times n}\)，列向量 \(b_1,\cdots,b_k\in\C^m\)。证明向量 \(x\) 使得 \(\displaystyle\min_{x\in\C^n}\sum_{i=1}^{k}\|Ax-b_i\|^2\) 成立的充要条件是，\(x\) 为方程</p>
+                <div class="eq-scroll">\[ Ax=\frac1k\sum_{i=1}^{k}b_i \]</div>
+                <p>的最小二乘解。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>记 \(\bar b=\tfrac1k\sum b_i\)，写 \(b_i=\bar b+e_i\)，则 \(\sum e_i=0\)。展开：\(\sum_i\|Ax-b_i\|^2=\sum_i\|(Ax-\bar b)-e_i\|^2=k\|Ax-\bar b\|^2+\sum_i\|e_i\|^2-2\Re\big((Ax-\bar b)^{\mathrm H}\sum_i e_i\big)=k\|Ax-\bar b\|^2+\sum_i\|e_i\|^2\)。第二项与 \(x\) 无关，故极小化等价于极小化 \(\|Ax-\bar b\|\)，即 \(x\) 是 \(Ax=\bar b\) 的最小二乘解。（统计意义：对同一矩阵的多组观测，最佳解只依赖观测均值。）</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex64-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag tag-mid">不同系数的法方程</span></header>
+              <div class="card-body">
+                <p>设 \(A_i\in\C^{m\times n}\)，列向量 \(b_i\in\C^m\ (i=1,\cdots,k)\)。证明向量 \(x\) 使得 \(\displaystyle\min_{x\in\C^n}\sum_{i=1}^{k}\|A_ix-b_i\|^2\) 成立的充要条件是，\(x\) 为方程</p>
+                <div class="eq-scroll">\[ \Big(\sum_{i=1}^{k}A_i^{\mathrm H}A_i\Big)x=\sum_{i=1}^{k}A_i^{\mathrm H}b_i \]</div>
+                <p>的解。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>令 \(F(x)=\sum_i\|A_ix-b_i\|^2=\sum_i(A_ix-b_i)^{\mathrm H}(A_ix-b_i)\)。这是 \(x\) 的实值二次函数，极小点处对 \(x\) 的复梯度为零：逐项展开并令变分 \(\partial F/\partial x^{\mathrm H}=0\)，得 \(\sum_i A_i^{\mathrm H}(A_ix-b_i)=0\)，即所述方程。反之该方程是二次凸函数的驻点方程，二次项 \(\sum A_i^{\mathrm H}A_i\succeq0\)，故驻点即全局最小点。（这就是第 1 题法方程在多模型情形的推广，也是最小二乘测量平差的基本公式。）</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex64-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag tag-mid">Tikhonov 正则化</span></header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{m\times n},\ b\in\C^m\)，\(a^2\) 是正实数，证明满足</p>
+                <div class="eq-scroll">\[ \min_{x\in\C^n}\{\|Ax-b\|^2+a^2\|x\|^2\} \]</div>
+                <p>的 \(x\) 为</p>
+                <div class="eq-scroll">\[ x=(A^{\mathrm H}A+a^2I)^{-1}A^{\mathrm H}b. \]</div>
+                <p>提示：利用习题 3。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>把罚项写成第二组"观测"：\(\|Ax-b\|^2+a^2\|x\|^2=\|Ax-b\|^2+\|aI_n\cdot x-0\|^2\)。对两个模型 \(A_1=A,\ b_1=b\) 与 \(A_2=aI_n,\ b_2=0\) 应用题 3 的法方程：\((A^{\mathrm H}A+a^2I)x=A^{\mathrm H}b+0\)。因 \(A^{\mathrm H}A+a^2I\succ0\)（特征值为 \(\lambda_i(A^{\mathrm H}A)+a^2\ge a^2&gt;0\)）必可逆，故 \(x=(A^{\mathrm H}A+a^2I)^{-1}A^{\mathrm H}b\)。这就是经典的 <strong>Tikhonov 正则化（岭回归）</strong>公式：用一点偏差换取解的稳定与范数可控。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex64-5">
+              <header class="card-head"><span class="card-label">第 5 题</span><span class="tag">约束最近点</span></header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{m\times n},\ b\in\C^m,\ a\in\C^n\)。若方程组 \(Ax=b\) 相容，证明：使得 \(\displaystyle\min_{Ax=b}\|x-a\|\) 成立的唯一解是</p>
+                <div class="eq-scroll">\[ x=A^{(1,4)}b+(I-A^{(1,4)}A)a. \]</div>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>令 \(u=x-a\)，则 \(Ax=b\Leftrightarrow Au=b-Aa\)（相容：因 \(b\in R(A)\)）。原问题化为求相容方程组 \(Au=b-Aa\) 的极小范数解。由定理 6.30，\(u=A^{(1,4)}(b-Aa)\)，故 \(x=a+A^{(1,4)}b-A^{(1,4)}Aa=A^{(1,4)}b+(I-A^{(1,4)}A)a\)。唯一由引理 6 保证。几何意义：在仿射解集 \(x_0+N(A)\) 上找距给定点 \(a\) 最近的点。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex64-6">
+              <header class="card-head"><span class="card-label">第 6 题</span><span class="tag tag-hard">综合大例题</span></header>
+              <div class="card-body">
+                <p>取习题 6.3 第 3 题的矩阵 \(A=\begin{pmatrix}1&0&0&1\\1&1&0&0\\0&1&1&0\\0&0&1&1\end{pmatrix}\)，问：</p>
+                <p>(1) 当 \(b=(1,1,1,1)^{\mathrm T}\) 时，方程组 \(Ax=b\) 是否相容？(2) 当 \(b=(1,0,1,0)^{\mathrm T}\) 时是否相容？若相容求其通解和极小范数解；若不相容求其极小范数最小二乘解。</p>
+                <details class="solution"><summary><span>查看完整解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由习题 6.3 第 3 题：\(\operatorname{rank}A=3\)，一个 \(\{1\}\)-逆（取 \(L=O\)）为
+                  \(A^{(1)}=\begin{pmatrix}1&0&0&0\\-1&1&0&0\\1&-1&1&0\\0&0&0&0\end{pmatrix}\)，
+                  且 \(A^+=\tfrac18\begin{pmatrix}3&3&-1&-1\\-1&3&3&-1\\-1&-1&3&3\\3&-1&-1&3\end{pmatrix}\)，\(N(A)\) 由 \(v=( -1,1,-1,1)^{\mathrm T}\) 张成。</p>
+                  <p><strong>(1)</strong> \(b=\mathbf 1\)：因 \(A(\tfrac12\mathbf 1)=\mathbf 1\)（每行和为 2），故相容（也可验 \(AA^{(1)}b=b\)）。特解 \(A^{(1)}b=(1,0,1,0)^{\mathrm T}\)，通解为</p>
+                  <p>\[ x=(1,0,1,0)^{\mathrm T}+t(-1,1,-1,1)^{\mathrm T},\quad t\in\C. \]</p>
+                  <p>极小范数解 \(x=A^+b=(\tfrac12,\tfrac12,\tfrac12,\tfrac12)^{\mathrm T}\)（对应 \(t=\tfrac12\)；它在 \(R(A^{\mathrm T})\) 中且与 \(v\) 正交：内积为 0）。</p>
+                  <p><strong>(2)</strong> \(b=(1,0,1,0)^{\mathrm T}\)：\(b\) 与 \(N(A^{\mathrm T})\) 的生成向量 \((1,-1,1,-1)^{\mathrm T}\) 的内积为 \(2\ne0\)，即 \(b\notin R(A)\)，不相容。极小范数最小二乘解</p>
+                  <p>\[ x=A^+b=(\tfrac14,\tfrac14,\tfrac14,\tfrac14)^{\mathrm T}. \]</p>
+                  <p>此时 \(Ax=(\tfrac12,\tfrac12,\tfrac12,\tfrac12)^{\mathrm T}=P_{R(A)}b\)，残差 \(b-Ax=(\tfrac12,-\tfrac12,\tfrac12,-\tfrac12)^{\mathrm T}\in N(A^{\mathrm T})\) 与 \(R(A)\) 正交，\(\|Ax-b\|^2=1\) 为最小残差平方；而 \(x=\tfrac14\mathbf 1\perp v\) 保证它在最小二乘解（一族平行直线）中范数最小。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结</h2>
+            <div class="summary-block">
+              <p>四类问题、四种逆，一张对照表：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>问题</th><th>所用广义逆</th><th>公式</th><th>唯一性</th></tr>
+                  <tr><td>矩阵方程相容判据 / 通解</td><td>\(\{1\}\)-逆</td><td>\(AA^{(1)}DB^{(1)}B=D\)；\(X=A^{(1)}DB^{(1)}+Y-A^{(1)}AYBB^{(1)}\)</td><td>一族</td></tr>
+                  <tr><td>\(Ax=b\) 相容 / 通解</td><td>\(\{1\}\)-逆</td><td>\(AA^{(1)}b=b\)；\(x=A^{(1)}b+(I-A^{(1)}A)y\)</td><td>一族</td></tr>
+                  <tr><td>极小范数解</td><td>\(\{1,4\}\)-逆</td><td>\(x=A^{(1,4)}b\)</td><td>解唯一，逆不唯一</td></tr>
+                  <tr><td>最小二乘解</td><td>\(\{1,3\}\)-逆</td><td>\(x=A^{(1,3)}b\)；法方程 \(A^{\mathrm H}Ax=A^{\mathrm H}b\)</td><td>列满秩时唯一</td></tr>
+                  <tr><td>极小范数最小二乘解</td><td>\(A^+\)</td><td>\(x=A^+b\)；矩阵版 \(X=A^+DB^+\)</td><td>唯一</td></tr>
+                </table>
+              </div>
+              <p style="margin-top:12px">两个不变量是理论枢纽：\(AX=AA^+=P_{R(A)}\)（\(X\in A\{1,3\}\)，引理 8）与 \(XA=A^+A=P_{R(A^{\mathrm H})}\)（\(X\in A\{1,4\}\)，引理 7）；前者把右端投影进值域（最小二乘），后者把解约束在 \(R(A^{\mathrm H})\)（极小范数）。</p>
+              <p><strong>承上启下：</strong>§6.5（选学）把这套语言推广到带约束 \(x\in S\) 与加权范数的情形，得到 S-约束广义逆与加权广义逆；§6.6（选学）介绍刻画方阵"幂零部分"的 Drazin 逆。本章主线（6.1–6.4）到此完整：投影 → 定义与性质 → 算法 → 方程组应用。</p>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>同一个 \(A^+\) 为什么能同时回答"相容的极小范数解"和"矛盾的最小二乘解"？勾股分解 (6.4.16) 中哪一项在相容时为零？</li>
+                  <li>为什么最小二乘解一般不唯一而极小范数最小二乘解唯一？\(A\) 列满秩时法方程的系数矩阵 \(A^{\mathrm H}A\) 有什么性质？</li>
+                  <li>习题 4 的 Tikhonov 公式在 \(a\to0\) 时退化为什么？它与列满秩公式 (6.2.3) 有什么关系？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="6.3-generalized-inverse-computation.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§6.3 广义逆矩阵的计算方法</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="6.5-constrained-weighted-inverse.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§6.5 约束广义逆和加权广义逆（选学）</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

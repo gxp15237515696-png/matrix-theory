@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§4.3 矩阵的满秩分解 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §4.3：满秩分解 A=FG（列满秩 F × 行满秩 G）、Hermite 标准形、置换矩阵、主元列构造法（定理 4.13、4.14）、秩不等式与行满秩 QR">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§4.3 矩阵的满秩分解</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="4.3" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 4 章 矩阵分解</a><span class="sep" aria-hidden="true">/</span>
+            <span>§4.3 矩阵的满秩分解</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 4 章 · 矩阵分解</div>
+            <h1>§4.3 矩阵的满秩分解</h1>
+            <p class="lede">把任意非零矩阵（甚至<strong>长方、奇异</strong>矩阵）拆成两个"瘦""胖"满秩因子的乘积：<strong>\(A=FG\)</strong>，其中 \(F\) 列满秩、\(G\) 行满秩。构造方法极其简单——初等行变换化为 <strong>Hermite（行最简）标准形</strong>，主元所在列直接从原矩阵取出作 \(F\)，非零行作 \(G\)。满秩分解是第 6 章<strong>广义逆矩阵</strong>的直接工具，也用于证明秩不等式；本节最后用它再次得到列满秩矩阵的"瘦 QR"。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.220–225</strong></span>
+              <span class="chip">建议 <strong>2 学时</strong></span>
+              <span class="chip">定义 <strong>3 个</strong></span>
+              <span class="chip">定理 <strong>2 个</strong></span>
+              <span class="chip">例题 <strong>4 道</strong></span>
+            </div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>陈述满秩分解定义，说明任一非零矩阵都存在 \(A=FG\)；</li>
+                  <li>用初等行变换化 Hermite 标准形，读出秩；</li>
+                  <li>按定理 4.14 直接取主元列构成 \(F\)、非零行构成 \(G\)，验证 \(FG=A\)；</li>
+                  <li>用满秩分解证明 \(\operatorname{rank}(A_1+A_2)\le\operatorname{rank}A_1+\operatorname{rank}A_2\)；</li>
+                  <li>知道满秩分解不唯一，并了解其在广义逆中的作用。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>Hermite 标准形；</li>
+                      <li>主元列法；</li>
+                      <li>分解不唯一。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>为何 F 必须取自<strong>原矩阵 A</strong> 的列；</li>
+                      <li>置换矩阵 \(P_1\) 的作用；</li>
+                      <li>秩等式 \(\operatorname{rank}(FG)=r\)。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 2 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>满秩分解定义、存在性、例 4.10</td><td class="num">p.220–222</td></tr>
+                    <tr><td class="num">2</td><td>Hermite 形、定理 4.14、例 4.11–4.13、习题</td><td class="num">p.222–225</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 180" role="img" aria-label="满秩分解脉络图">
+                    <defs><marker id="m43" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="40" y="32" width="200" height="48"/><rect x="320" y="32" width="200" height="48"/><rect x="600" y="32" width="200" height="48"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="140" y="54">初等行变换</text><text x="140" y="71" font-size="11" fill="#666">A → Hermite 标准形 B</text>
+                      <text x="420" y="54">主元列 + 非零行</text><text x="420" y="71" font-size="11" fill="#666">F 取 A 的 j₁…jᵣ 列，G 取 B 前 r 行</text>
+                      <text x="700" y="54">A = FG</text><text x="700" y="71" font-size="11" fill="#666">F 列满秩 m×r，G 行满秩 r×n</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m43)"><line x1="240" y1="56" x2="318" y2="56"/><line x1="520" y1="56" x2="598" y2="56"/></g>
+                    <g class="fm-node" fill="#f3f0fa" stroke="#6b4e9e"><rect x="280" y="120" width="280" height="44"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="420" y="147">应用：秩不等式 · 广义逆 · 瘦 QR</text>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、定义与存在性 ================= -->
+          <section class="section" id="sec-definition">
+            <h2 class="sec-title"><span class="cn">一</span>满秩分解的定义与存在性</h2>
+            <section class="card def" id="def-4-8">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 4.8</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\C_r^{m\times n}\)（秩为 \(r&gt;0\)），如果存在
+                  <div class="eq-scroll">\[ F\in\C_r^{m\times r}\quad(\text{列满秩}),\qquad G\in\C_r^{r\times n}\quad(\text{行满秩}), \]</div>
+                  使
+                  <div class="eq-scroll">\[ A=FG, \tag{4.3.1} \]</div>
+                  则称 (4.3.1) 为 \(A\) 的<strong>满秩分解</strong>。满秩（列满秩/行满秩）矩阵取一个因子为单位阵时称为平凡分解。</p>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-4-13">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 4.13（存在性）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\C_r^{m\times n}\)（\(r&gt;0\)），则 \(A\) 有满秩分解。</p>
+                <details class="proof">
+                  <summary><span>证明（初等行变换，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>\(\operatorname{rank}A=r\) 时，由初等变换理论，可用有限个 \(m\) 阶初等矩阵之积 \(P\)（可逆）把 \(A\) 化为行阶梯形
+                      <div class="eq-scroll">\[ A\xrightarrow{\text{行}}B=\left[\frac{G}{O}\right]\ \begin{matrix}\leftarrow r\text{ 行}\\ \leftarrow m-r\text{ 行}\end{matrix},\qquad PA=B,\ A=P^{-1}B, \]</div>
+                      其中 \(G\) 是 \(r\times n\) 行满秩矩阵。把 \(P^{-1}\) 分块为 \(P^{-1}=[F\ \vdots\ S]\)（\(F\) 为前 \(r\) 列，\(m\times r\)），则
+                      <div class="eq-scroll">\[ A=P^{-1}B=[F\ \ S]\begin{bmatrix}G\\O\end{bmatrix}=FG. \]</div>
+                      可逆矩阵的前 \(r\) 列线性无关，故 \(F\) 列满秩。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <section class="card ex" id="exm-4-10">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 4.10（先求 P⁻¹ 的笨办法）</span>
+              </header>
+              <div class="card-body">
+                <p>对
+                  \[ A=\begin{pmatrix}-1&0&1&2\\1&2&-1&1\\2&2&-2&-1\end{pmatrix} \]
+                  做初等行变换化行阶梯形：
+                  <div class="eq-scroll">\[ A\xrightarrow{\text{行}}
+                     B=\left[\begin{array}{cccc}-1&0&1&2\\ \hdashline 0&2&0&3\\0&0&0&0\end{array}\right],\quad
+                     P=\begin{pmatrix}1&0&0\\1&1&0\\1&-1&1\end{pmatrix},\quad
+                     P^{-1}=\begin{pmatrix}1&0&0\\-1&1&0\\-2&1&1\end{pmatrix}. \]</div>
+                  取 \(P^{-1}\) 前 2 列与 \(B\) 前 2 行：
+                  <div class="eq-scroll">\[ F=\begin{pmatrix}1&0\\-1&1\\-2&1\end{pmatrix},\quad
+                     G=\begin{pmatrix}-1&0&1&2\\0&2&0&3\end{pmatrix},\quad A=FG. \]</div>
+                  但显式求 \(P^{-1}\) 较繁，下面用 Hermite 标准形免去这一步。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 二、Hermite 标准形与主元列法 ================= -->
+          <section class="section" id="sec-hermite">
+            <h2 class="sec-title"><span class="cn">二</span>Hermite 标准形与主元列构造法</h2>
+            <section class="card def" id="def-4-9">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 4.9：Hermite 标准形（行最简形）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(B\in\C_r^{m\times n}\)，若满足：</p>
+                <ol style="margin:8px 0 0 1.2em">
+                  <li>前 \(r\) 行每行至少含一个非零元，且<strong>第一个非零元素是 1</strong>，后 \(m-r\) 行全为零；</li>
+                  <li>第 \(i\) 行首元 1 所在列为 \(j_i\)，且列标严格右移：\(j_1&lt;j_2&lt;\cdots&lt;j_r\)；</li>
+                  <li>第 \(j_1,j_2,\ldots,j_r\) 列恰为单位阵 \(I_m\) 的前 \(r\) 列（即这些主元列其余元素全为 0），</li>
+                </ol>
+                <p style="margin-bottom:0">则称 \(B\) 为 <strong>Hermite 标准形</strong>（RREF，行最简形）。任意非零矩阵都可经初等行变换化为 Hermite 标准形，且<strong>唯一</strong>。</p>
+              </div>
+            </section>
+            <section class="card def" id="def-4-10">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 4.10：置换矩阵</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">以单位阵的列向量 \(e_1,\ldots,e_n\) 按某个排列 \(j_1,\ldots,j_n\) 为列构成的矩阵
+                  <div class="eq-scroll">\[ P=(e_{j_1},e_{j_2},\ldots,e_{j_n}) \tag{4.3.3} \]</div>
+                  称为<strong>置换矩阵</strong>（右乘实现列交换，\(AP\) 把 \(A\) 的列重排为 \(j_1,\ldots,j_n\)）。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-4-14">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></span>
+                <span class="card-label">定理 4.14（主元列法：免求 P⁻¹）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\) 的 Hermite 标准形为 \(B\)，主元在第 \(j_1,j_2,\ldots,j_r\) 列，则在满秩分解 \(A=FG\) 中可直接取：</p>
+                <div class="eq-scroll">\[
+                \boxed{\ F=(\,a_{j_1},a_{j_2},\ldots,a_{j_r}\,)\ \text{（\(A\) 的主元列）},\qquad
+                G=B\text{ 的前 }r\text{ 行}\ }
+                \]</div>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>设 \(PA=B\)，分块 \(P^{-1}=[F\ \ S]\)。取置换矩阵 \(P_1=(e_{j_1},\ldots,e_{j_r},e_{j_{r+1}},\ldots,e_{j_n})\) 把主元列调到最前。记 \(A=(a_1,\ldots,a_n)\)、\(B=(b_1,\ldots,b_n)\)，由 \(B\) 的主元列恰为标准单位向量：
+                      <div class="eq-scroll">\[ BP_1=\begin{bmatrix}I_r&B_{12}\\O&O\end{bmatrix},\qquad
+                         AP_1=P^{-1}(BP_1)=[F\ \ S]\begin{bmatrix}I_r&B_{12}\\O&O\end{bmatrix}=[F\ \ FB_{12}]. \]</div>
+                      故 \(AP_1\) 的前 \(r\) 列就是 \(F\)；而这 \(r\) 列正是 \(A\) 的第 \(j_1,\ldots,j_r\) 列。即 \(F\) 直接取自原矩阵，无需计算 \(P^{-1}\)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="steps">满秩分解标准步骤</h3>
+            <ol style="margin-left:1.2em;line-height:2">
+              <li>对 \(A\) 做初等<strong>行</strong>变换，化为 Hermite 标准形 \(B\)（主元为 1、主元列其余清零）；</li>
+              <li>读出主元列号 \(j_1,\ldots,j_r\)，秩为 \(r\)；</li>
+              <li>\(G\)：取 \(B\) 的前 \(r\) 个非零行；</li>
+              <li>\(F\)：取<strong>原矩阵 \(A\)</strong>（不是 \(B\)）的第 \(j_1,\ldots,j_r\) 列；</li>
+              <li>验证 \(FG=A\)。</li>
+            </ol>
+            <section class="card ex" id="exm-4-11">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 4.11（复数矩阵）</span>
+              </header>
+              <div class="card-body">
+                <p>\(A=\begin{pmatrix}0&0&1\\2&1&1\\2\mathrm j&\mathrm j&0\end{pmatrix}\)（\(\mathrm j=\sqrt{-1}\)）行变换得
+                  \[ A\xrightarrow{\text{行}}B=\begin{pmatrix}1&1/2&0\\0&0&1\\0&0&0\end{pmatrix}. \]</p>
+                <p>\(B\) 的主元在第 1、3 列（\(j_1=1,j_2=3\)），故取 \(A\) 的第 1、3 列与 \(B\) 的前两行：
+                  <div class="eq-scroll">\[ F=\begin{pmatrix}0&1\\2&1\\2\mathrm j&0\end{pmatrix},\quad
+                     G=\begin{pmatrix}1&1/2&0\\0&0&1\end{pmatrix},\quad A=FG. \]</div></p>
+              </div>
+            </section>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">满秩分解不唯一</span>
+              </header>
+              <div class="card-body">
+                <p>若 \(A=FG\) 是一个满秩分解，任取 \(r\) 阶非奇异矩阵 \(D\)，则
+                  \[ A=(FD)(D^{-1}G)=\tilde F\tilde G \]</p>
+                  <p>是另一个满秩分解。但<strong>用 Hermite 标准形主元列法得到的 \(F,G\) 是规范化、确定的</strong>（主元列为原矩阵列、\(G\) 主元列为单位向量）。</p>
+              </div>
+            </aside>
+          </section>
+
+          <!-- ================= 三、应用 ================= -->
+          <section class="section" id="sec-applications">
+            <h2 class="sec-title"><span class="cn">三</span>满秩分解的应用</h2>
+            <section class="card ex" id="exm-4-12">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 4.12：秩的次可加性</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A_1,A_2\) 都是 \(m\times n\) 矩阵，证明
+                  <div class="eq-scroll">\[ \operatorname{rank}(A_1+A_2)\le\operatorname{rank}A_1+\operatorname{rank}A_2. \]</div></p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>零矩阵情形显然。否则设满秩分解 \(A_1=F_1G_1,\ A_2=F_2G_2\)，则
+                      <div class="eq-scroll">\[ A_1+A_2=F_1G_1+F_2G_2=[F_1\ \ F_2]\begin{bmatrix}G_1\\G_2\end{bmatrix}. \]</div>
+                      右端乘积的秩不超过"并排放"矩阵 \([F_1\ \ F_2]\) 的秩，而它的列空间是两个列空间之和，故
+                      <div class="eq-scroll">\[ \operatorname{rank}(A_1+A_2)\le\operatorname{rank}[F_1\ \ F_2]\le\operatorname{rank}F_1+\operatorname{rank}F_2=\operatorname{rank}A_1+\operatorname{rank}A_2. \]</div></p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <section class="card ex" id="exm-4-13">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 4.13：行满秩因子 R</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\C_r^{m\times n}\)（\(r&gt;0\)），则必有
+                  <div class="eq-scroll">\[ A=QR, \]</div>
+                  其中 \(Q\) 是 \(m\times r\) 矩阵满足 \(Q^{\mathrm H}Q=I_r\)（列标准正交），\(R\) 是 \(r\times n\) 行满秩矩阵。</p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>取满秩分解 \(A=FG\)。由定理 4.7（列满秩矩阵的瘦 QR），\(F=QR_1\)，其中 \(Q^{\mathrm H}Q=I\)、\(R_1\) 为 \(r\) 阶非奇异上三角阵。于是
+                      \[ A=QR_1G=QR,\quad R=R_1G, \]</p>
+                      <p>可逆阵乘行满秩阵仍行满秩，故 \(R\) 的 \(r\) 个行线性无关。</p>
+                    </div>
+                </details>
+              </div>
+            </section>
+            <div class="grid2">
+              <div class="mini-card"><div class="mc-title">两个常用秩结论（习题）</div><p style="margin:0">
+                ① 列满秩 \(B\)：\(B^{\mathrm T}B\) 非奇异；<br>
+                ② \(F\) 列满秩、\(G\) 行满秩：\(\operatorname{rank}(FG)=r\)（乘积保持秩）；<br>
+                ③ \(\operatorname{rank}A=\operatorname{rank}(A^{\mathrm T}A)=\operatorname{rank}(AA^{\mathrm T})\)。</p></div>
+              <div class="mini-card"><div class="mc-title">通向广义逆</div><p style="margin:0">满秩分解是第 6 章构造 <strong>Moore–Penrose 广义逆</strong>的基础：若 \(A=FG\)，则
+                \[ A^+=G^{\mathrm H}(GG^{\mathrm H})^{-1}(F^{\mathrm H}F)^{-1}F^{\mathrm H}. \]
+                两个小方阵的逆都存在（\(F\) 列满秩、\(G\) 行满秩）。注意复矩阵须用共轭转置 \(H\)（实矩阵时 \(H\) 即 \(T\)）。</p></div>
+            </div>
+
+            <h3 class="sub-title" id="fullrank-lab-title">动手实验：满秩分解器（3×4）</h3>
+            <p>改矩阵元素，工具自动做 Gauss–Jordan 全消元求 Hermite 标准形，报告秩、主元列、\(F\) 与 \(G\)，并验证 \(FG=A\)。内置习题 4.3 第 1 题 (1)、秩 2 与满秩示例，可直接切换核对。</p>
+            <section class="card lab" data-fullrank-lab></section>
+          </section>
+
+          <!-- ================= 习题 4.3 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 4.3（共 5 题）</h2>
+            <div class="ex-toolbar">
+              <span data-fold-tools="details.solution">
+                <button type="button" data-fold="open">全部展开解答</button>
+                <button type="button" data-fold="close">全部收起</button>
+              </span>
+            </div>
+
+            <article class="card task" id="ex43-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag tag-mid">求满秩分解</span></header>
+              <div class="card-body">
+                <p>求下列矩阵的满秩分解：
+                  \[ (1)\ A_1=\begin{pmatrix}1&2&3&0\\0&2&1&-1\\1&0&2&1\end{pmatrix};\qquad
+                     (2)\ A_2=\begin{pmatrix}1&-1&1&1\\-1&1&-1&-1\\-1&-1&1&1\\1&1&-1&-1\end{pmatrix}. \]</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p><strong>(1)</strong> 第 3 行 = 第 1 行 − 第 2 行，秩为 2。行变换化 Hermite 形（主元在第 1、2 列）：
+                    \[ B=\begin{pmatrix}1&0&2&1\\0&1&1/2&-1/2\\0&0&0&0\end{pmatrix}. \]</p>
+                    <p>取 \(A_1\) 第 1、2 列与 \(B\) 前两行：
+                    \[ F=\begin{pmatrix}1&2\\0&2\\1&0\end{pmatrix},\quad
+                       G=\begin{pmatrix}1&0&2&1\\0&1&1/2&-1/2\end{pmatrix},\quad A_1=FG. \]</p>
+                  <p><strong>(2)</strong> 第 2 行 = −第 1 行、第 4 行 = −第 3 行，而第 1 行 \((1,-1,1,1)\) 与第 3 行 \((-1,-1,1,1)\) 线性无关，故秩为 <strong>2</strong>。Gauss–Jordan 全消元得主元在第 1、2 列：
+                    \[ B=\begin{pmatrix}1&0&0&0\\0&1&-1&-1\\0&0&0&0\\0&0&0&0\end{pmatrix}. \]</p>
+                    <p>取 \(A_2\) 第 1、2 列与 \(B\) 前两行：
+                    \[ F=\begin{pmatrix}1&-1\\-1&1\\-1&-1\\1&1\end{pmatrix},\quad
+                       G=\begin{pmatrix}1&0&0&0\\0&1&-1&-1\end{pmatrix},\quad A_2=FG. \]</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex43-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag">列满秩判据</span></header>
+              <div class="card-body">
+                <p>设 \(B\in\R_r^{m\times r}\)（\(r&gt;0\)），证明 \(B^{\mathrm T}B\) 非奇异。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>证明齐次方程 \(B^{\mathrm T}Bx=0\) 只有零解：两边左乘 \(x^{\mathrm T}\)
+                    \[ x^{\mathrm T}B^{\mathrm T}Bx=(Bx)^{\mathrm T}(Bx)=\|Bx\|_2^2=0. \]</p>
+                    <p>故 \(Bx=0\)。因 \(B\) 列满秩（列线性无关），\(Bx=0\) 只有零解 \(x=0\)。于是 \(r\) 阶方阵 \(B^{\mathrm T}B\) 的齐次方程只有零解，故非奇异。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex43-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag tag-mid">左逆/右逆</span></header>
+              <div class="card-body">
+                <p>设 \(B,A\) 依次为 \(m\times n\) 和 \(n\times m\) 矩阵，若 \(BA=I\)，称 \(B\) 为 \(A\) 的<strong>左逆矩阵</strong>。证明 \(A\) 有左逆矩阵的充要条件是 \(A\) 为列满秩矩阵。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p><strong>必要性：</strong>\(BA=I_m\) ⇒ \(m=\operatorname{rank}(BA)\le\operatorname{rank}A\le m\)（\(A\) 是 \(n\times m\)），故 \(\operatorname{rank}A=m\)，即 \(A\) 列满秩。</p>
+                  <p><strong>充分性：</strong>若 \(A\) 列满秩，由第 2 题 \(A^{\mathrm T}A\)（\(m\) 阶）非奇异，令
+                    \[ B=(A^{\mathrm T}A)^{-1}A^{\mathrm T}, \]</p>
+                    <p>则 \(BA=(A^{\mathrm T}A)^{-1}A^{\mathrm T}A=I_m\)，\(B\) 即左逆。（对照 §1.3 习题 5 列满秩 \(S\) 诱导范数的构造，同一思想。）</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex43-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag">秩保持</span></header>
+              <div class="card-body">
+                <p>设 \(F\in\C_r^{m\times r}\)、\(G\in\C_r^{r\times n}\)，证明 \(\operatorname{rank}(FG)=r\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>上界：\(\operatorname{rank}(FG)\le\min(\operatorname{rank}F,\operatorname{rank}G)=r\)。</p>
+                  <p>下界：因 \(F\) 列满秩，存在左逆 \(F_L\)（第 3 题）使 \(F_LF=I_r\)，故
+                    \[ r=\operatorname{rank}I_r=\operatorname{rank}(F_LFG)\le\operatorname{rank}(FG). \]</p>
+                    <p>夹逼得 \(\operatorname{rank}(FG)=r\)。这保证满秩分解两个因子的秩"恰好"等于 \(A\) 的秩，没有进一步坍缩。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex43-5">
+              <header class="card-head"><span class="card-label">第 5 题</span><span class="tag tag-hard">Gram 矩阵保秩</span></header>
+              <div class="card-body">
+                <p>证明
+                  \[ \operatorname{rank}A=\operatorname{rank}(A^{\mathrm T}A)=\operatorname{rank}(AA^{\mathrm T}), \]
+                  这里 \(A\in\R_r^{m\times r}\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>关键是证明齐次方程 \(Ax=0\) 与 \(A^{\mathrm T}Ax=0\) 同解：前者显然推出后者；反之若 \(A^{\mathrm T}Ax=0\)，左乘 \(x^{\mathrm T}\) 得 \(\|Ax\|_2^2=x^{\mathrm T}A^{\mathrm T}Ax=0\)，故 \(Ax=0\)。零空间相同 ⇒ 秩相同：
+                    \[ \operatorname{rank}(A^{\mathrm T}A)=\operatorname{rank}A=r. \]</p>
+                  <p>对 \(A^{\mathrm T}\) 同理：\(\operatorname{rank}(AA^{\mathrm T})=\operatorname{rank}(A^{\mathrm T})=\operatorname{rank}A\)。这是实矩阵情形（复数版本为 \(A^{\mathrm H}A\)），也是最小二乘正规方程系数矩阵保持秩与正定性的根据。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 本节小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结与自检</h2>
+            <div class="summary-block">
+              <p>满秩分解把任意秩 \(r\) 的矩阵还原为"列基 × 行坐标"，而行最简形直接给出答案：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>要点</th><th>内容</th></tr>
+                  <tr><td>定义</td><td>\(A=FG\)，\(F\) 为 \(m\times r\) 列满秩、\(G\) 为 \(r\times n\) 行满秩</td></tr>
+                  <tr><td>存在性</td><td>初等行变换化阶梯 \(\begin{pmatrix}G\\O\end{pmatrix}\)（定理 4.13）</td></tr>
+                  <tr><td>Hermite 形</td><td>主元为 1、主元列为标准单位向量、主元列号严格右移；任意矩阵唯一可化</td></tr>
+                  <tr><td>主元列法（4.14）</td><td>\(F\) 取 <strong>A</strong> 的主元列，\(G\) 取 <strong>B</strong> 的非零行，自动有 \(FG=A\)</td></tr>
+                  <tr><td>不唯一性</td><td>\(A=(FD)(D^{-1}G)\)；Hermite 规范化后确定</td></tr>
+                  <tr><td>应用</td><td>秩次可加性、左逆/右逆、\(\operatorname{rank}(A^{\mathrm T}A)=\operatorname{rank}A\)、广义逆 \(A^+\)</td></tr>
+                </table>
+              </div>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>为什么 \(F\) 必须从原矩阵 \(A\) 的列中取，而不能从 Hermite 形 \(B\) 的对应列取？用 \(AP_1=[F\ \ FB_{12}]\) 解释一次。</li>
+                  <li>满秩分解与 QR 分解有什么异同？从因子的形状、约束（正交 vs 仅满秩）、唯一性三个角度比较。</li>
+                  <li>若 \(A\) 本身列满秩或行满秩，满秩分解退化成什么？此时 \(F\) 或 \(G\) 是什么矩阵？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="4.2-qr-decomposition.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§4.2 矩阵的 QR 分解</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="4.4-svd.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§4.4 矩阵的奇异值分解</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

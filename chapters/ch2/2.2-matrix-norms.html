@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§2.2 矩阵的范数 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §2.2：广义矩阵范数、与向量范数的相容性、Frobenius 范数、由向量范数诱导的算子范数（列和范数、谱范数、行和范数）">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§2.2 矩阵的范数</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="2.2" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 2 章 范数理论及其应用</a><span class="sep" aria-hidden="true">/</span>
+            <span>§2.2 矩阵的范数</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 2 章 · 范数理论及其应用</div>
+            <h1>§2.2 矩阵的范数</h1>
+            <p class="lede">矩阵空间 \(\C^{m\times n}\) 本身是一个 \(mn\) 维线性空间，当然可以照搬向量范数；但矩阵之间还有<strong>乘法</strong>，好的矩阵范数必须照顾乘法（<strong>相容性</strong>）。本节先定义广义矩阵范数，再证明由任意向量范数可<strong>诱导</strong>出与之相容的矩阵范数（算子范数），并导出数值分析中最重要的三个：列和范数、谱范数、行和范数，外加与酉变换无关的 Frobenius 范数。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.122–132</strong></span>
+              <span class="chip">建议 <strong>3 学时</strong></span>
+              <span class="chip">定义 <strong>2 个</strong></span>
+              <span class="chip">定理 <strong>3 个</strong></span>
+              <span class="chip">例题 <strong>3 道</strong></span>
+            </div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>陈述广义矩阵范数的四条件（非负、齐次、三角、相容性）；</li>
+                  <li>验证 \(\|A\|_{m_1},\|A\|_{m_\infty},\|A\|_F\) 是矩阵范数；</li>
+                  <li>说清"矩阵范数与向量范数相容"的含义并会用 \(\|Ax\|\le\|A\|\|x\|\)；</li>
+                  <li>理解诱导范数 \(\|A\|=\max_{\|x\|=1}\|Ax\|\) 的几何意义（单位球被放大的最大倍数）；</li>
+                  <li>熟练计算列和、行和、谱范数与 Frobenius 范数；</li>
+                  <li>知道 \(F\)-范数在酉（正交）乘下不变。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>相容性条件；</li>
+                      <li>诱导范数定义；</li>
+                      <li>\(\|A\|_1,\|A\|_2,\|A\|_\infty\) 的计算公式；</li>
+                      <li>Frobenius 范数。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>区分 \(m_1,m_\infty\) 与 \(1,\infty\)（诱导）范数；</li>
+                      <li>谱范数 \(\|A\|_2=\sqrt{\lambda_{\max}(A^{\mathrm H}A)}\)；</li>
+                      <li>诱导范数的上确界能取到。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 3 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>广义矩阵范数、\(m_1/m_\infty\) 范数</td><td class="num">p.122–124</td></tr>
+                    <tr><td class="num">2</td><td>相容性、Frobenius 范数、酉不变性</td><td class="num">p.124–127</td></tr>
+                    <tr><td class="num">3</td><td>诱导范数与三种常用范数、习题</td><td class="num">p.127–132</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 240" role="img" aria-label="矩阵范数脉络图">
+                    <defs><marker id="m22" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="30" y="28" width="170" height="46"/><rect x="240" y="28" width="180" height="46"/>
+                      <rect x="460" y="28" width="180" height="46"/><rect x="680" y="28" width="140" height="46"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="115" y="50">矩阵空间 Cᵐˣⁿ</text><text x="115" y="66" font-size="11" fill="#666">mn 维线性空间</text>
+                      <text x="330" y="50">广义矩阵范数</text><text x="330" y="66" font-size="11" fill="#666">四条件·含相容性</text>
+                      <text x="550" y="50">与向量范数相容</text><text x="550" y="66" font-size="11" fill="#666">‖Ax‖≤‖A‖‖x‖</text>
+                      <text x="750" y="50">F-范数</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m22)">
+                      <line x1="200" y1="51" x2="238" y2="51"/><line x1="420" y1="51" x2="458" y1="51"/><line x1="640" y1="51" x2="678" y1="51"/>
+                    </g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46">
+                      <rect x="200" y="140" width="440" height="52"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13.5" text-anchor="middle">
+                      <text x="420" y="162">诱导（算子）范数 ‖A‖ = max_{‖x‖=1} ‖Ax‖</text>
+                      <text x="420" y="182" font-size="12" fill="#666">列和 ‖A‖₁ · 谱范数 ‖A‖₂=√λₘₐₓ(AᴴA) · 行和 ‖A‖∞</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m22)"><path d="M550 76 C520 110 470 120 450 138" stroke-dasharray="4 4"/></g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、矩阵范数定义与性质 ================= -->
+          <section class="section" id="sec-general">
+            <h2 class="sec-title"><span class="cn">一</span>矩阵范数的定义与性质</h2>
+            <p>矩阵空间 \(\C^{m\times n}\) 是 \(mn\) 维线性空间，把 \(m\times n\) 矩阵看作其中的"向量"，本可按 §2.1 的方式定义范数。但矩阵之间还有<strong>乘法</strong>，定义矩阵范数时应予以体现。</p>
+
+            <h3 class="sub-title" id="def-matrix-norm">1. 定义 2.3：广义矩阵范数</h3>
+            <section class="card def" id="def-2-3">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 2.3</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{m\times n}\)，定义实值函数 \(\|A\|\)，满足：</p>
+                <ol class="axiom-list" style="list-style:none">
+                  <li><span class="n">1</span><strong>非负性</strong>：\(A\ne O\Rightarrow\|A\|&gt;0\)；\(A=O\Rightarrow\|A\|=0\)；</li>
+                  <li><span class="n">2</span><strong>齐次性</strong>：\(\|\alpha A\|=|\alpha|\,\|A\|\)（\(\alpha\in\C\)）；</li>
+                  <li><span class="n">3</span><strong>三角不等式</strong>：\(\|A+B\|\le\|A\|+\|B\|\)；</li>
+                </ol>
+                <p style="margin-bottom:0">则称 \(\|A\|\) 为 \(A\) 的<strong>广义矩阵范数</strong>。若对 \(\C^{m\times n},\C^{n\times l},\C^{m\times l}\) 上的<strong>同类</strong>广义范数还满足</p>
+                <div class="eq-scroll" style="margin-top:6px">
+                  \[ \|AB\|\le\|A\|\,\|B\|\qquad(B\in\C^{n\times l}), \tag{2.2.1} \]
+                </div>
+                <p style="margin-bottom:0">则称 \(\|A\|\) 为 \(A\) 的<strong>矩阵范数</strong>（第 4 条称<strong>相容性</strong>或<strong>次乘性</strong>）。"同类"指实数 \(\|A\|,\|B\|,\|AB\|\) 按同一规则计算。</p>
+              </div>
+            </section>
+            <p>与向量情形相同，矩阵序列 \(\{A^{(k)}\}\) 收敛于 \(A\) 的充要条件是 \(\|A^{(k)}-A\|\to0\)。由三角不等式还有
+              \[ \big|\|A\|-\|B\|\big|\le\|A-B\|, \]
+              故矩阵范数是其元素的连续函数：\(A^{(k)}\to A\Rightarrow\|A^{(k)}\|\to\|A\|\)。</p>
+
+            <h3 class="sub-title" id="m1-minf">2. 例 2.7：两种元素型矩阵范数</h3>
+            <section class="card ex" id="exm-2-7">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 2.7</span>
+              </header>
+              <div class="card-body">
+                <p>对 \(A=(a_{ij})_{m\times n}\)，下列两个函数都是 \(\C^{m\times n}\) 上的矩阵范数（教材限定方阵，此处推广到长方形矩阵）：
+                  <div class="eq-scroll">\[ \|A\|_{m_1}=\sum_{i=1}^m\sum_{j=1}^n|a_{ij}|,\qquad
+                     \|A\|_{m_\infty}=n\cdot\max_{i,j}|a_{ij}|\quad(\text{方阵 }n\times n). \]</div></p>
+                <details class="proof">
+                  <summary><span>为什么 \(\|A\|_{m_1}\) 满足相容性（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>设 \(A=(a_{ij})_{m\times n},B=(b_{ij})_{n\times l}\)，则
+                      \[ \|AB\|_{m_1}=\sum_{i,j}\Big|\sum_{k=1}^n a_{ik}b_{kj}\Big|
+                         \le\sum_{i,j}\sum_k|a_{ik}||b_{kj}|
+                         =\Big(\sum_{i,k}|a_{ik}|\Big)\Big(\sum_{k,j}|b_{kj}|\Big)=\|A\|_{m_1}\|B\|_{m_1}. \]
+                      非负、齐次、三角不等式由绝对值性质直接成立。\(\|A\|_{m_\infty}\) 同理（方阵时维数因子保证相容性）。</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0" class="muted">注意记号：\(\|A\|_{m_1},\|A\|_{m_\infty}\) 是<strong>把所有元素直接相加/取最大</strong>的广义范数，与后面由向量范数诱导出的 \(\|A\|_1,\|A\|_\infty\)（列和、行和）<strong>不是一回事</strong>，不要混淆。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="compatibility">3. 定义 2.4：与向量范数相容</h3>
+            <section class="card def" id="def-2-4">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 2.4</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">对 \(\C^{m\times n}\) 上的矩阵范数 \(\|\cdot\|_M\) 与 \(\C^m,\C^n\) 上的同类向量范数 \(\|\cdot\|_V\)，若
+                  <div class="eq-scroll">\[ \|Ax\|_V\le\|A\|_M\,\|x\|_V\qquad(\forall A\in\C^{m\times n},\ \forall x\in\C^n), \tag{2.2.2} \]</div>
+                  则称矩阵范数 \(\|\cdot\|_M\) 与向量范数 \(\|\cdot\|_V\) <strong>相容</strong>。</p>
+              </div>
+            </section>
+            <p>数值估计中矩阵常作为线性映射出现，相容性保证"先放大向量再取范数"不超过"矩阵范数 × 向量范数"，是误差分析（如扰动方程组、迭代收敛）最常用的不等式。</p>
+          </section>
+          <!-- ================= 二、Frobenius 范数 ================= -->
+          <section class="section" id="sec-frobenius">
+            <h2 class="sec-title"><span class="cn">二</span>Frobenius 范数</h2>
+            <section class="card ex" id="exm-2-8">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 2.8</span><span class="card-tag">F-范数与 ℓ₂ 相容</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A=(a_{ij})_{m\times n}\in\C^{m\times n}\)，函数
+                  <div class="eq-scroll">\[ \|A\|_F=\left(\sum_{i=1}^m\sum_{j=1}^n|a_{ij}|^2\right)^{1/2}=\big(\tr(A^{\mathrm H}A)\big)^{1/2} \tag{2.2.3} \]</div>
+                  是 \(\C^{m\times n}\) 上的矩阵范数，且与向量范数 \(\|\cdot\|_2\) 相容。</p>
+                <details class="proof">
+                  <summary><span>证明要点（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>非负、齐次显然。三角不等式把矩阵按列 \(a_j\) 拉直成向量，对 \(\|A+B\|_F^2=\sum\|a_j+b_j\|_2^2\) 用向量 2-范数的三角不等式（Cauchy–Schwarz）。相容性与次乘性：
+                      <div class="eq-scroll">\[ \|AB\|_F^2=\sum_{i,j}\Big|\sum_k a_{ik}b_{kj}\Big|^2\le
+                         \Big(\sum_{i,k}|a_{ik}|^2\Big)\Big(\sum_{k,j}|b_{kj}|^2\Big)=\|A\|_F^2\|B\|_F^2. \tag{2.2.4} \]</div>
+                      取 \(B=x\in\C^{n\times1}\) 即得 \(\|Ax\|_2\le\|A\|_F\|x\|_2\)。</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0">式 (2.2.3) 称 <strong>Frobenius 范数</strong>（\(F\)-范数），也记作 \(\|A\|_{m_2}\)。它就是把矩阵元素全部拉直后取欧氏长度，最易计算。</p>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-2-3">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 2.3（酉不变性）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\C^{m\times n}\)，\(P\in\C^{m\times m}\)、\(Q\in\C^{n\times n}\) 都是酉矩阵，则
+                  <div class="eq-scroll">\[ \|PA\|_F=\|A\|_F=\|AQ\|_F. \]</div>
+                  即左乘或右乘酉（实矩阵时为正交）矩阵不改变 \(F\)-范数。</p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>记 \(A\) 的列为 \(a_j\)，酉矩阵保持向量 2-范数：
+                      \[ \|PA\|_F^2=\sum_j\|Pa_j\|_2^2=\sum_j\|a_j\|_2^2=\|A\|_F^2. \]
+                      右乘用 \(\|AQ\|_F=\|(AQ)^{\mathrm H}\|_F=\|Q^{\mathrm H}A^{\mathrm H}\|_F=\|A^{\mathrm H}\|_F=\|A\|_F\)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0"><strong>推论：</strong>与 \(A\) 酉（正交）相似的矩阵 \(B=Q^{\mathrm H}AQ\) 有相同的 \(F\)-范数。几何上这相当于"旋转不改变长度"。</p>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-2-9">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 2.9</span><span class="card-tag">由矩阵范数构造相容的向量范数</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(\|\cdot\|_M\) 是 \(\C^{n\times n}\) 上的矩阵范数，任取 \(\C^n\) 中<strong>非零固定</strong>向量 \(y\)，定义
+                  <div class="eq-scroll">\[ \|x\|_V=\|xy^{\mathrm H}\|_M\qquad(\forall x\in\C^n), \tag{2.2.5} \]</div>
+                  则 \(\|x\|_V\) 是 \(\C^n\) 上的向量范数，且 \(\|\cdot\|_M\) 与 \(\|\cdot\|_V\) 相容。</p>
+                <details class="proof">
+                  <summary><span>证明思路（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>非负性用到 \(y\ne\mathbf0\)：\(x\ne\mathbf0\Rightarrow xy^{\mathrm H}\ne O\)；齐次、三角由矩阵范数对应性质。相容性：
+                      \[ \|Ax\|_V=\|(Ax)y^{\mathrm H}\|_M=\|A(xy^{\mathrm H})\|_M\le\|A\|_M\|xy^{\mathrm H}\|_M=\|A\|_M\|x\|_V. \]</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0">这说明<strong>任何一种矩阵范数都一定能找到与之相容的向量范数</strong>，为下面的诱导范数做铺垫。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 三、诱导范数 ================= -->
+          <section class="section" id="sec-induced">
+            <h2 class="sec-title"><span class="cn">三</span>几种常用的矩阵范数（诱导范数）</h2>
+            <p>下面给出一种规定矩阵范数的具体方法，使它自动与已知向量范数相容。</p>
+            <section class="card thm" id="thm-2-4">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 2.4（诱导范数 / 算子范数）</span><span class="card-tag">单位球上的最大放大率</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">已知 \(\C^m,\C^n\) 上的同类向量范数 \(\|\cdot\|\)，设 \(A\in\C^{m\times n}\)，则函数
+                  <div class="eq-scroll">\[ \|A\|=\max_{\|x\|=1}\|Ax\|=\sup_{x\ne\mathbf0}\frac{\|Ax\|}{\|x\|} \tag{2.2.6} \]</div>
+                  是 \(\C^{m\times n}\) 上的矩阵范数，且与该向量范数相容。有限维空间中连续函数在单位闭球（紧集）上取到最大值，所以 max 能取到。</p>
+                <details class="proof">
+                  <summary><span>四条件验证（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>非负、齐次由定义直接得到。三角：取 \(x_1\) 使 \(\|x_1\|=1\) 且 \(\|(A+B)x_1\|=\|A+B\|\)，则
+                      \[ \|A+B\|=\|Ax_1+Bx_1\|\le\|Ax_1\|+\|Bx_1\|\le\|A\|+\|B\|. \]</p>
+                    <p>对任意 \(y\)（取 \(y_0=y/\|y\|\)）有 \(\|Ay\|\le\|A\|\|y\|\)，这就是相容性。次乘性：取 \(\|x_2\|=1\) 使 \(\|AB\|=\|(AB)x_2\|\)，则
+                      \[ \|AB\|=\|A(Bx_2)\|\le\|A\|\|Bx_2\|\le\|A\|\|B\|. \]</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0">对单位矩阵有 \(\|I\|=\max_{\|x\|=1}\|Ix\|=1\)；反之与向量范数相容的矩阵范数必有 \(\|I\|\ge1\)（因为 \(\|x\|=\|Ix\|\le\|I\|\|x\|\)）。</p>
+              </div>
+            </section>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">几何直觉</span>
+              </header>
+              <div class="card-body">
+                <p>\(\|A\|\) 是线性映射 \(A\) 把向量"拉长"的<strong>最大倍数</strong>：把范数单位球 \(\{x:\|x\|=1\}\) 映成一个椭球（或平行体），\(\|A\|\) 就是这个象集到原点的最远距离。这也是迭代法收敛速度、条件数估计的核心量。</p>
+              </div>
+            </aside>
+
+            <h3 class="sub-title" id="thm-2-5">定理 2.5：三种诱导范数的计算公式</h3>
+            <section class="card thm" id="thm-2-5-card">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 2.5</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A=(a_{ij})_{m\times n}\)，对应向量的 \(1,2,\infty\) 范数，诱导出的矩阵范数依次为：</p>
+                <div class="table-wrap">
+                  <table class="book">
+                    <tr><th>名称</th><th>公式</th></tr>
+                    <tr><td><strong>列和范数</strong> \(\|A\|_1\)</td><td><div class="eq-scroll" style="margin:0">\[ \|A\|_1=\max_j\sum_{i=1}^m|a_{ij}| \tag{2.2.7} \]</div>（各列元素绝对值之和的最大值）</td></tr>
+                    <tr><td><strong>谱范数</strong> \(\|A\|_2\)</td><td><div class="eq-scroll" style="margin:0">\[ \|A\|_2=\sqrt{\lambda_1},\quad\lambda_1=\lambda_{\max}(A^{\mathrm H}A) \tag{2.2.8} \]</div>（\(A^{\mathrm H}A\) 最大特征值的平方根，即 \(A\) 的最大奇异值）</td></tr>
+                    <tr><td><strong>行和范数</strong> \(\|A\|_\infty\)</td><td><div class="eq-scroll" style="margin:0">\[ \|A\|_\infty=\max_i\sum_{j=1}^n|a_{ij}| \tag{2.2.9} \]</div>（各行元素绝对值之和的最大值）</td></tr>
+                  </table>
+                </div>
+                <details class="proof">
+                  <summary><span>证明梗概（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p><strong>(1) 列和：</strong>\(\|x\|_1=1\) 时 \(\|Ax\|_1=\sum_i|\sum_j a_{ij}\xi_j|\le\sum_j|\xi_j|\sum_i|a_{ij}|\le\max_j\sum_i|a_{ij}|\)；取第 \(k\) 个单位坐标向量（第 \(k\) 列和最大）恰好取等号。</p>
+                    <p><strong>(3) 行和：</strong>类似，上界由 \(|\sum_j a_{ij}\xi_j|\le\sum_j|a_{ij}||\xi_j|\) 得到，取 \(x\) 的分量为各元素的符号 \(\eta_j=|a_{kj}|/a_{kj}\)（使第 \(k\) 行全部同号）取等号。</p>
+                    <p><strong>(2) 谱范数：</strong>\(A^{\mathrm H}A\) 是半正定 Hermite 矩阵，特征值 \(\lambda_1\ge\cdots\ge\lambda_n\ge0\)。取标准正交特征基，\(\|x\|_2=1\) 时
+                      \[ \|Ax\|_2^2=(x,A^{\mathrm H}Ax)\le\lambda_1(x,x)=\lambda_1, \]
+                      取属于 \(\lambda_1\) 的单位特征向量 \(x_1\) 恰取等号，故 \(\|A\|_2=\sqrt{\lambda_1}\)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <p>除三种诱导范数外，Frobenius 范数也是常用矩阵范数。可以证明：\(\C^{m\times n}\) 上<strong>所有满足定义 2.3 的矩阵范数互相等价</strong>（与向量范数同理，有限维空间范数等价）。</p>
+
+            <h3 class="sub-title" id="norm-lab-title">动手实验：矩阵范数计算器</h3>
+            <p>改一改 3×3 矩阵，同时观察五种范数与谱半径。特别对比：\(\|A\|_1\) 按列求和、\(\|A\|_\infty\) 按行求和，二者一般不等；谱范数总是不超过 \(F\)-范数。</p>
+            <section class="card lab" data-matrix-norm-lab></section>
+          </section>
+          <!-- ================= 习题 2.2 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 2.2（共 6 题）</h2>
+            <div class="ex-toolbar">
+              <span data-fold-tools="details.solution">
+                <button type="button" data-fold="open">全部展开解答</button>
+                <button type="button" data-fold="close">全部收起</button>
+              </span>
+            </div>
+
+            <article class="card task" id="ex22-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag tag-mid">范数计算</span></header>
+              <div class="card-body">
+                <p>求矩阵 \(A=\begin{pmatrix}-1&2&1\end{pmatrix}\)（\(1\times3\)）和 \(B=\begin{pmatrix}-\mathrm j&2&3\\1&0&\mathrm j\end{pmatrix}\)（\(2\times3\)）的 \(\|\cdot\|_1,\|\cdot\|_\infty\) 及 \(\|\cdot\|_2\)（诱导范数）。</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>对 \(A\)（单行）：\(\|A\|_1=\max\)列和\(=\max\{1,2,1\}=2\)（三列各只有一个元素，取绝对值最大者）；\(\|A\|_\infty=\)行和\(=|-1|+2+1=4\)；\(\|A\|_2=\sqrt{\lambda_{\max}(A^{\mathrm H}A)}=\sqrt{AA^{\mathrm H}}=\sqrt{1+4+1}=\sqrt6\)。</p>
+                  <p>对 \(B\)：列和依次为 \(|-\mathrm j|+|1|=2,\ |2|+|0|=2,\ |3|+|\mathrm j|=4\)，故 \(\|B\|_1=4\)；行和为 \(1+2+3=6\)、\(1+0+1=2\)，故 \(\|B\|_\infty=6\)；\(\|B\|_2=\sqrt{\lambda_{\max}(B^{\mathrm H}B)}\)：\(B^{\mathrm H}B=\begin{pmatrix}2&2\mathrm j&4\mathrm j\\-2\mathrm j&4&6\\-4\mathrm j&6&10\end{pmatrix}\)，特征方程 \(\lambda(\lambda^2-16\lambda+12)=0\)，最大特征值 \(\lambda_{\max}=8+2\sqrt{13}\approx15.21\)，故 \(\|B\|_2=\sqrt{8+2\sqrt{13}}\approx3.90\)。</p>
+                  <p class="muted">注意区分：题目要的是诱导范数 \(\|A\|_1,\|A\|_\infty\)（列和、行和），不是 \(m_1,m_\infty\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex22-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag">特征值界</span></header>
+              <div class="card-body">
+                <p>设 \(\lambda\) 是方阵 \(A\in\C^{m\times m}\) 的特征值，证明 \(|\lambda|\le\sqrt[m]{\|A^m\|}\)。</p>
+                <details class="solution"><summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>取属于 \(\lambda\) 的特征向量 \(x\ne\mathbf0\)：\(Ax=\lambda x\)，反复作用 \(m\) 次得 \(A^m x=\lambda^m x\)。用相容性（任意与向量范数相容的矩阵范数）：
+                    \[ |\lambda|^m\|x\|=\|\lambda^m x\|=\|A^m x\|\le\|A^m\|\,\|x\|. \]
+                    约去 \(\|x\|&gt;0\) 得 \(|\lambda|^m\le\|A^m\|\)，开 \(m\) 次方即得。特例 \(m=1\)：谱半径 \(\rho(A)\le\|A\|\)（任何相容范数都是谱半径的上界）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex22-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag tag-mid">构造反例</span></header>
+              <div class="card-body">
+                <p>对定理 2.5 的三种范数，举矩阵例子，使它的一种范数小于 1 而其他两种不小于 1。</p>
+                <details class="solution"><summary><span>参考构造（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>取 \(A=\begin{pmatrix}0.9&0\\0&0.9\end{pmatrix}\) 三种范数都等于 \(0.9\)，不行；需要让列、行、奇异值三个量分散。分别让三种范数各自"变小"：</p>
+                  <p><strong>① 使 \(\|A\|_1&lt;1\)：</strong>\(A=\begin{pmatrix}0.9&0.9\\0&0\end{pmatrix}\)，\(\|A\|_1=\max(0.9,0.9)=0.9&lt;1\)，而 \(\|A\|_\infty=1.8\ge1\)；\(A^{\mathrm T}A=\begin{pmatrix}0.81&0.81\\0.81&0.81\end{pmatrix}\) 特征值为 \(1.62,0\)，故 \(\|A\|_2=\sqrt{1.62}\approx1.27\ge1\)。</p>
+                  <p><strong>② 使 \(\|A\|_\infty&lt;1\)：</strong>转置即可，\(A=\begin{pmatrix}0.9&0\\0.9&0\end{pmatrix}\)，\(\|A\|_\infty=0.9&lt;1\) 而 \(\|A\|_1=1.8\ge1\)、\(\|A\|_2\approx1.27\ge1\)。</p>
+                  <p><strong>③ 使 \(\|A\|_2&lt;1\)：</strong>取 \(A=\begin{pmatrix}0.7&0.2\\0.3&0.7\end{pmatrix}\)，\(\|A\|_1=\|A\|_\infty=1.0\ge1\)，而 \(A^{\mathrm T}A=\begin{pmatrix}0.58&0.35\\0.35&0.53\end{pmatrix}\) 最大特征值 \(\approx0.906\)，故 \(\|A\|_2\approx0.952&lt;1\)。</p>
+                  <p>三例说明：三种范数数值可以相差很大，但由等价性互相控制（\(\|A\|_2\le\sqrt{\|A\|_1\|A\|_\infty}\)）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex22-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag">非奇异与特征值下界</span></header>
+              <div class="card-body">
+                <p>设 \(A\) 非奇异，\(\lambda\) 是它的任一特征值，证明
+                  \[ |\lambda|\ge\frac{1}{\|A^{-1}\|}. \]</p>
+                <details class="solution"><summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由 \(Ax=\lambda x\)（\(x\ne\mathbf0\)）得 \(A^{-1}x=\dfrac1\lambda x\)，即 \(1/\lambda\) 是 \(A^{-1}\) 的特征值。由第 2 题（\(m=1\)）：
+                    \[ \Big|\frac1\lambda\Big|\le\|A^{-1}\|\ \Longrightarrow\ |\lambda|\ge\frac1{\|A^{-1}\|}. \]
+                    结合上题，非奇异矩阵的特征值全落在环形区域 \(\|A^{-1}\|^{-1}\le|\lambda|\le\|A\|\) 内。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex22-5">
+              <header class="card-head"><span class="card-label">第 5 题</span><span class="tag tag-hard">加权诱导范数</span></header>
+              <div class="card-body">
+                <p>设可逆 \(S\in\R^{n\times n}\)，\(\|x\|_S=\|Sx\|_2\) 是 \(\R^n\) 上的向量范数，\(\|A\|_S\) 表示从属于它的矩阵范数，导出 \(\|A\|_S\) 与矩阵 2-范数的关系。</p>
+                <details class="solution"><summary><span>解答（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>
+                    \[ \|A\|_S=\max_{\|x\|_S=1}\|Ax\|_S=\max_{\|Sx\|_2=1}\|SAx\|_2. \]
+                    令 \(y=Sx\)（\(x=S^{-1}y\)），则 \(\|Sx\|_2=\|y\|_2=1\)，
+                    \[ \|A\|_S=\max_{\|y\|_2=1}\|SAS^{-1}y\|_2=\|SAS^{-1}\|_2. \]
+                    即加权诱导范数等于 \(A\) 在相似变换 \(S\) 下的谱范数。这与例 2.4 的加权向量范数 \(\|x\|_A=\sqrt{x^{\mathrm T}Ax}\) 是同一思想。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex22-6">
+              <header class="card-head"><span class="card-label">第 6 题</span><span class="tag tag-mid">相容性验证</span></header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{m\times n},x\in\C^n\)，证明矩阵范数 \(\|A\|_{m_1}\) 与向量范数 \(\|x\|_p\)（\(1\le p&lt;\infty\)）相容。</p>
+                <details class="solution"><summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>记 \(y=Ax\)，其第 \(i\) 个分量 \(y_i=\sum_j a_{ij}\xi_j\)。由 Hölder 不等式（\(1/p+1/q=1\)）：
+                    \[ |y_i|\le\sum_j|a_{ij}||\xi_j|\le\left(\sum_j|a_{ij}|^q\right)^{1/q}\|x\|_p. \]
+                    再对 \(i\) 求和：
+                    \[ \|Ax\|_p=\Big(\sum_i|y_i|^p\Big)^{1/p}\le\|x\|_p\Big(\sum_i\Big(\sum_j|a_{ij}|^q\Big)^{p/q}\Big)^{1/p}. \]
+                    对 \(p\ge1\) 可进一步放缩为 \(\|x\|_p\sum_{i,j}|a_{ij}|=\|A\|_{m_1}\|x\|_p\)：先由 \(\ell_q\le\ell_1\) 把 \((\sum_j|a_{ij}|^q)^{1/q}\) 放大为 \(s_i=\sum_j|a_{ij}|\)，再由幂和估计 \((\sum_i s_i^p)^{1/p}\le\sum_i s_i\) 收尾（\(p=1\) 时直接成立）。故二者相容。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 本节小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结与自检</h2>
+            <div class="summary-block">
+              <p>矩阵范数 = 向量范数三条件 + <strong>乘法相容性</strong>；最有用的一族是由向量范数诱导的算子范数，它自动相容且 \(\|I\|=1\)。</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>范数</th><th>定义 / 公式</th><th>类型</th></tr>
+                  <tr><td>\(\|A\|_{m_1}\)</td><td>\(\sum_{i,j}|a_{ij}|\)（所有元素绝对值和）</td><td>矩阵范数（元素型，满足相容性）</td></tr>
+                  <tr><td>\(\|A\|_{m_\infty}\)</td><td>\(n\max_{i,j}|a_{ij}|\)（方阵）</td><td>矩阵范数（元素型，满足相容性）</td></tr>
+                  <tr><td>\(\|A\|_F\)</td><td>\(\sqrt{\sum_{i,j}|a_{ij}|^2}=\sqrt{\tr A^{\mathrm H}A}\)，酉乘不变，与 \(\ell_2\) 相容</td><td>矩阵范数</td></tr>
+                  <tr><td>\(\|A\|_1\) 列和</td><td>\(\max_j\sum_i|a_{ij}|\)，由 \(\ell_1\) 诱导</td><td>诱导范数</td></tr>
+                  <tr><td>\(\|A\|_2\) 谱范数</td><td>\(\sqrt{\lambda_{\max}(A^{\mathrm H}A)}\)（最大奇异值），由 \(\ell_2\) 诱导，酉乘不变</td><td>诱导范数</td></tr>
+                  <tr><td>\(\|A\|_\infty\) 行和</td><td>\(\max_i\sum_j|a_{ij}|\)，由 \(\ell_\infty\) 诱导</td><td>诱导范数</td></tr>
+                </table>
+              </div>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>广义矩阵范数与（真正的）矩阵范数差在哪一条？为什么 \(\max_{i,j}|a_{ij}|\) 直接取最大不能做矩阵范数，要乘 \(n\)？</li>
+                  <li>默写出诱导范数定义，说明它的几何意义，以及为什么这样定义自动满足 \(\|AB\|\le\|A\|\|B\|\)。</li>
+                  <li>\(\|A\|_1,\|A\|_2,\|A\|_\infty,\|A\|_F\) 中哪几个在正交（酉）相似下不变？谱范数为什么等于最大奇异值？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="2.1-vector-norms.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§2.1 向量范数及其性质</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="2.3-norm-applications.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§2.3 范数的一些应用</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

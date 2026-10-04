@@ -1,0 +1,396 @@
+/* ============================================================
+   矩阵论课程网页 · 组件样式 components.css
+   定义/定理/证明/例题/注意/习题/实验 七类学术组件 + 教学控件
+   ============================================================ */
+
+/* ---------- 面包屑 / 节头 ---------- */
+.breadcrumb {
+  font-family: var(--font-sans); font-size: .82rem; color: var(--ink-faint);
+  margin-bottom: 18px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+}
+.breadcrumb a { color: var(--ink-soft); }
+.breadcrumb .sep { color: var(--ink-soft); }
+
+.lesson-hero { padding-bottom: 26px; margin-bottom: 30px; border-bottom: 2px solid var(--rule); }
+.lesson-hero .kicker {
+  font-family: var(--font-sans); letter-spacing: .22em; font-size: .78rem;
+  color: var(--c-thm); font-weight: 700; margin-bottom: 10px;
+}
+.lesson-hero h1 { font-size: 2.05rem; letter-spacing: .02em; margin-bottom: 14px; }
+.lesson-hero .lede { color: var(--ink-soft); font-size: 1.02rem; max-width: 42em; margin: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.chip {
+  font-family: var(--font-sans); font-size: .78rem; color: var(--ink-soft);
+  background: var(--surface); border: 1px solid var(--rule-info);
+  border-radius: 999px; padding: 3px 13px;
+}
+.chip strong { color: var(--c-thm); font-weight: 700; }
+
+/* ---------- 章节标题 ---------- */
+.section { margin: 52px 0 0; }
+h2.sec-title {
+  font-size: 1.5rem; margin: 0 0 22px; padding-top: 26px;
+  border-top: 1px solid var(--rule);
+  display: flex; align-items: center; gap: 14px;
+}
+h2.sec-title .cn {
+  flex: none; width: 2.1em; height: 2.1em; display: grid; place-items: center;
+  background: linear-gradient(150deg, #32405c, #26314a);
+  color: #f4ecdc; border-radius: 9px; font-size: 1.05rem;
+  box-shadow: 0 3px 8px rgba(38,49,74,.3);
+}
+h3.sub-title {
+  font-size: 1.18rem; margin: 30px 0 12px; padding-left: 12px;
+  border-left: 4px solid var(--c-def);
+}
+h4.minor-title { font-size: 1.02rem; margin: 20px 0 8px; color: var(--ink-soft); }
+
+/* ---------- 学术卡片基类 ---------- */
+.card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--card-c, var(--ink-faint));
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 16px 20px 15px;
+  margin: 18px 0;
+  scroll-margin-top: 86px;
+}
+.card.def  { --card-c: var(--c-def);  background: linear-gradient(180deg, var(--c-def-bg),  var(--surface) 62%); }
+.card.thm  { --card-c: var(--c-thm);  background: linear-gradient(180deg, var(--c-thm-bg),  var(--surface) 62%); }
+.card.ex   { --card-c: var(--c-ex);   background: linear-gradient(180deg, var(--c-ex-bg),   var(--surface) 62%); }
+.card.note { --card-c: var(--c-note); background: linear-gradient(180deg, var(--c-note-bg),  var(--surface) 66%); }
+.card.task { --card-c: var(--c-task); background: linear-gradient(180deg, var(--c-task-bg),  var(--surface) 66%); }
+.card.lab  { --card-c: var(--c-lab);  background: linear-gradient(180deg, var(--c-lab-bg),   var(--surface) 60%); }
+/* 1.4.3：原 #b06a2f 对卡片底仅 3.83:1，且压在图标底上只有 4.24:1；调深后两处均达标 */
+.card.thm.cor { --card-c: #9c5c26; border-left-color: #9c5c26; }
+
+.card-head {
+  display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
+  margin-bottom: 9px;
+  font-family: var(--font-sans);
+}
+.card-icon {
+  flex: none; width: 25px; height: 25px; display: grid; place-items: center;
+  border-radius: 6px; color: var(--on-accent); background: var(--card-c);
+}
+.card-icon svg { width: 15px; height: 15px; }
+.card-label { font-weight: 700; font-size: .9rem; letter-spacing: .03em; color: var(--card-c); }
+.card-tag {
+  font-size: .72rem; padding: 1px 9px; border-radius: 999px;
+  border: 1px solid var(--card-c); color: var(--card-c); background: rgba(255,255,255,.55);
+}
+.card-body > :last-child { margin-bottom: 0; }
+.card-body p:last-child { margin-bottom: 0; }
+.card .term { font-weight: 700; }
+.axiom-list { list-style: none; padding-left: 0; margin: .4em 0; }
+.axiom-list li {
+  position: relative; padding-left: 2.1em; margin: .4em 0;
+}
+.axiom-list li .n {
+  position: absolute; left: 0; top: .12em;
+  width: 1.45em; height: 1.45em; display: grid; place-items: center;
+  font-family: var(--font-sans); font-size: .78rem; font-weight: 700;
+  border-radius: 50%; background: var(--c-def-bg); color: var(--c-def);
+  border: 1px solid var(--c-def);
+}
+.axiom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 22px; }
+@media (max-width: 620px) { .axiom-grid { grid-template-columns: 1fr; } }
+
+/* 公式编号颜色 */
+.katex .tag { color: var(--ink-faint); font-family: var(--font-serif); }
+.eq-center { text-align: center; }
+.qed { text-align: right; color: var(--ink-soft); margin: .3em 0 0; }
+
+/* ---------- 可折叠：证明 / 解答 ---------- */
+details.proof, details.solution {
+  margin-top: 12px; border-top: 1px dashed var(--rule-strong); padding-top: 4px;
+}
+details summary {
+  cursor: pointer; list-style: none;
+  font-family: var(--font-sans); font-size: .84rem; font-weight: 700;
+  color: var(--card-c); padding: 6px 2px;
+  display: flex; align-items: center; gap: 8px; user-select: none;
+}
+details summary::-webkit-details-marker { display: none; }
+details summary .chev { transition: transform .2s; margin-left: auto; }
+details[open] summary .chev { transform: rotate(90deg); }
+details summary:hover { opacity: .82; }
+.proof-body, .solution-body { padding: 4px 2px 6px; }
+/* 1.3.1：解答 / 证明区的小标题由 h4 降为 h3（消除 h2→h4 跳级），
+   外观保持原样，故 h3 与 h4 写同一组声明。 */
+.proof-body h3, .proof-body h4,
+.solution-body h3, .solution-body h4 {
+  font-family: var(--font-sans); font-size: .82rem; letter-spacing: .1em;
+  color: var(--ink-faint); margin: 12px 0 4px;
+}
+.solution-body { background: var(--surface-alt); border-radius: var(--radius-sm); padding: 10px 16px; border: 1px solid var(--rule-info); }
+
+/* ---------- 表格 ---------- */
+.table-wrap { overflow-x: auto; margin: 14px 0; }
+table.book {
+  width: 100%; border-collapse: collapse; font-size: .94rem;
+  background: var(--surface);
+}
+table.book th, table.book td { padding: 9px 13px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--rule-info); }
+table.book th {
+  font-family: var(--font-sans); font-weight: 700; font-size: .86rem;
+  background: var(--surface-alt); color: var(--ink-soft);
+  white-space: nowrap;
+}
+table.book tr:last-child td { border-bottom: 0; }
+table.book td.num, table.book th.num { font-family: var(--font-mono); text-align: center; white-space: nowrap; }
+table.book.center td:not(:first-child) { text-align: center; }
+
+/* ---------- 网格小工具 ---------- */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.grid2 > *, .grid3 > * { min-width: 0; }   /* 同 .plan-grid：允许 grid 子项收缩，宽公式由 .katex-display/.eq-scroll 自行横滑 */
+.mini-card {
+  background: var(--surface-alt); border: 1px solid var(--rule);
+  border-radius: var(--radius-sm); padding: 12px 15px;
+}
+.mini-card .mc-title { font-family: var(--font-sans); font-weight: 700; font-size: .86rem; color: var(--c-def); margin-bottom: 4px; }
+@media (max-width: 720px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+
+/* ============================================================
+   教学计划区
+   ============================================================ */
+.lesson-plan { margin: 8px 0 10px; }
+.plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.plan-grid > * { min-width: 0; }   /* 允许 grid 子项收缩，内部宽内容（脉络图/表格）自行横滑，不撑破整页 */
+.plan-card {
+  background: var(--surface); border: 1px solid var(--rule);
+  border-top: 3px solid var(--pc, var(--c-def));
+  border-radius: var(--radius); box-shadow: var(--shadow-card);
+  padding: 15px 18px;
+}
+.plan-card.full { grid-column: 1 / -1; }
+.plan-card h3 {
+  font-size: 1.02rem; margin: 0 0 10px; display: flex; align-items: center; gap: 9px;
+  font-family: var(--font-sans);
+}
+.plan-card h3 .pc-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--pc, var(--c-def)); }
+.plan-card ul { margin: 0; padding-left: 1.2em; }
+.plan-card li { font-size: .92rem; margin: .35em 0; color: var(--ink-soft); }
+.pc-goal { --pc: var(--c-def); }
+.pc-key  { --pc: var(--c-thm); }
+.pc-time { --pc: var(--c-ex); }
+.pc-map  { --pc: var(--c-lab); }
+.pd-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 18px; }
+.pd-cols h4 { font-family: var(--font-sans); font-size: .8rem; color: var(--c-thm); margin: 2px 0 4px; }
+@media (max-width: 760px) { .plan-grid { grid-template-columns: 1fr; } .pd-cols { grid-template-columns: 1fr; } }
+
+/* 知识脉络图 */
+.flow-map { width: 100%; height: auto; overflow-x: auto; }
+.flow-map svg { width: 100%; height: auto; min-width: 560px; display: block; }
+.fm-node rect { rx: 8; stroke-width: 1.4; }
+.fm-node text { font-family: var(--font-sans); font-size: 13px; fill: var(--ink); }
+.fm-edge { stroke: var(--ink-faint); stroke-width: 1.4; fill: none; }
+
+/* ============================================================
+   交互一：公理步进器（例 1.5）
+   ============================================================ */
+.axiom-stepper { margin-top: 14px; border-top: 1px dashed var(--rule-strong); padding-top: 14px; }
+.as-dots { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.as-group-label { font-family: var(--font-sans); font-size: .76rem; color: var(--ink-faint); width: 100%; margin-top: 4px; }
+.as-dot {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 1.5px solid var(--c-lab); background: var(--surface);
+  color: var(--c-lab); font-family: var(--font-sans); font-weight: 700; font-size: .9rem;
+  cursor: pointer; transition: all .18s;
+}
+.as-dot:hover { border-color: var(--c-lab); }
+.as-dot.done { background: var(--c-lab-bg); border-color: var(--c-lab); }
+.as-dot.current { background: var(--c-lab); color: var(--on-accent); border-color: var(--c-lab); box-shadow: 0 3px 10px rgba(107,78,158,.4); }
+.as-panel {
+  margin-top: 14px; background: var(--surface-alt); border: 1px solid var(--rule);
+  border-radius: var(--radius-sm); padding: 14px 18px; min-height: 132px;
+}
+.js .as-panel { display: none; }
+.js .as-panel.active { display: block; }
+.cl-left { display: grid; gap: 18px; justify-items: center; align-content: start; }
+.as-panel .as-law { font-family: var(--font-sans); font-weight: 700; color: var(--c-lab); font-size: .9rem; margin-bottom: 6px; }
+.as-panel .as-check { margin-top: 10px; font-size: .92rem; color: var(--c-ex); }
+.as-ctrl { display: flex; gap: 10px; margin-top: 12px; align-items: center; font-family: var(--font-sans); }
+.as-btn {
+  border: 1px solid var(--c-lab); background: var(--surface); color: var(--c-lab);
+  border-radius: 7px; padding: 6px 16px; font-size: .86rem; cursor: pointer; font-family: var(--font-sans);
+}
+.as-btn:hover { background: var(--c-lab-bg); }
+.as-progress { font-size: .82rem; color: var(--ink-faint); margin-left: auto; }
+.as-done-banner {
+  display: none; margin-top: 12px; padding: 10px 15px; border-radius: var(--radius-sm);
+  background: var(--c-ex-bg); border: 1px solid var(--c-ex-line); color: var(--c-ex);
+  font-family: var(--font-sans); font-size: .9rem;
+}
+.as-done-banner.show { display: block; }
+
+/* ============================================================
+   交互二：基变换坐标实验室
+   ============================================================ */
+.coord-lab .lab-body { display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: start; }
+@media (max-width: 680px) { .coord-lab .lab-body { grid-template-columns: 1fr; } }
+.cl-matrix { display: inline-block; }
+.cl-matrix .cl-name { font-family: var(--font-sans); font-weight: 700; font-size: .88rem; color: var(--c-lab); margin-bottom: 5px; }
+.cl-grid { display: grid; gap: 6px; padding: 8px 12px; position: relative; }
+.cl-grid.n2 { grid-template-columns: repeat(2, auto); }
+.cl-grid::before, .cl-grid::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 7px;
+  border: 1.5px solid var(--ink); border-radius: 4px;
+}
+.cl-grid::before { left: 0; border-right: 0; }
+.cl-grid::after { right: 0; border-left: 0; }
+.cl-grid input {
+  width: 62px; padding: 6px 4px; text-align: center;
+  border: 1px solid var(--rule-info); border-radius: 5px;
+  font-family: var(--font-mono); font-size: .95rem; color: var(--ink);
+  background: var(--surface);
+}
+.cl-grid input:focus { outline: 2px solid var(--c-lab); border-color: var(--c-lab); }
+.cl-grid input.bad { border-color: var(--c-thm); background: var(--c-thm-bg); }
+.cl-out { font-size: .95rem; }
+.cl-out .cl-row { display: flex; gap: 8px; align-items: baseline; margin: 6px 0; flex-wrap: wrap; }
+.cl-out .cl-k { font-family: var(--font-sans); font-size: .84rem; color: var(--ink-soft); min-width: 78px; }
+.cl-out .cl-v { font-family: var(--font-mono); font-weight: 700; color: var(--ink); }
+.cl-out .cl-v.warn { color: var(--c-thm); }
+.cl-presets { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+.cl-preset {
+  font-family: var(--font-sans); font-size: .8rem; cursor: pointer;
+  border: 1px solid var(--c-lab); background: var(--surface); color: var(--c-lab);
+  border-radius: 999px; padding: 4px 13px;
+}
+.cl-preset:hover { background: var(--c-lab-bg); }
+.cl-alert {
+  display: none; margin-top: 10px; font-family: var(--font-sans); font-size: .86rem;
+  color: var(--c-thm); background: var(--c-thm-bg); border: 1px solid var(--c-thm);
+  border-radius: var(--radius-sm); padding: 7px 13px;
+}
+.cl-alert.show { display: block; }
+
+/* ============================================================
+   交互三：R³ 交与和 SVG
+   ============================================================ */
+.subspace-fig { margin-top: 14px; }
+.sf-stage { background: var(--surface-alt); border: 1px solid var(--rule); border-radius: var(--radius-sm); padding: 8px; }
+.sf-stage svg { width: 100%; height: auto; display: block; }
+.sf-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.sf-btn {
+  font-family: var(--font-sans); font-size: .83rem; cursor: pointer;
+  border: 1px solid var(--rule-info); background: var(--surface); color: var(--ink-soft);
+  border-radius: 7px; padding: 5px 13px;
+}
+.sf-btn.active { background: var(--c-thm); border-color: var(--c-thm); color: var(--on-accent); }
+.sf-caption { font-size: .86rem; color: var(--ink-soft); margin-top: 8px; min-height: 1.6em; font-family: var(--font-sans); }
+/* 填充色随主题切换（--sf-fill）：深色主题原 rgba(43,95,139,.13) 对舞台底仅 1.08:1，几乎不可见。
+   填充不参与 3:1（见报告豁免说明），真正承担平面边界的是下面 1.2px 的 --c-def 描边。 */
+.sf-plane { fill: var(--sf-fill); stroke: var(--c-def); stroke-width: 1.2; opacity: 0; transition: opacity .3s; }
+.sf-line { stroke-width: 2.4; fill: none; opacity: .35; transition: opacity .3s; }
+.sf-l1 { stroke: var(--c-ex); } .sf-l2 { stroke: var(--c-lab); }
+.sf-origin { fill: var(--c-thm); opacity: .35; transition: opacity .3s; }
+.sf-label { font-family: var(--font-sans); font-size: 14px; fill: var(--ink-soft); }
+.f-mode-l1 .sf-l1, .f-mode-l2 .sf-l2 { opacity: 1; }
+.f-mode-int .sf-origin { opacity: 1; }
+.f-mode-int .sf-origin-ring { opacity: 1; }
+.f-mode-sum .sf-plane, .f-mode-sum .sf-l1, .f-mode-sum .sf-l2 { opacity: 1; }
+.sf-origin-ring { fill: none; stroke: var(--c-thm); stroke-width: 2; opacity: 0; }
+
+/* ============================================================
+   习题区
+   ============================================================ */
+.ex-toolbar {
+  display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+  font-family: var(--font-sans); margin: 6px 0 18px;
+}
+.ex-toolbar button {
+  border: 1px solid var(--rule-info); background: var(--surface); color: var(--ink-soft);
+  border-radius: 7px; padding: 6px 14px; font-size: .84rem; cursor: pointer;
+}
+.ex-toolbar button:hover { border-color: var(--c-task); color: var(--c-task); }
+.ex-toolbar .ex-hint { font-size: .8rem; color: var(--ink-faint); }
+.tag {
+  font-family: var(--font-sans); font-size: .71rem; padding: 1px 9px; border-radius: 999px;
+  border: 1px solid var(--rule-info); color: var(--ink-soft);
+}
+.tag-hard { border-color: var(--c-thm); color: var(--c-thm); }
+.tag-mid { border-color: var(--c-note); color: var(--c-note); }
+
+/* ---------- 本节小结 ---------- */
+.summary-block { background: var(--surface-alt); border: 1px solid var(--rule); border-radius: var(--radius); padding: 18px 22px; }
+/* 1.3.1：小结区里原本是裸 <h4>（直接挂在 h2.sec-title 之下，构成跳级），
+   现降为 h3；此处显式写回 1em，使其与原 h4（继承正文字号）外观完全一致。 */
+.summary-block .sum-cap { font-size: 1em; }
+.self-check { background: var(--c-note-bg); border: 1px solid var(--c-note); border-radius: var(--radius-sm); padding: 12px 16px; margin-top: 14px; }
+/* 1.3.1：自检问题标题同样由 h4 降为 h3，外观不变 */
+.self-check h3, .self-check h4 { font-family: var(--font-sans); color: var(--c-note); margin: 0 0 6px; font-size: .9rem; }
+
+/* ---------- 页脚导航 ---------- */
+.lesson-nav {
+  display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: stretch;
+  margin: 54px 0 10px; padding-top: 24px; border-top: 2px solid var(--rule);
+  font-family: var(--font-sans);
+}
+.lesson-nav > * { min-width: 0; }
+.lesson-nav a,
+.lesson-nav .disabled {
+  border: 1px solid var(--rule); border-radius: var(--radius-sm);
+  padding: 10px 15px; background: var(--surface); color: var(--ink-soft);
+  display: flex; flex-direction: column; gap: 2px;
+}
+.lesson-nav a:hover { text-decoration: none; border-color: var(--c-def); color: var(--link-dark); }
+/* 失效占位：已是 <span aria-disabled>（不可聚焦、不响应点击），属 WCAG 1.4.3「inactive 组件」例外；
+   不透明度由 .45 提到 .7，避免上一版「鼠标点不动、键盘却能跳页首」的行为不一致与过暗文字 */
+.lesson-nav .disabled { opacity: .7; pointer-events: none; user-select: none; }
+.lesson-nav .ln-dir { font-size: .74rem; color: var(--ink-faint); }
+.lesson-nav .ln-ttl { font-weight: 700; font-size: .9rem; }
+.lesson-nav .ln-next { text-align: right; }
+.lesson-nav .ln-home { align-self: center; border: 0; background: none; padding: 6px; }
+.lesson-nav .ln-home:hover { background: none; color: var(--c-thm); }
+
+/* ============================================================
+   课程主页 index.html
+   ============================================================ */
+.home { max-width: 1040px; margin: 0 auto; padding: 40px 24px 60px; }
+.home-hero { text-align: center; padding: 46px 20px 40px; }
+.home-hero .seal-lg {
+  width: 74px; height: 74px; border-radius: 16px; margin: 0 auto 20px;
+  display: grid; place-items: center; font-family: var(--font-serif); font-size: 2.1rem; font-weight: 700;
+  color: #f7ead9; background: linear-gradient(145deg, #9e3b46, #7d2c35);
+  box-shadow: 0 10px 26px rgba(158,59,70,.35);
+}
+.home-hero h1 { font-size: 2.5rem; margin-bottom: 12px; letter-spacing: .06em; }
+.home-hero .sub { color: var(--ink-soft); font-size: 1.05rem; margin: 0; }
+.home-hero .meta { margin-top: 18px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.offline-note {
+  max-width: 720px; margin: 0 auto 38px; display: flex; gap: 12px; align-items: flex-start;
+  background: var(--c-note-bg); border: 1px solid var(--c-note);
+  border-radius: var(--radius); padding: 13px 18px; font-size: .9rem; color: var(--ink-soft);
+  font-family: var(--font-sans);
+}
+.offline-note svg { flex: none; margin-top: 3px; }
+.chapter-block { margin-bottom: 30px; }
+.chapter-block > .cb-head {
+  display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px;
+  border-bottom: 2px solid var(--rule); padding-bottom: 8px;
+}
+.chapter-block > .cb-head h2 { font-size: 1.28rem; }
+.chapter-block > .cb-head .cb-range { font-family: var(--font-sans); font-size: .8rem; color: var(--ink-faint); }
+.lesson-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+.lesson-card {
+  display: block; background: var(--surface); border: 1px solid var(--rule);
+  border-radius: var(--radius); padding: 14px 16px; color: var(--ink);
+  box-shadow: var(--shadow-card); transition: transform .15s, box-shadow .15s;
+}
+.lesson-card:hover { text-decoration: none; transform: translateY(-2px); box-shadow: var(--shadow-pop); border-color: var(--c-def); }
+.lesson-card .lc-id { font-family: var(--font-mono); font-size: .8rem; color: var(--c-thm); font-weight: 700; }
+.lesson-card .lc-title { font-weight: 700; margin: 3px 0 3px; font-size: 1.02rem; }
+.lesson-card .lc-meta { font-family: var(--font-sans); font-size: .78rem; color: var(--ink-faint); }
+.lesson-card.locked { opacity: .62; background: var(--surface-alt); }
+.lesson-card.locked:hover { transform: none; box-shadow: var(--shadow-card); border-color: var(--rule); }
+.badge-soon {
+  display: inline-block; font-family: var(--font-sans); font-size: .7rem; color: var(--ink-faint);
+  border: 1px solid var(--rule-info); border-radius: 999px; padding: 0 8px; margin-left: 6px;
+}
+.badge-new { background: var(--c-ex); color: var(--on-accent); border-color: var(--c-ex); }
+.home footer { text-align: center; margin-top: 50px; color: var(--ink-faint); font-family: var(--font-sans); font-size: .8rem; }

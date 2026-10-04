@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§4.1 Gauss 消去法与矩阵的三角分解 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §4.1：Gauss 消去法的矩阵形式、Frobenius 矩阵、LU 与 LDU 分解存在唯一性（定理 4.1）、Doolittle/Crout 算法、对称正定矩阵的 Cholesky 分解、分块拟 LU 与 Schur 补">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§4.1 Gauss 消去法与矩阵的三角分解</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="4.1" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 4 章 矩阵分解</a><span class="sep" aria-hidden="true">/</span>
+            <span>§4.1 Gauss 消去法与矩阵的三角分解</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 4 章 · 矩阵分解</div>
+            <h1>§4.1 Gauss 消去法与矩阵的三角分解</h1>
+            <p class="lede">第 4 章把矩阵拆成结构简单的因子之积：<strong>LU/LDU</strong>（三角）、<strong>QR</strong>（正交×上三角）、满秩分解与奇异值分解。本节从最经典的 Gauss 消去法出发，证明消元过程在矩阵上等价于一连串 <strong>Frobenius（单位下三角）矩阵</strong>左乘，从而得到 \(A=LU\)；再给出 LDU 唯一存在的充要条件（顺序主子式非零）、Doolittle/Crout 实用算法、对称正定矩阵的 <strong>Cholesky 分解</strong>，最后用分块矩阵导出 Schur 补。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.178–195</strong></span>
+              <span class="chip">建议 <strong>4 学时</strong></span>
+              <span class="chip">定义 <strong>2 个</strong></span>
+              <span class="chip">定理 <strong>2 个</strong></span>
+              <span class="chip">例题 <strong>3 道</strong></span>
+            </div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>把 Gauss 消元写成 Frobenius 矩阵左乘 \(L_r^{-1}A^{(r-1)}=A^{(r)}\)；</li>
+                  <li>写出乘数矩阵 \(L\) 与上三角 \(U\)，得到 \(A=LU\)；</li>
+                  <li>陈述 LDU 分解唯一存在的充要条件（顺序主子式 \(\Delta_k\ne0\)）与 \(d_k=\Delta_k/\Delta_{k-1}\)；</li>
+                  <li>区分 Doolittle 与 Crout 分解，使用递推公式；</li>
+                  <li>对对称正定矩阵做 Cholesky 分解 \(A=GG^{\mathrm T}\)；</li>
+                  <li>写出分块拟 LU 与 Schur 补公式。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>Frobenius 矩阵的结构；</li>
+                      <li>定理 4.1 的条件；</li>
+                      <li>Crout/Doolittle 递推；</li>
+                      <li>Cholesky 公式。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>为什么 \(L=L_1L_2\cdots L_{n-1}\) 恰好收集乘数；</li>
+                      <li>LU 不唯一而 LDU 唯一；</li>
+                      <li>顺序主子式为零时需行交换。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 4 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>Gauss 消元的矩阵形式、Frobenius 矩阵</td><td class="num">p.178–182</td></tr>
+                    <tr><td class="num">2</td><td>LU/LDU 分解、定理 4.1、例 4.1</td><td class="num">p.182–188</td></tr>
+                    <tr><td class="num">3</td><td>Doolittle/Crout 算法、Cholesky</td><td class="num">p.189–192</td></tr>
+                    <tr><td class="num">4</td><td>分块拟 LU、Schur 补、习题</td><td class="num">p.193–195</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 210" role="img" aria-label="三角分解脉络图">
+                    <defs><marker id="m41" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="30" y="28" width="180" height="48"/><rect x="250" y="28" width="170" height="48"/><rect x="460" y="28" width="170" height="48"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="120" y="50">Gauss 消元</text><text x="120" y="67" font-size="11" fill="#666">Lᵣ⁻¹A⁽ʳ⁻¹⁾=A⁽ʳ⁾</text>
+                      <text x="335" y="50">A = LU</text><text x="335" y="67" font-size="11" fill="#666">单位下三角 × 上三角</text>
+                      <text x="545" y="50">A = LDU（唯一）</text><text x="545" y="67" font-size="11" fill="#666">Δₖ≠0，dₖ=Δₖ/Δₖ₋₁</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m41)"><line x1="210" y1="52" x2="248" y2="52"/><line x1="420" y1="52" x2="458" y2="52"/></g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="140" y="130" width="250" height="48"/></g>
+                    <g class="fm-node" fill="#f3f0fa" stroke="#6b4e9e"><rect x="450" y="130" width="250" height="48"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="265" y="152">Doolittle / Crout 算法</text><text x="265" y="169" font-size="11" fill="#666">直接递推 lᵢⱼ、uᵢⱼ</text>
+                      <text x="575" y="152">对称正定 → Cholesky</text><text x="575" y="169" font-size="11" fill="#666">A=GGᵀ（平方根法）</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m41)"><path d="M335 78 C300 108 290 118 275 128" stroke-dasharray="4 4"/><path d="M545 78 C560 108 570 118 575 128" stroke-dasharray="4 4"/></g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、Gauss 消去法的矩阵形式 ================= -->
+          <section class="section" id="sec-gauss">
+            <h2 class="sec-title"><span class="cn">一</span>Gauss 消去法的矩阵形式</h2>
+            <p>解 \(n\) 元线性方程组
+              <div class="eq-scroll">\[ Ax=b,\qquad A=(a_{ij})_{n\times n} \tag{4.1.2} \]</div>
+              Gauss 消去法的基本思想是把 \(A\) 化为上三角矩阵（把增广矩阵 \([A\vdots b]\) 化为阶梯形）。按选主元方式分三种：<strong>自然顺序（按主对角元）、按列选主元、总体选主元</strong>。为建立三角分解理论，先假定不进行行、列交换，即按自然顺序消元。</p>
+
+            <h3 class="sub-title" id="frobenius">Frobenius 矩阵（消元矩阵）</h3>
+            <p>记 \(A^{(0)}=A\)。若一阶顺序主子式 \(\Delta_1=a_{11}^{(0)}\ne0\)，令<strong>乘数</strong>
+              <div class="eq-scroll">\[ c_{i1}=\frac{a_{i1}^{(0)}}{a_{11}^{(0)}}\quad(i=2,\ldots,n), \]</div>
+              构造 Frobenius 矩阵
+              <div class="eq-scroll">\[
+              L_1=\begin{pmatrix}
+              1&&\\c_{21}&1&\\\vdots&&\ddots&\\c_{n1}&&&1
+              \end{pmatrix},\qquad
+              L_1^{-1}=\begin{pmatrix}
+              1&&\\-c_{21}&1&\\\vdots&&\ddots&\\-c_{n1}&&&1
+              \end{pmatrix},
+              \]</div>
+              左乘后第一列主元以下全部化为零：
+              <div class="eq-scroll">\[
+              L_1^{-1}A^{(0)}=
+              \begin{pmatrix}
+              a_{11}^{(0)}&a_{12}^{(0)}&\cdots&a_{1n}^{(0)}\\
+              &a_{22}^{(1)}&\cdots&a_{2n}^{(1)}\\
+              &\vdots&&\vdots\\
+              &a_{n2}^{(1)}&\cdots&a_{nn}^{(1)}
+              \end{pmatrix}=A^{(1)}, \tag{4.1.3}
+              \]</div>
+              即 \(A^{(0)}=L_1A^{(1)}\)。由于倍加初等变换不改变行列式，<strong>二阶顺序主子式</strong>
+              <div class="eq-scroll">\[ \Delta_2=a_{11}^{(0)}a_{22}^{(1)}. \tag{4.1.5} \]</div>
+            </p>
+            <p>一般地，第 \(r\) 步（\(r=1,\ldots,n-1\)）在
+              <div class="eq-scroll">\[
+              \Delta_r=a_{11}^{(0)}a_{22}^{(1)}\cdots a_{rr}^{(r-1)}\ne0
+              \]</div>
+              时，令
+              <div class="eq-scroll">\[ c_{ir}=\frac{a_{ir}^{(r-1)}}{a_{rr}^{(r-1)}}\quad(i=r+1,\ldots,n), \]</div>
+              构造 \(L_r\)（第 \(r\) 列对角以下为 \(c_{r+1,r},\ldots,c_{nr}\)，其余同单位阵），则
+              <div class="eq-scroll">\[ L_r^{-1}A^{(r-1)}=A^{(r)},\qquad A^{(r-1)}=L_rA^{(r)}. \tag{4.1.10–11} \]</div>
+              消元能进行到底的充要条件是
+              <div class="eq-scroll">\[ \boxed{\ \Delta_r\ne0\quad(r=1,2,\ldots,n-1)\ } \tag{4.1.14} \]</div>
+            </p>
+            <div class="grid2">
+              <div class="mini-card"><div class="mc-title">Frobenius 矩阵的作用</div><p style="margin:0">\(L_r\) 是单位下三角矩阵，\(L_r^{-1}\) 只需把第 \(r\) 列乘数变号。它左乘 \(A^{(r-1)}\) 恰好同时完成"第 \(i\) 行减去 \(c_{ir}\) 倍第 \(r\) 行"的全部倍加行变换。</p></div>
+              <div class="mini-card"><div class="mc-title">主元与顺序主子式</div><p style="margin:0">每一步的主元就是 \(a_{rr}^{(r-1)}=\dfrac{\Delta_r}{\Delta_{r-1}}\)（取 \(\Delta_0=1\)）。主元为零等价于某个顺序主子式为零，这时必须选主元（交换行）。</p></div>
+            </div>
+          </section>
+          <!-- ================= 二、LU / LDU 分解 ================= -->
+          <section class="section" id="sec-lu">
+            <h2 class="sec-title"><span class="cn">二</span>矩阵的三角（LU）分解</h2>
+            <p>条件 \(\Delta_r\ne0\) 满足时，反复使用 \(A^{(r-1)}=L_rA^{(r)}\)：
+              <div class="eq-scroll">\[ A=A^{(0)}=L_1A^{(1)}=L_1L_2A^{(2)}=\cdots=L_1L_2\cdots L_{n-1}A^{(n-1)}. \]</div>
+              令
+              <div class="eq-scroll">\[ L=L_1L_2\cdots L_{n-1}=
+                 \begin{pmatrix}
+                 1&&\\c_{21}&1&\\\vdots&c_{32}&\ddots&\\c_{n1}&c_{n2}&\cdots&1
+                 \end{pmatrix},\qquad U=A^{(n-1)}, \tag{4.1.15} \]</div>
+              这里 \(L\) 是对角线全为 1 的<strong>单位下三角矩阵</strong>（Frobenius 矩阵相乘恰好把所有乘数 \(c_{ij}\) 收集在对应位置），\(U\) 是上三角矩阵，于是
+              <div class="eq-scroll">\[ \boxed{\ A=LU\ } \]</div>
+            </p>
+
+            <section class="card def" id="def-4-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 4.1：三角分解 / LU 与 LDU</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">方阵 \(A\) 能写成<strong>下三角阵 \(L\)</strong> 与<strong>上三角阵 \(U\)</strong> 的乘积时，称 \(A\) 可作<strong>三角分解（LU/LR 分解）</strong>。若进一步
+                  <div class="eq-scroll">\[ A=LDU, \]</div>
+                  其中 \(L\) 是单位下三角、\(U\) 是单位上三角、\(D=\diag(d_1,\ldots,d_n)\) 是对角阵，则称 <strong>LDU 分解</strong>。</p>
+              </div>
+            </section>
+            <p>一个矩阵的 LU 分解并不唯一：若 \(A=LU\)，任取对角元非零的对角阵 \(D\)，则 \(A=(LD)(D^{-1}U)=\hat L\hat U\) 又是一个 LU 分解。但限定两边都是"单位"三角阵后，LDU 分解唯一。</p>
+
+            <section class="card thm" id="thm-4-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 4.1（LDU 唯一存在的充要条件）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A=(a_{ij})\) 是 \(n\) 阶矩阵，则 <strong>\(A\) 可唯一分解为 \(A=LDU\)</strong>（\(L\) 单位下三角、\(U\) 单位上三角、\(D\) 对角）的充要条件是
+                  <div class="eq-scroll">\[ \Delta_k\ne0\quad(k=1,2,\ldots,n-1), \]</div>
+                  且
+                  <div class="eq-scroll">\[ d_k=\frac{\Delta_k}{\Delta_{k-1}}\quad(k=1,\ldots,n;\ \Delta_0=1). \]</div></p>
+                <details class="proof">
+                  <summary><span>证明思路（分块归纳，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p><strong>充分性</strong>来自 Gauss 消元：\(\Delta_k\ne0\) 保证各步主元非零，消元到底给出 \(A=LU\)，再把 \(U\) 的对角元提出成 \(D=\diag(u_{11},\ldots,u_{nn})\)，剩余的 \(D^{-1}U\) 是单位上三角，即 \(A=LDU\)。</p>
+                    <p><strong>必要性</strong>用分块矩阵比较：把第 \(n\) 阶 LDU 写为 \(n-1\) 阶主子块加一行一列，左上角给出 \(A_{n-1}=L_{n-1}D_{n-1}U_{n-1}\)，故 \(\Delta_{n-1}=\det A_{n-1}=\det D_{n-1}=d_1\cdots d_{n-1}\ne0\)；递推得各阶顺序主子式非零。唯一性由两个 LDU 分解相乘后，单位上/下三角阵的乘积仍是单位三角阵，逐层比较元素得到。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0"><strong>推论：</strong>\(n\) 阶非奇异矩阵 \(A\) 有三角分解 \(A=LU\) 的充要条件也是 \(\Delta_k\ne0\)（\(k=1,\ldots,n-1\)）。非奇异时 \(L,U\) 均可逆。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="solve-by-lu">用 LU 解方程组（三角分解法）</h3>
+            <p>当 \(\Delta_k\ne0\) 时 \(A=LU\)，方程组 \(Ax=b\) 化为两个三角形方程组：
+              <div class="eq-scroll">\[ \left.\begin{aligned} &amp;Ly=b\\ &amp;Ux=y \end{aligned}\right\} \tag{4.1.22} \]</div>
+              先<strong>前代</strong>由 \(Ly=b\) 解出 \(y\)，再<strong>回代</strong>由 \(Ux=y\) 解出 \(x\)。多个右端项 \(b_1,\ldots,b_s\) 时只需做一次分解，重复解三角方程即可，工作量大幅节省——这是 LU 分解相对重复消元的最大优势。</p>
+
+            <section class="card ex" id="exm-4-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 4.1</span>
+              </header>
+              <div class="card-body">
+                <p>求 \(A=\begin{pmatrix}2&-1&3\\1&2&1\\2&4&2\end{pmatrix}\) 的 LDU 分解。</p>
+                <details class="proof">
+                  <summary><span>解（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>\(\Delta_1=2,\ \Delta_2=5\)，故有唯一 LDU 分解。第一步乘数 \(c_{21}=1/2,\ c_{31}=1\)：
+                      \[ L_1^{-1}A=\begin{pmatrix}2&-1&3\\0&\frac52&-\frac12\\0&5&-1\end{pmatrix}=A^{(1)}. \]</p>
+                    <p>第二步 \(c_{32}=5/(5/2)=2\)：
+                      \[ L_2^{-1}A^{(1)}=\begin{pmatrix}2&-1&3\\0&\frac52&-\frac12\\0&0&0\end{pmatrix}=A^{(2)}=U. \]</p>
+                    <p>故 \(L=L_1L_2=\begin{pmatrix}1&0&0\\\frac12&1&0\\1&2&1\end{pmatrix}\)，提出对角 \(D=\diag(2,\frac52,0)\)（注意 \(\det A=0\)，矩阵奇异，但前两阶主子式非零仍可分解），单位上三角
+                      \[ U_0=\begin{pmatrix}1&-\frac12&\frac32\\0&1&-\frac15\\0&0&1\end{pmatrix},\quad A=LDU_0. \]</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="pivot">顺序主子式为零：选主元分解（定理 4.2）</h3>
+            <p>若某阶顺序主子式为零，自然顺序消元无法进行。实际计算中还可能遇到主元虽非零但<strong>很小</strong>导致舍入误差放大，这时通过行交换选主元。</p>
+            <section class="card thm" id="thm-4-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 4.2（带行交换的分解）与推论</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">若 \(A\) 是 \(n\) 阶<strong>非奇异</strong>矩阵，则存在置换矩阵 \(P\)，使 \(PA\) 的 \(n\) 个顺序主子式全非零（定理 4.2）；从而存在<strong>带行交换的三角分解</strong>（推论）
+                  <div class="eq-scroll">\[ PA=L\hat U=LDU, \tag{4.1.21} \]</div>
+                  其中 \(L\) 单位下三角、\(\hat U\) 上三角、\(U\) 单位上三角、\(D\) 对角。对应地解 \(Ax=b\) 时先交换右端：\(PAx=Pb\)。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 三、Doolittle / Crout / Cholesky ================= -->
+          <section class="section" id="sec-algorithms">
+            <h2 class="sec-title"><span class="cn">三</span>其他三角分解及其算法</h2>
+            <div class="grid2">
+              <div class="mini-card"><div class="mc-title">定义 4.2：Doolittle 分解</div><p style="margin:0">把 LDU 中的 \(D\) 与 \(U\) 合并：
+                <div class="eq-scroll" style="margin:6px 0">\[ A=L(DU)=L\hat U. \tag{4.1.23} \]</div>
+                \(L\) 是<strong>单位</strong>下三角，\(\hat U\) 是上三角（对角元可任意）。</p></div>
+              <div class="mini-card"><div class="mc-title">Crout 分解</div><p style="margin:0">把 \(D\) 与 \(L\) 合并：
+                <div class="eq-scroll" style="margin:6px 0">\[ A=(LD)U=\hat L U. \tag{4.1.24} \]</div>
+                \(\hat L\) 是下三角，\(U\) 是<strong>单位</strong>上三角。</p></div>
+            </div>
+
+            <h3 class="sub-title" id="crout">Crout 递推公式</h3>
+            <p>设 \(A=\hat LU\)。比较元素先得到第一列与第一行：</p>
+            <div class="eq-scroll">\[ l_{i1}=a_{i1}\qquad(i=1,\ldots,n), \tag{4.1.26} \]</div>
+            <div class="eq-scroll">\[ u_{1j}=\frac{a_{1j}}{l_{11}}\qquad(j=2,\ldots,n). \tag{4.1.27} \]</div>
+            <p>一般地对 \(k=2,3,\ldots,n\)，先算 \(\hat L\) 的第 \(k\) 列：</p>
+            <div class="eq-scroll">\[ l_{ik}=a_{ik}-\sum_{r=1}^{k-1}l_{ir}u_{rk}\qquad(i=k,k+1,\ldots,n), \tag{4.1.28} \]</div>
+            <p>再算 \(U\) 的第 \(k\) 行：</p>
+            <div class="eq-scroll">\[ u_{kj}=\frac{1}{l_{kk}}\Big(a_{kj}-\sum_{r=1}^{k-1}l_{kr}u_{rj}\Big)\qquad(j=k+1,\ldots,n). \tag{4.1.29} \]</div>
+            <p>计算顺序为"<strong>一列 \(\hat L\)、一行 \(U\)</strong>"交错进行（教材的阶梯框图）；算出的 \(l_{ij},u_{ij}\) 可直接覆盖原矩阵 \(A\) 的对应位置（原地存储）。总运算量约 \(\frac13n^3+O(n^2)\)，与 Gauss 消元相同。与之对偶的 <strong>Doolittle 算法</strong>（\(A=LU\)，\(L\) 单位下三角、\(U\) 上三角，教材式 4.1.30）对 \(i=1,2,\ldots,n\) 依次为</p>
+            <div class="eq-scroll">\[
+            \left.
+            \begin{aligned}
+            u_{ik}&amp;=a_{ik}-\sum_{r=1}^{i-1}l_{ir}u_{rk} &amp;&(k=i,i+1,\ldots,n),\\
+            l_{ki}&amp;=\frac{1}{u_{ii}}\Big(a_{ki}-\sum_{r=1}^{i-1}l_{kr}u_{ri}\Big) &amp;&(k=i+1,\ldots,n).
+            \end{aligned}
+            \right\}\tag{4.1.30}
+            \]</div>
+
+            <h3 class="sub-title" id="cholesky">对称正定矩阵的 Cholesky 分解</h3>
+            <p>当 \(A\) 实对称正定时，所有顺序主子式 \(\Delta_k&gt;0\)，故有唯一 LDU 分解 \(A=LDU\)，且 \(d_k=\Delta_k/\Delta_{k-1}&gt;0\)。由对称性
+              \[ LDU=U^{\mathrm T}DL^{\mathrm T}, \]
+              再用唯一性比较得 <strong>\(U=L^{\mathrm T}\)</strong>，于是
+              <div class="eq-scroll">\[ A=LDL^{\mathrm T}. \tag{4.1.31} \]</div>
+              令 \(\widetilde D=\diag(\sqrt{d_1},\ldots,\sqrt{d_n})\)，\(G=L\widetilde D\)（下三角），则
+              <div class="eq-scroll">\[ A=GG^{\mathrm T}. \tag{4.1.32} \]</div></p>
+            <section class="card def" id="def-4-3">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 4.3：Cholesky 分解（平方根法/对称三角分解）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">实对称正定矩阵可唯一分解为<strong>对角元全为正</strong>的下三角阵 \(G=(g_{ij})\) 与其转置之积 \(A=GG^{\mathrm T}\)，比较元素得递推公式
+                  <div class="eq-scroll">\[
+                  g_{ij}=
+                  \begin{cases}
+                  \Big(a_{ii}-\displaystyle\sum_{k=1}^{i-1}g_{ik}^2\Big)^{1/2},&amp;i=j\\[6pt]
+                  \dfrac1{g_{jj}}\Big(a_{ij}-\displaystyle\sum_{k=1}^{j-1}g_{ik}g_{jk}\Big),&amp;i&gt;j\\
+                  0,&amp;i&lt;j
+                  \end{cases}\tag{4.1.33}
+                  \]</div>
+                  且
+                  <div class="eq-scroll">\[ |g_{ij}|\le\sqrt{a_{ii}}\quad(j\le i). \tag{4.1.34} \]</div>
+                  中间量被对角元控制，<strong>计算过程无条件稳定、不必选主元</strong>，运算量约为一般 LU 的一半，是求解对称正定方程组与采样高斯分布的标准方法。为避免开方，也可直接使用 \(A=LDL^{\mathrm T}\)（改进平方根法）。</p>
+              </div>
+            </section>
+            <section class="card ex" id="exm-4-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 4.2</span>
+              </header>
+              <div class="card-body">
+                <p>求 \(A=\begin{pmatrix}5&-2&0\\-2&3&-1\\0&-1&1\end{pmatrix}\) 的 Cholesky 分解。</p>
+                <details class="proof">
+                  <summary><span>解（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>顺序主子式 \(5,11,6\) 均正，对称正定。由式 (4.1.33)：
+                      \[ g_{11}=\sqrt5,\quad g_{21}=-\frac2{\sqrt5},\quad
+                         g_{22}=\sqrt{3-\frac45}=\sqrt{\frac{11}{5}}, \]
+                      \[ g_{31}=0,\quad g_{32}=-\sqrt{\frac5{11}},\quad
+                         g_{33}=\sqrt{1-\frac5{11}}=\sqrt{\frac6{11}}, \]
+                      即
+                      \[ G=\begin{pmatrix}
+                      \sqrt5&0&0\\-\frac2{\sqrt5}&\sqrt{\frac{11}{5}}&0\\
+                      0&-\sqrt{\frac5{11}}&\sqrt{\frac6{11}}
+                      \end{pmatrix},\quad A=GG^{\mathrm T}. \]</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="lu-lab-title">动手实验：LU / LDU / Cholesky 分解器</h3>
+            <p>改 3×3 矩阵，实时给出顺序主子式、单位下三角 \(L\)、上三角 \(U\)、对角阵 \(D\) 与单位上三角 \(U_0\)，对称正定时自动给出 Cholesky 因子，并验证 \(LU=A\)。切换到例 4.2 的矩阵可对照平方根法结果。</p>
+            <section class="card lab" data-lu-lab></section>
+          </section>
+
+          <!-- ================= 四、分块拟 LU ================= -->
+          <section class="section" id="sec-block-lu">
+            <h2 class="sec-title"><span class="cn">四</span>分块矩阵的拟 LU 分解与 Schur 补</h2>
+            <p>把 \(A\in\R^{n\times n}\) 分成四块
+              <div class="eq-scroll">\[ A=\begin{pmatrix}A_{11}&A_{12}\\A_{21}&A_{22}\end{pmatrix}, \tag{4.1.35} \]</div>
+              其中 \(A_{11}\) 为 \(n_1\) 阶、\(A_{22}\) 为 \(n_2\) 阶（\(n_1+n_2=n\)）。若 \(A_{11}\) 可逆，构造拟下三角矩阵左乘，得到<strong>拟 LU 分解</strong>：
+              <div class="eq-scroll">\[
+              \begin{pmatrix}I_{n_1}&O\\-A_{21}A_{11}^{-1}&I_{n_2}\end{pmatrix}
+              \begin{pmatrix}A_{11}&A_{12}\\A_{21}&A_{22}\end{pmatrix}
+              =
+              \begin{pmatrix}A_{11}&A_{12}\\O&A_{22}-A_{21}A_{11}^{-1}A_{12}\end{pmatrix},
+              \]</div>
+              进一步分离成<strong>拟 LDU 分解</strong>
+              <div class="eq-scroll">\[
+              A=
+              \begin{pmatrix}I_{n_1}&O\\A_{21}A_{11}^{-1}&I_{n_2}\end{pmatrix}
+              \begin{pmatrix}A_{11}&O\\O&S\end{pmatrix}
+              \begin{pmatrix}I_{n_1}&A_{11}^{-1}A_{12}\\O&I_{n_2}\end{pmatrix},
+              \tag{4.1.38}
+              \]</div>
+              其中
+              <div class="eq-scroll">\[ S=A_{22}-A_{21}A_{11}^{-1}A_{12} \]</div>
+              称为 \(A_{11}\) 在 \(A\) 中的 <strong>Schur 补</strong>。取行列式即得<strong>分块行列式公式</strong>：
+              <div class="eq-scroll">\[ \det A=\det A_{11}\cdot\det(A_{22}-A_{21}A_{11}^{-1}A_{12}). \tag{4.1.40} \]</div>
+              若 \(A_{22}\) 可逆，对称地有另一分解与 \(\det A=\det A_{22}\cdot\det(A_{11}-A_{12}A_{22}^{-1}A_{21})\)（对称的 Schur 补公式）。</p>
+            <section class="card ex" id="exm-4-3">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 4.3（Sylvester 行列式恒等式）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\R^{m\times n},B\in\R^{n\times m}\)，则
+                  <div class="eq-scroll">\[ \det(I_m+AB)=\det(I_n+BA). \tag{4.1.42} \]</div>
+                  特别地，对列向量 \(a,b\in\R^n\)：\(\det(I_n+ba^{\mathrm T})=1+a^{\mathrm T}b\)。</p>
+                <details class="proof">
+                  <summary><span>证明（用两种分块拟 LDU，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>对 \(\begin{pmatrix}I_n&B\\-A&I_m\end{pmatrix}\) 分别以 \(I_n\) 和 \(I_m\) 为枢轴做分块消元：
+                      \[ \det\begin{pmatrix}I_n&B\\-A&I_m\end{pmatrix}=\det(I_m+AB), \]
+                      另一方向同样计算得 \(\det(I_n+BA)\)，二者是同一行列式，故相等。列向量情形取 \(n=1\)，\(\det(1+a^{\mathrm T}b)=1+a^{\mathrm T}b\)。该恒等式在系统理论、矩阵求逆引理（Sherman–Morrison）中反复出现。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 习题 4.1 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 4.1（共 4 题）</h2>
+            <div class="ex-toolbar">
+              <span data-fold-tools="details.solution">
+                <button type="button" data-fold="open">全部展开解答</button>
+                <button type="button" data-fold="close">全部收起</button>
+              </span>
+            </div>
+
+            <article class="card task" id="ex41-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag tag-hard">LDU 与 Doolittle</span></header>
+              <div class="card-body">
+                <p>求矩阵
+                  \[ A=\begin{pmatrix}5&2&-4&0\\2&1&-2&1\\-4&-2&5&0\\0&1&0&2\end{pmatrix} \]
+                  的 LDU 分解和 Doolittle 分解。</p>
+                <details class="solution"><summary><span>解法提示（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>先检查顺序主子式 \(\Delta_1=5,\Delta_2=1,\Delta_3=1\) 均非零（\(\det A=-7\)），分解唯一存在。按 Doolittle 递推（或逐列构造 Frobenius 矩阵）算出乘数与各行，得到单位下三角 \(L\) 与上三角 \(\hat U\)（Doolittle）；再令 \(D=\diag(\hat u_{11},\ldots,\hat u_{44})\)，\(U_0=D^{-1}\hat U\) 即得 LDU。可用上面的分解器输入该矩阵核对。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex41-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag">Doolittle 递推</span></header>
+              <div class="card-body">
+                <p>证明式 (4.1.30) 的 Doolittle 算法公式（解答先给出对偶的 Crout 版 (4.1.28)(4.1.29) 推导）。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由 \(A=\hat LU\) 比较元素：\(a_{ij}=\sum_{r=1}^{\min(i,j)}l_{ir}u_{rj}\)，且 \(u_{jj}=1\)。当计算第 \(k\) 列的 \(l_{ik}\)（\(i\ge k\)）时，
+                    \[ a_{ik}=\sum_{r=1}^{k-1}l_{ir}u_{rk}+l_{ik}u_{kk}=\sum_{r=1}^{k-1}l_{ir}u_{rk}+l_{ik}, \]
+                    解出 \(l_{ik}=a_{ik}-\sum_{r=1}^{k-1}l_{ir}u_{rk}\)。计算第 \(k\) 行的 \(u_{kj}\)（\(j&gt;k\)）时
+                    \[ a_{kj}=\sum_{r=1}^{k-1}l_{kr}u_{rj}+l_{kk}u_{kj}, \]
+                    故 \(u_{kj}=\dfrac{1}{l_{kk}}\big(a_{kj}-\sum_{r=1}^{k-1}l_{kr}u_{rj}\big)\)。按"一列一行"交错计算，右端只含已算出的元素，递推成立。（Doolittle 版 (4.1.30) 与之对偶：对 \(A^{\mathrm T}\) 套用同一推导，或按"一行 \(U\)、一列 \(L\)"对称比较元素即得。）</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex41-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag tag-mid">消元后保持正定</span></header>
+              <div class="card-body">
+                <p>设 \(A\) 为实对称正定矩阵，Gauss 消去法第一步后
+                  \[ A^{(1)}=\begin{pmatrix}a_{11}&a_{12}&\cdots&a_{1n}\\ \hdashline0&\\\vdots&&B\\0&\end{pmatrix}, \]
+                  证明 \(B\) 仍是实对称正定矩阵，且其对角元素不增加（\(b_{ii}\le a_{ii}\)）。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>消元后 \(B=A_{22}-A_{21}A_{11}^{-1}A_{12}\)，这正是 \(a_{11}\) 的 Schur 补（式 4.1.38）。<strong>对称性</strong>：\(A_{12}=A_{21}^{\mathrm T}\)，故
+                    \[ B^{\mathrm T}=(A_{22}-A_{21}a_{11}^{-1}A_{12})^{\mathrm T}=B. \]</p>
+                  <p><strong>正定性</strong>：对任意非零 \(y\in\R^{n-1}\)，取 \(x_1=-a_{11}^{-1}A_{12}y,\ x'=(x_1,y^{\mathrm T})\)，则分块二次型
+                    \[ x^{\mathrm T}Ax=a_{11}\Big(x_1+\frac{A_{12}y}{a_{11}}\Big)^2+y^{\mathrm T}By=y^{\mathrm T}By. \]</p>
+                    <p>可取 \(x_1\) 使第一项为零，此时 \(x\ne0\)（因 \(y\ne0\)），由 \(A\) 正定知 \(y^{\mathrm T}By=x^{\mathrm T}Ax&gt;0\)，故 \(B\) 正定。</p>
+                  <p><strong>对角元不增</strong>：\(b_{ii}=a_{ii}-a_{i1}^2/a_{11}\le a_{ii}\)（减去非负项）。这保证 Gauss 消元中主元不会增大，是不选主元消元对正定矩阵稳定的原因之一。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex41-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag">Cholesky</span></header>
+              <div class="card-body">
+                <p>求对称正定矩阵
+                  \[ A=\begin{pmatrix}5&2&-4\\2&1&-2\\-4&-2&5\end{pmatrix} \]
+                  的 Cholesky 分解。</p>
+                <details class="solution"><summary><span>解法提示（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>验证顺序主子式 \(5,1,1\) 均正，对称正定。按式 (4.1.33) 逐列计算：
+                    \[ g_{11}=\sqrt5,\quad g_{21}=\frac2{\sqrt5},\quad
+                       g_{22}=\sqrt{1-\frac45}=\frac1{\sqrt5}, \]</p>
+                    \[ g_{31}=-\frac4{\sqrt5},\quad
+                       g_{32}=\frac{-2-(-4/\sqrt5)(2/\sqrt5)}{1/\sqrt5}=-\frac{2}{\sqrt5},\quad
+                       g_{33}=\sqrt{5-\frac{16}{5}-\frac45}=1. \]
+                    <p class="muted">核对：\(g_{31}^2+g_{32}^2+g_{33}^2=\frac{16}5+\frac45+1=5=a_{33}\)，且 \(GG^{\mathrm T}=A\)。建议用交互分解器输入该矩阵复核。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 本节小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结与自检</h2>
+            <div class="summary-block">
+              <p>Gauss 消元的矩阵本质是<strong>单位下三角矩阵的连续左乘</strong>，由此得到数值线性代数最基础的分解：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>分解</th><th>形式</th><th>条件 / 特点</th></tr>
+                  <tr><td>LU</td><td>\(A=LU\)，\(L\) 单位下三角，\(U\) 上三角</td><td>\(\Delta_k\ne0\ (k&lt;n)\)；不唯一</td></tr>
+                  <tr><td>LDU</td><td>\(A=LDU\)，两边单位三角 + 对角</td><td>\(\Delta_k\ne0\) 时<strong>唯一</strong>，\(d_k=\Delta_k/\Delta_{k-1}\)</td></tr>
+                  <tr><td>带选主元</td><td>\(PA=LDU\)</td><td>任意非奇异矩阵（定理 4.2）</td></tr>
+                  <tr><td>Doolittle / Crout</td><td>\(A=L\hat U\) / \(A=\hat LU\)</td><td>约 \(n^3/3\) 次运算，可原地存储</td></tr>
+                  <tr><td>Cholesky</td><td>\(A=GG^{\mathrm T}=LDL^{\mathrm T}\)</td><td>对称正定；稳定不用选主元，运算量约一半</td></tr>
+                  <tr><td>分块拟 LU</td><td>Schur 补 \(S=A_{22}-A_{21}A_{11}^{-1}A_{12}\)</td><td>\(\det A=\det A_{11}\det S\)；\(\det(I+AB)=\det(I+BA)\)</td></tr>
+                </table>
+              </div>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>不翻书写出 Frobenius 矩阵 \(L_r\) 的结构，说明为什么 \(L=L_1\cdots L_{n-1}\) 恰好把全部乘数 \(c_{ij}\) 收在下三角。</li>
+                  <li>LU 分解为什么一般不唯一，而 LDU 唯一？唯一性证明中"单位三角阵相乘仍是单位三角阵"起什么作用？</li>
+                  <li>对称正定时为什么 \(U=L^{\mathrm T}\)？Cholesky 因子的元素满足什么界，为什么说它数值稳定？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="../ch3/3.5-matrix-function-applications.html"><span class="ln-dir">上一章</span><span class="ln-ttl">第 3 章 §3.5 矩阵函数的一些应用</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="4.2-qr-decomposition.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§4.2 矩阵的 QR 分解</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

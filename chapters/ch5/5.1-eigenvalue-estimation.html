@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§5.1 特征值的估计 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §5.1：特征值的界（Hirsch/Schur/Hadamard 不等式、对角占优）、Gerschgorin 圆盘定理（特征值包含区域与连通部分计数）、Ostrowski 圆盘、扰动定理（Bauer-Fike）与近似特征向量">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§5.1 特征值的估计</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="5.1" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 5 章 特征值的估计及对称矩阵的极性</a><span class="sep" aria-hidden="true">/</span>
+            <span>§5.1 特征值的估计</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 5 章 · 特征值的估计及对称矩阵的极性</div>
+            <h1>§5.1 特征值的估计</h1>
+            <p class="lede">精确求 \(n\) 阶矩阵的特征值（解特征方程）在 \(n\ge5\) 时一般没有根式公式，数值计算也较繁；但大量问题只需要知道它们<strong>大概落在复平面的什么范围</strong>：Routh–Hurwitz 稳定性要求特征值全在左半平面、迭代法收敛要求都在单位圆内。本节用矩阵元素直接给出三类估计——特征值的<strong>模/实部/虚部上界</strong>（Schur、Hadamard 不等式）、乘积之模的界（对角占优）、以及最著名的 <strong>Gerschgorin 圆盘定理</strong>：每个特征值都落在以对角元为圆心的某个圆盘里，\(k\) 个连通圆盘恰含 \(k\) 个特征值。最后介绍 Bauer–Fike 扰动界。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.234–264</strong></span>
+              <span class="chip">建议 <strong>5 学时</strong></span>
+              <span class="chip">定义 <strong>3 个</strong></span>
+              <span class="chip">定理 <strong>16 个</strong></span>
+              <span class="chip">例题 <strong>10 道</strong></span>
+
+              <span class="chip">引理 <strong>1 个</strong></span>
+              <span class="chip">推论 <strong>8 个</strong></span></div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>用 Schur 不等式估计特征值模的平方和、用定理 5.1/5.2 估计虚部、实部；</li>
+                  <li>陈述行（列）严格/弱对角占优，知道严格对角占优 ⇒ 可逆；</li>
+                  <li>写出 Gerschgorin 圆盘并应用定理 5.6（包含）与定理 5.7（\(k\) 连通含 \(k\) 个）；</li>
+                  <li>用对角相似 \(DAD^{-1}\) 收缩圆盘、隔离特征值（例 5.7）；</li>
+                  <li>了解 Ostrowski 卵形界与 Bauer–Fike 扰动估计。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>Gerschgorin 两定理；</li>
+                      <li>圆盘收缩技巧；</li>
+                      <li>Schur 不等式。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>连通部分的计数；</li>
+                      <li>虚部界的推导；</li>
+                      <li>圆盘的几何意义。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 5 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>特征值的界（定理 5.1–5.5）</td><td class="num">p.236–245</td></tr>
+                    <tr><td class="num">2</td><td>Gerschgorin 圆盘定理 5.6、5.7</td><td class="num">p.245–250</td></tr>
+                    <tr><td class="num">3</td><td>圆盘收缩、例 5.7、定理 5.8–5.10</td><td class="num">p.250–255</td></tr>
+                    <tr><td class="num">4</td><td>Ostrowski 定理 5.11、5.12</td><td class="num">p.255–259</td></tr>
+                    <tr><td class="num">5</td><td>扰动估计 5.13–5.15、习题</td><td class="num">p.259–264</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 200" role="img" aria-label="特征值估计脉络图">
+                    <defs><marker id="m51" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="30" y="28" width="190" height="50"/><rect x="320" y="28" width="200" height="50"/><rect x="620" y="28" width="190" height="50"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="125" y="50">特征值的界</text><text x="125" y="67" font-size="11" fill="#666">Schur/Hadamard/对角占优</text>
+                      <text x="420" y="50">Gerschgorin 圆盘</text><text x="420" y="67" font-size="11" fill="#666">包含 + 连通计数</text>
+                      <text x="715" y="50">收缩与扰动</text><text x="715" y="67" font-size="11" fill="#666">DAD⁻¹ / Bauer–Fike</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m51)"><line x1="220" y1="53" x2="318" y2="53"/><line x1="520" y1="53" x2="618" y2="53"/></g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="230" y="126" width="380" height="48"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13.5" text-anchor="middle">
+                      <text x="420" y="155">不直接解特征方程，用元素圈定特征值位置</text>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、特征值的界 ================= -->
+          <section class="section" id="sec-bounds">
+            <h2 class="sec-title"><span class="cn">一</span>特征值的界</h2>
+
+            <h3 class="sub-title" id="hirsch">虚部界（定理 5.1）</h3>
+            <section class="card thm" id="thm-5-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 5.1（实矩阵特征值的虚部界，Hirsch）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A=(a_{rs})\in\R^{n\times n}\)，令
+                  <div class="eq-scroll">\[ M=\max_{1\le r,s\le n}\frac12|a_{rs}-a_{sr}|. \]</div>
+                  若 \(\lambda\) 是 \(A\) 的任一特征值，则
+                  <div class="eq-scroll">\[ |\operatorname{Im}\lambda|\le M\sqrt{\frac{n(n-1)}2}. \tag{5.1.1} \]</div>
+                </p>
+                <details class="proof">
+                  <summary><span>证明思路（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>取单位特征向量 \(x\)（\(x^{\mathrm H}x=1\)），由 \(Ax=\lambda x\) 与 \(\bar\lambda=x^{\mathrm H}A^{\mathrm T}x\)：
+                      \[ 2\mathrm j\,\operatorname{Im}\lambda=\lambda-\bar\lambda=x^{\mathrm H}(A-A^{\mathrm T})x. \]</p>
+                    <p>右端用 \(A-A^{\mathrm T}\) 的反对称性配对，取模后借助 Cauchy–Schwarz 与恒等式
+                      \[ \sum_{r,s}(\bar\xi_r\xi_s-\xi_r\bar\xi_s)(\xi_r\bar\xi_s-\bar\xi_r\xi_s)\le2 \]</p>
+                    <p>（本质是 \(\sum|\xi_r|^2\sum|\xi_s|^2-|\sum\xi_r\bar\xi_s|^2\) 型估计）及
+                      \[ (\eta_1+\cdots+\eta_m)^2\le m(\eta_1^2+\cdots+\eta_m^2) \tag{5.1.2} \]</p>
+                    <p>共 \(n(n-1)/2\) 对，得 \(4[\operatorname{Im}\lambda]^2\le 2n(n-1)M^2\)，即式 (5.1.1)。</p>
+                    <p><strong>推论：</strong>实对称矩阵 \(M=0\)，故特征值全为实数（又一种证法）。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="unified-bounds">模、实部、虚部的统一界（定理 5.2）</h3>
+            <section class="card thm" id="thm-5-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></span>
+                <span class="card-label">定理 5.2（用 A±Aᴴ 统一估计）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\C^{n\times n}\)，则其任一特征值 \(\lambda\) 满足
+                  <div class="eq-scroll">\[ |\lambda|\le\|A\|_{m_\infty}, \tag{模} \]</div>
+                  <div class="eq-scroll">\[ |\operatorname{Re}\lambda|\le\frac12\|A+A^{\mathrm H}\|_{m_\infty}, \tag{5.1.3} \]</div>
+                  <div class="eq-scroll">\[ |\operatorname{Im}\lambda|\le\frac12\|A-A^{\mathrm H}\|_{m_\infty}. \tag{5.1.4} \]</div>
+                  推导关键：单位特征向量给出 \(\lambda=x^{\mathrm H}Ax\)，于是
+                  \[ \lambda+\bar\lambda=x^{\mathrm H}(A+A^{\mathrm H})x,\quad \lambda-\bar\lambda=x^{\mathrm H}(A-A^{\mathrm H})x, \]</p>
+                  再用引理 1（\(|y^{\mathrm H}By|\le\|B\|_{m_\infty}\)，\(\|y\|_2=1\)）。<strong>推论：</strong>Hermite 阵特征值为实数（\(A=A^{\mathrm H}\)，虚部界 0）；反 Hermite 阵特征值为 0 或纯虚数。
+              </div>
+            </section>
+            <section class="card ex" id="exm-5-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 5.1</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">估计 \(A=\begin{pmatrix}1&-0.8\\0.5&0\end{pmatrix}\) 特征值的上界。</p>
+                <p>定理 5.2 给出 \(|\lambda|\le2,\ |\operatorname{Re}\lambda|\le2,\ |\operatorname{Im}\lambda|\le1.3\)；定理 5.1 更精确：\(M=\frac12(0.8+0.5)=0.65\)，
+                  <div class="eq-scroll">\[ |\operatorname{Im}\lambda|\le0.65\sqrt{\tfrac{2(2-1)}2}=0.65. \]</div>
+                  实际特征值 \(\lambda_{1,2}=\frac12(1\pm\mathrm j\sqrt{0.6})\)，于是 \(|\lambda_{1,2}|=0.6325,\ |\operatorname{Re}\lambda_{1,2}|=0.5,\ |\operatorname{Im}\lambda_{1,2}|=0.3873\)——三项都明显小于估计值，且<strong>虚部估计（0.65 对 0.387）优于定理 5.2 的 1.3</strong>。</p>
+              </div>
+            </section>
+          </section>
+          <!-- ====== 对角占优与乘积界 ====== -->
+          <section class="section" id="sec-dominance">
+            <h2 class="sec-title"><span class="cn">二</span>对角占优与特征值乘积的界</h2>
+            <section class="card def" id="def-5-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 5.1 / 5.2：行（列）对角占优</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">记第 \(r\) 行<strong>去心绝对行和</strong>
+                  <div class="eq-scroll">\[ R_r(A)=\sum_{\substack{j=1\\j\ne r}}^n|a_{rj}|. \]</div>
+                  若 \(|a_{rr}|&gt;R_r\)（所有 \(r\)），称 <strong>A 按行严格对角占优</strong>；若 \(|a_{rr}|\ge R_r\) 且至少一个严格，称按行（弱）对角占优。\(A^{\mathrm T}\) 按行占优则称 <strong>A 按列占优</strong>。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-5-3">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 5.3（Levy–Desplanques：乘积之模的夹逼）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">令
+                  <div class="eq-scroll">\[ M_r=|a_{rr}|+\sum_{s=r+1}^n|a_{rs}|,\qquad m_r=|a_{rr}|-\sum_{s=r+1}^n|a_{rs}|. \]</div>
+                  若 \(A\) 按行严格对角占优，则
+                  <div class="eq-scroll">\[ 0&lt;\prod_{r=1}^n m_r\le|\det A|=\prod_{r=1}^n|\lambda_r(A)|\le\prod_{r=1}^n M_r. \tag{5.1.5} \]</div>
+                  特别地严格对角占优 ⇒ \(|a_{rr}|&gt;R_r\ge0\)，每个 Gerschgorin 圆都不含原点（后面例 5.8 直接推出 \(\det A\ne0\)）。</p>
+                <details class="proof">
+                  <summary><span>证明思路（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>把第 1 行按分块展开 \(\det A=a_{11}\det A_1+\cdots\)，利用严格占优证明齐次方程 \(Ax=0\) 的解满足每个 \(|\xi_k^{(1)}|&lt;1\)（否则与占优条件矛盾），再逐行用
+                      \[ ||a|-|b||\le|a+b|\le|a|+|b| \tag{5.1.6} \]</p>
+                    <p>夹逼各步因子，递推到全部 \(n\) 行即得 (5.1.5)。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <section class="card ex" id="exm-5-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 5.2</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">对 \(A=\begin{pmatrix}1&-0.8\\0.5&1\end{pmatrix}\)，按行严格占优，\(M_1=1.8,M_2=1\)，故按模最小特征值
+                  <div class="eq-scroll">\[ |\lambda(A)|_{\min}\le\Big(\prod M_r\Big)^{1/2}=\sqrt{1.8}\approx1.342, \]</div>
+                  实际 \(|\lambda_{1,2}|=\sqrt{1.4}\approx1.183\)，上界成立。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="hadamard-schur">Hadamard 与 Schur 不等式</h3>
+            <section class="card thm" id="thm-5-4">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 5.4（Hadamard 行列式不等式）</span>
+              </header>
+              <div class="card-body">
+                <div class="eq-scroll">\[
+                \prod_{r=1}^n|\lambda_r(A)|=|\det A|\le\left[\prod_{s=1}^n\Big(\sum_{r=1}^n|a_{rs}|^2\Big)\right]^{1/2}
+                =\prod_{s=1}^n\|a_s\|_2. \tag{5.1.7}
+                \]</div>
+                <p style="margin-bottom:0">即"行列式模不超过各列长度之积"。等号成立 ⇔ 存在零列或各列两两正交（Schmidt 正交化后 \(\|b_s\|\le\|a_s\|\)，等号恰在正交时取得）。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-5-5">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></span>
+                <span class="card-label">定理 5.5（Schur 不等式：特征值模平方和）</span>
+              </header>
+              <div class="card-body">
+                <div class="eq-scroll">\[
+                \sum_{r=1}^n|\lambda_r|^2\le\sum_{r,s=1}^n|a_{rs}|^2=\|A\|_F^2. \tag{5.1.9}
+                \]</div>
+                <p style="margin-bottom:0">由 Schur 酉三角化 \(A=UTU^{\mathrm H}\)，对角元 \(t_{kk}\) 即特征值，\(\sum|t_{kk}|^2\le\sum|t_{rs}|^2=\operatorname{tr}(T^{\mathrm H}T)=\operatorname{tr}(A^{\mathrm H}A)\)（酉相似保迹）。<strong>等号 ⇔ \(A^{\mathrm H}A=AA^{\mathrm H}\)，即 A 是正规矩阵</strong>（此时 \(T\) 必须对角，回到定理 1.42）。</p>
+              </div>
+            </section>
+            <section class="card ex" id="exm-5-4">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 5.4（已知一个特征值，估其余）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">\(A=\begin{pmatrix}3+\mathrm j&-2-3\mathrm j&2\mathrm j\\1&0&0\\0&1&0\end{pmatrix}\) 有特征值 2，则
+                  <div class="eq-scroll">\[ |\lambda_2|^2\le|\lambda_2|^2+|\lambda_3|^2=\sum|a_{rs}|^2-|\lambda_1|^2=29-4=25, \]</div>
+                  故 \(|\lambda_2|\le5,\ |\lambda_3|\le5\)（实际为 1 与 \(\mathrm j\)）。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ====== Gerschgorin 圆盘 ====== -->
+          <section class="section" id="sec-gerschgorin">
+            <h2 class="sec-title"><span class="cn">三</span>特征值的包含区域：Gerschgorin 圆盘</h2>
+            <section class="card def" id="def-5-3">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/></svg></span>
+                <span class="card-label">定义 5.3：Gerschgorin 圆（盖尔圆）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">对每个 \(i\)，在复平面上定义圆盘
+                  <div class="eq-scroll">\[ G_i=\{\,z\in\C\mid |z-a_{ii}|\le R_i\,\},\qquad R_i=R_i(A)=\sum_{\substack{j=1\\j\ne i}}^n|a_{ij}|. \tag{5.1.10–11} \]</div>
+                  圆心是对角元 \(a_{ii}\)（复数），半径是第 \(i\) 行所有非对角元模之和（去心行和）。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-5-6">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg></span>
+                <span class="card-label">定理 5.6（Gerschgorin 第一定理：圆盘包含）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">矩阵 \(A\) 的<strong>一切特征值都在它的 \(n\) 个盖尔圆的并集之内</strong>：
+                  <div class="eq-scroll">\[ \lambda(A)\subseteq\bigcup_{i=1}^n G_i. \]</div></p>
+                <details class="proof">
+                  <summary><span>证明（最大分量法，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>设 \(Ax=\lambda x\)，取模最大的分量 \(|\xi_{i_0}|=\max_i|\xi_i|\ne0\)。考察第 \(i_0\) 个方程：
+                      \[ (\lambda-a_{i_0i_0})\xi_{i_0}=\sum_{j\ne i_0}a_{i_0j}\xi_j, \]</p>
+                    <p>两边除 \(|\xi_{i_0}|\)：
+                      \[ |\lambda-a_{i_0i_0}|\le\sum_{j\ne i_0}|a_{i_0j}|\frac{|\xi_j|}{|\xi_{i_0}|}\le\sum_{j\ne i_0}|a_{i_0j}|=R_{i_0}, \]</p>
+                    <p>故 \(\lambda\in G_{i_0}\)，当然也在并集中。证毕。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <section class="card ex" id="exm-5-5">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 5.5</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">\[ A=\begin{pmatrix}1&0.1&0.2&0.3\\0.5&3&0.1&0.2\\1&0.3&-1&0.5\\0.2&-0.3&-0.1&-4\end{pmatrix} \]
+                  四个盖尔圆：
+                  \[ |z-1|\le0.6,\quad |z-3|\le0.8,\quad |z+1|\le1.8,\quad |z+4|\le0.6. \]</p>
+                <p>\(G_2\)（圆心 3）、\(G_4\)（圆心 −4）各自孤立；\(G_1\) 与 \(G_3\)（圆心 1 与 −1）相交形成一个连通部分。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-5-7">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/></svg></span>
+                <span class="card-label">定理 5.7（Gerschgorin 第二定理：连通部分计数）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">由矩阵所有盖尔圆组成的<strong>连通部分</strong>，若它由 \(k\) 个盖尔圆构成，则其中<strong>恰有且仅有 \(A\) 的 \(k\) 个特征值</strong>（相重时重复计数，特征值相同时也算）。孤立的圆盘恰好含一个特征值。</p>
+                <details class="proof">
+                  <summary><span>证明思路（连续性方法，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>引入参数 \(u\in[0,1]\)：
+                      \[ A(u)=\begin{pmatrix}a_{11}&ua_{12}&\cdots\\ua_{21}&a_{22}&\cdots\\\vdots&&\ddots\end{pmatrix},\quad A(1)=A,\ A(0)=\diag(a_{ii}). \]</p>
+                    <p>\(A(u)\) 的第 \(i\) 个圆盘半径为 \(uR_i\)，随 \(u\) 从 0 连续缩小到圆心这一点；特征值 \(\lambda_i(u)\) 连续依赖 \(u\)（特征方程的根连续依赖系数）。\(u=0\) 时每个圆心各有一个特征值。若一个含 \(k\) 个圆盘的连通区域 \(D\) 在 \(u=1\) 中特征值数少于 \(k\)，必有某条特征值曲线从 \(D\) 连续走到另一连通区域 \(\widetilde D\)，中途必离开所有圆盘之并——但在中间时刻它属于半径 \(u_0R_i\) 的圆盘（定理 5.6），矛盾。故只能是 \(k\) 个。</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0">例 5.5 中：\(G_2,G_4\) 各含一个特征值，\(G_1\cup G_3\) 共含两个。<strong>注意：</strong>两个圆盘构成的连通部分不保证每个圆各一个——可能两个都在同一个圆里（例 5.6）。</p>
+              </div>
+            </section>
+            <section class="card ex" id="exm-5-6">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 5.6（连通不等于每圆一个）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">\(A=\begin{pmatrix}1&-0.8\\0.5&0\end{pmatrix}\)，两圆 \(|z-1|\le0.8\)、\(|z|\le0.5\) 相交构成一个连通部分（含两个特征值）。但实际
+                  \[ \lambda_{1,2}=\tfrac12(1\pm\mathrm j\sqrt{0.6}),\quad|\lambda_{1,2}|=\sqrt{0.4}\approx0.632>0.5, \]</p>
+                <p>两个特征值<strong>都不在 \(G_2\) 内</strong>，都落在 \(G_1\) 一侧——这正说明定理 5.7 只保证"总数 \(=k\)"，不能细分到每个圆。</p>
+              </div>
+            </section>
+          </section>
+          <!-- ====== 圆盘收缩与 Ostrowski ====== -->
+          <section class="section" id="sec-shrinking">
+            <h2 class="sec-title"><span class="cn">四</span>圆盘的收缩与更精细的界</h2>
+            <p>取正对角阵 \(D=\diag(\alpha_1,\ldots,\alpha_n)\)，由
+              <div class="eq-scroll">\[ B=DAD^{-1}=\left(\frac{\alpha_i}{\alpha_j}a_{ij}\right)\sim A \tag{5.1.12} \]</div>
+              相似不改变特征值。\(B\) 的盖尔圆为
+              <div class="eq-scroll">\[ G_i':\ |z-a_{ii}|\le r_i,\qquad r_i=\sum_{j\ne i}|a_{ij}|\frac{\alpha_i}{\alpha_j}. \tag{5.1.13} \]</div>
+              调整 \(\alpha_i\) 可改变目标圆大小：取 \(\alpha_i&lt;1\) 缩小目标圆、其余圆相应变大；取 \(\alpha_i&gt;1\) 则放大目标圆、缩小其余圆——把一个连通区域拆开成孤立圆，实现<strong>特征值隔离</strong>。</p>
+            <section class="card ex" id="exm-5-7">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 5.7（隔离特征值）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">\[ A=\begin{pmatrix}20&5&0.8\\4&10&1\\1&2&10\mathrm j\end{pmatrix}, \]
+                  原三圆 \(|z-20|\le5.8\)、\(|z-10|\le5\) 相交，而 \(|z-10\mathrm j|\le3\) 孤立。取 \(D=\diag(1,1,2)\)，则
+                  \[ B=DAD^{-1}=\begin{pmatrix}20&5&0.4\\4&10&0.5\\2&4&10\mathrm j\end{pmatrix}, \]</p>
+                <p>新圆 \(|z-20|\le5.4\)、\(|z-10|\le4.5\)、\(|z-10\mathrm j|\le6\) <strong>两两不相交</strong>，每个圆恰含一个特征值，于是三个特征值分别被隔离。</p>
+              </div>
+            </section>
+            <section class="card ex" id="exm-5-8">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 5.8：严格对角占优 ⇒ 可逆（圆盘证法）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">若 \(A\) 严格对角占优，则每个盖尔圆 \(|z-a_{ii}|\le R_i\) 都满足 \(R_i&lt;|a_{ii}|\)，故<strong>原点不在任何圆盘内</strong>。由定理 5.6，\(0\) 不是特征值，即 \(\det A\ne0\)。这比 §5.1 定理 5.3 的证明简洁得多——这是 Gerschgorin 定理最常用的推论。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="irreducible-sharp">不可约矩阵的加强：边界情形</h3>
+            <section class="card thm" id="thm-5-8">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 5.8（不可约：边界点被所有圆周共享）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设<strong>不可约</strong>矩阵 \(A=(a_{ij})_{n\times n}\) 的一个特征值 \(\lambda\) 在其 \(n\) 个盖尔圆并集的<strong>边界</strong>上，则所有 \(n\) 个圆周</p>
+                <div class="eq-scroll">\[ |z-a_{ii}|=R_i\qquad(i=1,2,\cdots,n) \tag{5.1.16} \]</div>
+                <p style="margin-bottom:0">都通过点 \(\lambda\)。（可约矩阵无此性质——这正是"不可约"假设的作用。）</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-5-9">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 5.9：不可约 + 一行非占优 ⇒ 严格不等式</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">若 \(A\) 不可约，且存在 \(i_0\) 使</p>
+                <div class="eq-scroll">\[ \sum_{j=1}^{n}|a_{i_0j}|&lt;\|A\|_\infty, \]</div>
+                <p style="margin-bottom:0">则 \(\rho(A)&lt;\|A\|_\infty\)（而一般情形只能得到 \(\rho(A)\le\|A\|_\infty\)）。<strong>证明思路：</strong>反设 \(\rho(A)=\|A\|_\infty\)，则取到模最大的特征值 \(\lambda_0\) 落在并集边界上，由定理 5.8 所有圆周都通过 \(\lambda_0\)，特别地 \(|\lambda_0|\le R_{i_0}+|a_{i_0i_0}|=\sum_j|a_{i_0j}|&lt;\|A\|_\infty\)，与 \(|\lambda_0|=\|A\|_\infty\) 矛盾。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-5-10">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 5.10（Ky Fan）：用优势矩阵界定特征值</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A=(a_{ij})_{n\times n}\in\C^{n\times n}\)，\(B=(b_{ij})_{n\times n}\in\R^{n\times n}\)。如果</p>
+                <div class="eq-scroll">\[ b_{ij}\ge|a_{ij}|\qquad(i,j=1,2,\cdots,n), \]</div>
+                <p style="margin-bottom:0">则对 \(A\) 的任一特征值 \(\lambda\)，必有某个 \(i\) 使</p>
+                <div class="eq-scroll">\[ |\lambda-a_{ii}|\le\rho(B)-b_{ii}. \tag{5.1.17} \]</div>
+                <details class="proof"><summary><span>证明思路</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">设 \(B\) 有正特征向量 \(\xi&gt;0\) 使 \(B\xi=\rho(B)\xi\)（非负不可约阵的 Perron 向量，§7.3 定理 7.1，教材 p.388 结论 (2)）。令 \(D=\diag(\xi_1,\ldots,\xi_n)\)，对相似阵 \(C=D^{-1}AD\) 用盖尔圆定理：\(C\) 与 \(A\) 有相同特征值，且 \(C\) 的第 \(i\) 个圆半径为 \(\xi_i^{-1}\sum_{j\ne i}|a_{ij}|\xi_j\le\xi_i^{-1}\sum_{j\ne i}b_{ij}\xi_j=\rho(B)-b_{ii}\)（用了 \(\sum_j b_{ij}\xi_j=\rho(B)\xi_i\)）。\(b_{ij}\) 允许为零时用 \(B_k=b_{ij}+1/k\) 逼近再取极限。</p>
+                </details>
+              </div>
+            </section>
+            <section class="card ex" id="exm-5-9">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 5.9：Ky Fan 界的用法</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">估计 \(A=\begin{pmatrix}1&amp;-0.8\\0.5&amp;0\end{pmatrix}\) 的特征值范围。<strong>解：</strong>取 \(B=\begin{pmatrix}1&amp;1\\1&amp;1\end{pmatrix}\)，则 \(b_{ij}\ge|a_{ij}|\) 成立，且 \(\rho(B)=2\)。由定理 5.10，\(A\) 的特征值 \(\lambda\) 至少满足下面两个不等式之一：</p>
+                <div class="eq-scroll">\[ |\lambda-1|\le2-1=1,\qquad |\lambda|\le2-1=1. \]</div>
+                <p style="margin-bottom:0">即 \(\lambda\) 落在两个单位圆盘之一的并集内——比直接看盖尔圆（\(|z-1|\le0.8\)、\(|z|\le0.5\)）宽松，但给出了不含任何矩阵元素组合的<strong>统一界</strong>。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="ostrowski">Ostrowski 圆盘（行和与列和的几何平均）</h3>
+            <section class="card thm" id="lem-5-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 3v18"/><path d="M5 8l7-5 7 5"/><path d="M5 16l7 5 7-5"/></svg></span>
+                <span class="card-label">引理 2：加权算术—几何平均不等式</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(\sigma,\tau\) 是两个非负实数，\(0\le\alpha\le1\)，则</p>
+                <div class="eq-scroll">\[ \tau^{\alpha}\sigma^{1-\alpha}\le\alpha\tau+(1-\alpha)\sigma. \tag{5.1.18} \]</div>
+                <p style="margin-bottom:0">（\(\alpha=1/2\) 即常用的 \(\sqrt{\tau\sigma}\le\frac{\tau+\sigma}2\)；一般 \(\alpha\) 由凸性给出。）</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-5-11">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 5.11（Ostrowski 第一定理）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A=(a_{ij})_{n\times n}\in\C^{n\times n}\)，\(0\le\alpha\le1\)，\(\lambda\) 是 \(A\) 的任一特征值。则存在 \(i\)，使</p>
+                <div class="eq-scroll">\[ |\lambda-a_{ii}|\le[R_i(A)]^{\alpha}[R_i(A^{\mathrm T})]^{1-\alpha}, \tag{5.1.19} \]</div>
+                <p style="margin-bottom:0">其中 \(R_i(A)=\sum_{j\ne i}|a_{ij}|\)（行和）、\(R_i(A^{\mathrm T})=\sum_{j\ne i}|a_{ji}|\)（列和）。取 \(\alpha=1\) 得行圆盘（Gerschgorin），\(\alpha=0\) 得列圆盘，中间值常给出更紧的界。</p>
+                <details class="proof"><summary><span>证明要点</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">\(\alpha=0,1\) 时即定理 5.6，故只需证 \(0&lt;\alpha&lt;1\)。设 \(Ax=\lambda x\)，\(x\ne0\)，取 \(|\xi_{i_0}|=\max_i|\xi_i|\ne0\)。反设不等式不成立，即对一切 \(i\) 有 \(|\lambda-a_{ii}|&gt;[R_i(A)]^\alpha[R_i(A^{\mathrm T})]^{1-\alpha}\)，于是 \(R_{i_0}(A)\ne0\)。由 \(|\lambda-a_{i_0i_0}||\xi_{i_0}|\le\sum_{j\ne i_0}|a_{i_0j}||\xi_j|\) 与 Hölder 不等式（§2.1）得 \(R_{i_0}(A^{\mathrm T})|\xi_{i_0}|^{\frac1{1-\alpha}}&lt;\sum_{j\ne i_0}|a_{i_0j}||\xi_j|^{\frac1{1-\alpha}}\)；再对 \(i\) 求和，并把 \(\sum_i R_i(A^{\mathrm T})|\xi_i|^{\frac1{1-\alpha}}\) 按 \(R_i(A^{\mathrm T})\) 的定义展开为双重和，两个结果互相矛盾，故假设不成立。</p>
+                </details>
+              </div>
+            </section>
+            <section class="card cor" id="cor-ostrowski">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></span>
+                <span class="card-label">定理 5.11 的八个推论（谱半径估计链）</span>
+              </header>
+              <div class="card-body">
+                <p>记 \(\rho_i(A)=\sum_{j=1}^{n}|a_{ij}|\)（第 \(i\) 行<strong>含对角元</strong>的绝对行和）。由定理 5.11 与引理 2 得：</p>
+                <div class="table-wrap">
+                  <table class="book">
+                    <tr><th>#</th><th>结论</th><th>说明</th></tr>
+                    <tr><td class="num">推论 1</td><td>\(|\lambda-a_{ii}|\le\alpha R_i(A)+(1-\alpha)R_i(A^{\mathrm T})\)（5.1.24）</td><td>用引理 2 对 (5.1.19) 右端放缩</td></tr>
+                    <tr><td class="num">推论 2</td><td>\(A\) 奇异 \(\Rightarrow\) 存在 \(i\) 使 \(|a_{ii}|\le[R_i(A)]^{\alpha}[R_i(A^{\mathrm T})]^{1-\alpha}\)，且 \(|a_{ii}|\le\alpha R_i(A)+(1-\alpha)R_i(A^{\mathrm T})\)</td><td>取 \(\lambda=0\)</td></tr>
+                    <tr><td class="num">推论 3</td><td>\(\rho(A)\le\max\limits_i\{|a_{ii}|+[R_i(A)]^{\alpha}[R_i(A^{\mathrm T})]^{1-\alpha}\}\)；\(\rho(A)\le\max\limits_i\{|a_{ii}|+\alpha R_i(A)+(1-\alpha)R_i(A^{\mathrm T})\}\)</td><td>对每个特征值用 (5.1.19)/(5.1.24)</td></tr>
+                    <tr><td class="num">推论 4</td><td>\(\rho(A)\le\max\limits_i\{[\rho_i(A)]^{\alpha}[\rho_i(A^{\mathrm T})]^{1-\alpha}\}\)（5.1.25）</td><td>用 Hölder 合并 \(|a_{ii}|\) 项</td></tr>
+                    <tr><td class="num">推论 5</td><td>\(\rho(A)\le\max\limits_i[\rho_i(A)\rho_i(A^{\mathrm T})]^{1/2}\)</td><td>取 \(\alpha=\tfrac12\)（Farnell）</td></tr>
+                    <tr><td class="num">推论 6</td><td>\(\rho(A)\le\min\{\max\limits_i\rho_i(A),\ \max\limits_i\rho_i(A^{\mathrm T})\}\)</td><td>取 \(\alpha=1,0\)（Brauer）</td></tr>
+                    <tr><td class="num">推论 7</td><td>\(\rho(A)\le\tfrac12\max\limits_i\{\rho_i(A)+\rho_i(A^{\mathrm T})\}\)</td><td>取 \(\alpha=\tfrac12\)（Parker）</td></tr>
+                    <tr><td class="num">推论 8</td><td>\(\rho(A)\le\tfrac12[\max\limits_i\rho_i(A)+\max\limits_i\rho_i(A^{\mathrm T})]\)</td><td>（Browne）</td></tr>
+                  </table>
+                </div>
+                <p style="margin-bottom:0">推论 6 即熟知的 \(\rho(A)\le\min\{\|A\|_\infty,\|A\|_1\}\)，其余各条都是它的加强。</p>
+              </div>
+            </section>
+            <section class="card ex" id="exm-5-10">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 5.10</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">对 \(A=\begin{pmatrix}1&-0.8\\0.5&1\end{pmatrix}\)，\(R_1(A)=0.8,R_2(A)=0.5\)，\(R_1(A^{\mathrm T})=0.5,R_2(A^{\mathrm T})=0.8\)。取 \(\alpha=\tfrac12\)：
+                  <div class="eq-scroll">\[ |\lambda-1|\le\sqrt{0.8\cdot0.5}=\sqrt{0.4}\approx0.632, \]</div>
+                  而实际 \(|\lambda_{1,2}-1|=\sqrt{0.4}\)，<strong>界恰好取等</strong>，比盖尔圆半径 0.8 精确。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-5-12">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/></svg></span>
+                <span class="card-label">定理 5.12（Ostrowski 第二定理：Cassini 卵形）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">对任一特征值 \(\lambda\)，存在 \(i\ne j\) 使
+                  <div class="eq-scroll">\[ |\lambda-a_{ii}|\,|\lambda-a_{jj}|\le R_i(A)R_j(A). \tag{Cassini 卵形} \]</div>
+                  即所有特征值属于 \(n(n-1)/2\) 个 Cassini 卵形的并集。<strong>推论：</strong>若对所有 \(i\ne j\) 恒有 \(|a_{ii}||a_{jj}|&gt;R_iR_j\)，则 \(\det A\ne0\)。</p>
+              </div>
+            </section>
+            <section class="card ex" id="exm-5-11">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 5.11：用 Cassini 判据证非奇异</span>
+              </header>
+              <div class="card-body">
+                <p>讨论 \(A=\begin{pmatrix}2&1.1&1\\-0.8&3&2\\1.5&1.1&3\end{pmatrix}\) 的奇异性。</p>
+                <p><strong>解：</strong>\(R_1(A)=2.1,\ R_2(A)=2.8,\ R_3(A)=2.6\)。逐一验证三对：</p>
+                <div class="eq-scroll">\[
+                |a_{11}||a_{22}|=6&gt;2.1\times2.8=R_1R_2,\qquad
+                |a_{11}||a_{33}|=6&gt;2.1\times2.6=R_1R_3,
+                \]</div>
+                <div class="eq-scroll">\[ |a_{22}||a_{33}|=9&gt;2.8\times2.6=R_2R_3. \]</div>
+                <p style="margin-bottom:0">三式全部成立，由定理 5.12 的推论得 \(\det A\ne0\)，即 \(A\) 非奇异。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ====== 扰动理论 ====== -->
+          <section class="section" id="sec-perturbation">
+            <h2 class="sec-title"><span class="cn">五</span>扰动理论中的特征值估计</h2>
+            <p>矩阵有小扰动 \(Q\) 时，特征值移动多少？先设 \(A=PDP^{-1}\) 可对角化。</p>
+            <section class="card thm" id="thm-5-13">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 5.13：扰动后的特征值配对界</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A=PDP^{-1}\in\C^{n\times n}\)，\(D=\diag(\lambda_1,\lambda_2,\cdots,\lambda_n)\)，\(Q\in\C^{n\times n}\)，且 \(A+Q\) 有特征值 \(\mu_1,\mu_2,\cdots,\mu_n\)，则对任一 \(\mu_j\) 存在着 \(\lambda_i\)，使得</p>
+                <div class="eq-scroll">\[ |\lambda_i-\mu_j|\le\|P^{-1}QP\|_\infty. \tag{5.1.26} \]</div>
+                <p style="margin-bottom:0">即扰动后每个特征值 \(\mu_j\) 都落在某个原特征值 \(\lambda_i\) 的 \(\|P^{-1}QP\|_\infty\) 邻域内；放大因子由 \(P\) 的条件数决定——这正是后续 Bauer–Fike 定理（定理 5.14）的雏形。</p>
+              </div>
+            </section>
+            <section class="card def" id="def-5-4">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 5.4：单调（绝对）范数</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">矩阵范数 \(\|\cdot\|\) 若对任意对角阵 \(D=\diag(\lambda_i)\) 都有
+                  <div class="eq-scroll">\[ \|D\|=\max_i|\lambda_i|, \tag{5.1.27} \]</div>
+                  则称它是<strong>单调（绝对）范数</strong>。所有 \(p\)-范数（\(\|\cdot\|_1,\|\cdot\|_2,\|\cdot\|_\infty\)）都是单调的。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-5-14">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 5.14（Bauer–Fike 扰动界）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A=PDP^{-1}\)，其中 \(\|\cdot\|\) 为<strong>单调范数</strong>（定义 5.4），则对 \(A+Q\) 的任一特征值 \(\mu\)，恒有
+                  <div class="eq-scroll">\[ \min_i|\lambda_i-\mu|\le\|P^{-1}QP\|. \tag{5.1.28} \]</div>
+                  即扰动后每个新特征值都落在以原特征值为中心、半径 \(\|P^{-1}QP\|\) 的某圆盘内；定理 5.13 进一步保证：与原 \(m\) 重特征值对应的、与其他圆盘不相交的圆盘内，恰有 \(A+Q\) 的 \(m\) 个特征值。</p>
+                <details class="proof">
+                  <summary><span>证明要点（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>令 \(B=P^{-1}QP\)，则 \(P^{-1}(A+Q)P=D+B\)。若 \(D-\mu I\) 可逆，分解
+                      \[ D+B-\mu I=(D-\mu I)[I+(D-\mu I)^{-1}B]. \]</p>
+                    <p>左边奇异 ⇒ \(I+(D-\mu I)^{-1}B\) 奇异 ⇒ \((D-\mu I)^{-1}B\) 以 −1 为特征值，故 \(\|(D-\mu I)^{-1}B\|\ge1\)。由单调性
+                      \[ 1\le\|(D-\mu I)^{-1}\|\,\|B\|=\frac{\|B\|}{\min_i|\lambda_i-\mu|}, \]</p>
+                    <p>整理即得 (5.1.28)。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <section class="card thm" id="thm-5-15">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></span>
+                <span class="card-label">定理 5.15（近似特征向量的后验误差）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">若 \(\|x\|_v=1\) 且<strong>残量</strong>满足
+                  <div class="eq-scroll">\[ \|Ax-\lambda x\|_v\le\varepsilon, \]</div>
+                  则在与 \(\|\cdot\|_v\) 相容的单调矩阵范数下
+                  <div class="eq-scroll">\[ \min_i|\lambda_i-\lambda|\le\varepsilon\,\|P^{-1}\|\,\|P\|. \tag{5.1.29} \]</div>
+                  <strong>注意：残差小不代表 \(\lambda\) 一定接近特征值</strong>——当条件数 \(\kappa(P)=\|P\|\|P^{-1}\|\) 很大时，小残差对应的误差可能被放大（教材反例：\(A=\begin{pmatrix}2&-10^{10}\\0&2\end{pmatrix}\)，\(x=(1,10^{-10})^{\mathrm T}\) 残差仅 \(10^{-10}\)，却不是好的近似）。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="gersh-lab-title">动手实验：Gerschgorin 圆盘可视化</h3>
+            <p>改 3×3（或 2×2，第 3 行/列补 0）矩阵，工具实时画出全部盖尔圆（彩圈）并用红点标出真实特征值，验证"特征值不出并集"；切换到严格对角占优矩阵可看到所有圆都不包住原点（⇒ 可逆）。</p>
+            <section class="card lab" data-gershgorin-lab></section>
+          </section>
+
+          <!-- ================= 习题 5.1 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 5.1（共 10 题）</h2>
+            <div class="ex-toolbar">
+              <span data-fold-tools="details.solution">
+                <button type="button" data-fold="open">全部展开解答</button>
+                <button type="button" data-fold="close">全部收起</button>
+              </span>
+            </div>
+
+            <article class="card task" id="ex51-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">Hadamard 等号</span></header>
+              <div class="card-body">
+                <p>设 \(A=(a_{ij})\)，\(\alpha_i&gt;0\)，证明
+                  \[ \prod_{i=1}^n|\lambda_i(A)|\le\left[\prod_{j=1}^n\alpha_j^{-2}\Big(\sum_{i=1}^n\alpha_i^2|a_{ij}|^2\Big)\right]^{1/2}, \]</p>
+                <p>并讨论等号条件。</p>
+                <details class="solution"><summary><span>查看提示</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>令 \(D=\diag(\alpha_i)\)，\(B=DAD^{-1}\sim A\)，其特征值与 \(A\) 相同。对 \(B\) 用 Hadamard 不等式 (5.1.7)：
+                    \[ \prod|\lambda_i|=|\det B|\le\prod_j\|b_{\cdot j}\|_2,\quad b_{ij}=\frac{\alpha_i}{\alpha_j}a_{ij}, \]</p>
+                  <p>第 \(j\) 列长度平方为 \(\sum_i\alpha_i^2|a_{ij}|^2/\alpha_j^2\)，开方连乘即得右边。等号条件化为：某列零，或 \(B\) 的各列两两正交（即加权后列正交）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex51-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag tag-mid">Schur 不等式</span></header>
+              <div class="card-body">
+                <p>证明：
+                  \[ (1)\ \sum_{r=1}^n[\operatorname{Re}\lambda_r(A)]^2\le\sum_{r,s}\left|\frac{a_{rs}+\bar a_{sr}}2\right|^2;\qquad
+                     (2)\ \sum_{r=1}^n[\operatorname{Im}\lambda_r(A)]^2\le\sum_{r,s}\left|\frac{a_{rs}-\bar a_{sr}}2\right|^2. \]</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由 Schur 分解 \(A=UTU^{\mathrm H}\)，\(\sum|\lambda_r|^2=\sum|t_{rr}|^2\le\|T\|_F^2=\|A\|_F^2\)。对 Hermite 部分 \(H=(A+A^{\mathrm H})/2\) 与反 Hermite 部分 \(K=(A-A^{\mathrm H})/(2\mathrm j)\) 分别应用 Schur 不等式：\(H\) 的特征值是 \(\operatorname{Re}\lambda_r\)（Schur 形中 \(H\) 的对角元为 \((t_{rr}+\bar t_{rr})/2=\operatorname{Re}\lambda_r\)），\(K\) 的特征值是 \(\operatorname{Im}\lambda_r\)；而 \(\|H\|_F^2=\sum|(a_{rs}+\bar a_{sr})/2|^2\) 等，即得两式。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex51-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag tag-hard">Gerschgorin 隔离</span></header>
+              <div class="card-body">
+                <p>用 Gerschgorin 定理隔离
+                  \[ A=\begin{pmatrix}20&3&1\\2&10&2\\8&1&0\end{pmatrix} \]
+                  的特征值，再利用实矩阵特征值性质改进结果。</p>
+                <details class="solution"><summary><span>查看提示</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>三圆：\(|z-20|\le4\)、\(|z-10|\le4\)、\(|z|\le9\)。前两圆在实轴投影分别为 \([16,24]\)、\([6,14]\)，不相交；第三圆 \([-9,9]\) 与第二圆 \([6,14]\) 相交（在 \(6\sim9\) 段）。取 \(D=\diag(\alpha_1,\alpha_2,\alpha_3)\)，相似阵 \(DAD^{-1}\) 的圆心不变、半径变为 \(r_i=\sum_{j\ne i}|a_{ij}|\alpha_i/\alpha_j\)，即
+                    \[ r_1=3\frac{\alpha_1}{\alpha_2}+\frac{\alpha_1}{\alpha_3},\qquad r_2=2\frac{\alpha_2}{\alpha_1}+2\frac{\alpha_2}{\alpha_3},\qquad r_3=8\frac{\alpha_3}{\alpha_1}+\frac{\alpha_3}{\alpha_2}. \]
+                    <strong>注意：调大 \(\alpha_3\) 只会放大第三圆</strong>（\(r_3\) 与 \(\alpha_3\) 同向变化）；要把第三圆压向原点，应把 \(\alpha_3\) 调<strong>小</strong>，同时适当调小 \(\alpha_1,\alpha_2\) 以抑制 \(r_1,r_2\) 的增长。例如取 \(\alpha=(\tfrac14,\tfrac15,\tfrac3{20})\)：\(r_1\approx5.42,\ r_2\approx4.27,\ r_3\approx5.55\)，三圆区间 \([-5.55,5.55]\)、\([5.73,14.27]\)、\([14.58,25.42]\) <strong>两两不相交</strong>，每个圆恰含一个特征值；再由实矩阵的非实特征值共轭成对，孤立圆中的特征值必为实数（实际为 \(21.14,\ 9.22,\ -0.36\)）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex51-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag tag-hard">可对角化且特征值为实数</span></header>
+              <div class="card-body">
+                <p>证明
+                  \[ A=\begin{pmatrix}2&2/n&\cdots&1/n\\1/n&4&1/n&\cdots&1/n\\\vdots&&\ddots&\vdots\\1/n&\cdots&1/n&2n\end{pmatrix} \]
+                  能够相似于对角矩阵，且特征值全为实数。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>盖尔圆为 \(|z-2k|\le R_k\)，其中 \(R_1=1\)、\(R_k=(n-1)/n\ (k\ge2)\)，圆心间距为 2，故各圆<strong>两两不交</strong>；由盖尔圆定理的隔离形式，每圆恰含一个特征值。又 \(A\) 为实矩阵，非实特征值必共轭成对，而各圆关于实轴对称且互不相交，故特征值全为实数且互异；互异特征值对应完备特征向量系，\(A\) 可相似对角化。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex51-5">
+              <header class="card-head"><span class="card-label">第 5 题</span><span class="tag">圆盘不交 ⇒ 实特征值</span></header>
+              <div class="card-body">
+                <p>设 \(A\in\R^{n\times n}\)，如果 \(A\) 的 \(n\) 个盖尔圆互不相交，则 \(\lambda(A)\) 全是实数。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>实矩阵的特征多项式系数为实数，故非实特征值必<strong>共轭成对</strong> \(\lambda,\bar\lambda\) 出现；由定理 5.6 它们分别属于两个盖尔圆 \(G_i,G_j\)，而共轭变换关于实轴对称——若圆心都在实轴上（实矩阵对角元为实数），\(\lambda\in G_i\) 则 \(\bar\lambda\) 属于与 \(G_i\) 关于实轴对称的圆。但每个盖尔圆的圆心都在实轴上、圆本身关于实轴对称，故 \(\lambda,\bar\lambda\) 必在<strong>同一个</strong>圆 \(G_i\) 中。圆互不相交时，该圆应只含一个特征值（定理 5.7），矛盾。因此没有非实特征值。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex51-6">
+              <header class="card-head"><span class="card-label">第 6 题</span><span class="tag">实部正负</span></header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{n\times n}\) 严格对角占优（或弱占优且不可约），其对角元素均为正数，证明 \(\operatorname{Re}\lambda(A)&gt;0\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>设 \(\lambda\in G_i\)，则 \(|\lambda-a_{ii}|\le R_i&lt;|a_{ii}|=a_{ii}\)（严格占优且 \(a_{ii}&gt;0\)）。复平面上圆盘 \(|z-a_{ii}|\le R_i\) 完全位于右半平面（最左点实部 \(a_{ii}-R_i&gt;0\)），故 \(\operatorname{Re}\lambda\ge a_{ii}-R_i&gt;0\)。这是矩阵为 <strong>M 矩阵/Hurwitz 判据</strong>的简单形式：严格行对角占优且对角元为正 ⇒ 所有特征值有正实部。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex51-7">
+              <header class="card-head"><span class="card-label">第 7 题</span><span class="tag tag-mid">实/纯虚对角元的界</span></header>
+              <div class="card-body">
+                <p>证明：(1) 若 \(a_{ii}\) 都是实数，则 \(|\operatorname{Im}\lambda(A)|\le\max_i\sum_{j\ne i}|a_{ij}|\)；(2) 若 \(a_{ii}\) 都是纯虚数，则 \(|\operatorname{Re}\lambda(A)|\le\max_i\sum_{j\ne i}|a_{ij}|\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>(1) 若 \(\lambda\in G_i\) 且 \(a_{ii}\in\R\)，则 \(\lambda\) 到实轴上点 \(a_{ii}\) 的距离 \(|\lambda-a_{ii}|\le R_i\)，故虚部 \(|\operatorname{Im}\lambda|\le|\lambda-a_{ii}|\le R_i\le\max_k R_k\)。<br>(2) 若 \(a_{ii}\) 纯虚（\(a_{ii}=\mathrm j\beta_i\)），则实部 \(|\operatorname{Re}\lambda|\le|\lambda-a_{ii}|\le R_i\)（圆心在虚轴上，到虚轴距离即实部绝对值）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex51-8">
+              <header class="card-head"><span class="card-label">第 8 题</span><span class="tag tag-hard">谱半径估计</span></header>
+              <div class="card-body">
+                <p>(1) 证明
+                  \[ A=\begin{pmatrix}1/4&1/4&1/4&1/4\\1/5&2/5&1/5&1/5\\1/6&1/6&3/6&1/6\\1/7&1/7&1/7&3/7\end{pmatrix} \]
+                  的谱半径 \(\rho(A)&lt;1\)；(2) 将元素"\(a_{ii}\)"改为 \(4/7\)，则 \(\rho(A)=1\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>(1) 用 \(\infty\)-范数（最大行和）：各行和依次为 1、1、1、6/7&lt;1，故 \(\|A\|_\infty=1\) 不足以得严格结论；改用<strong>列和</strong>或加权 \(\infty\)-范数：第 1 列和 \(1/4+1/5+1/6+1/7\approx0.76&lt;1\)，其余列各为 \(1/4+2/5+1/6+1/7\approx0.960\)、\(1/4+1/5+1/2+1/7\approx1.09\)、\(1/4+1/5+1/6+3/7\approx1.05\)，均未全部小于 1，故仍取适当正对角 \(D\) 使 \(\|DAD^{-1}\|_\infty&lt;1\)（圆盘全部在单位圆内），由 \(\rho(A)\le\|DAD^{-1}\|_\infty&lt;1\) 得证（实际 \(\rho(A)\approx0.961\)）。<br>(2) 改后第 4 行为 \((1/7,1/7,1/7,4/7)\)，各行和恰为 1，且全 1 向量 \(\mathbf1=(1,1,1,1)^{\mathrm T}\) 满足 \(A\mathbf1=\mathbf1\)，故 1 是特征值；又 \(\rho(A)\le\|A\|_\infty=1\)，所以 \(\rho(A)=1\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex51-9">
+              <header class="card-head"><span class="card-label">第 9 题</span><span class="tag">两圆连通的特征值分布</span></header>
+              <div class="card-body">
+                <p>在盖尔圆定理中，如果一个连通部分由两个盖尔圆构成：(1) 何时每个圆上可能都有两个特征值？(2) 何时每个圆上不可能都有两个特征值？</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>定理 5.7 只保证两圆<strong>合计</strong>含两个特征值。(1) 当矩阵为复矩阵（或两圆心在复平面上不对称于实轴）时，两个特征值可都落在其中一个圆内，另一圆一个也没有（如例 5.6 的复推广），即"某圆可能有两个"；甚至两圆相交区域可以同时容纳两个特征值，从单圆角度看"两圆都覆盖这两个点"也是可能的。(2) 当 \(A\) 是<strong>实矩阵且两圆心在实轴上、两圆关于实轴的交集结构使非实共轭对必须分居</strong>……更直接的充分条件：若两圆只在实轴上一点相切或关于实轴对称分布，则实特征值受实轴投影区间限制；特别当两圆与实轴的交集互不相交（仅在复平面上部相交）时，每个圆实轴投影各含一个实特征值，不可能同圆两个。核心判据仍是实矩阵非实特征值成对且关于实轴对称。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex51-10">
+              <header class="card-head"><span class="card-label">第 10 题</span><span class="tag tag-mid">Ostrowski 估计</span></header>
+              <div class="card-body">
+                <p>应用 Ostrowski 定理（或推论）证明
+                  \[ A=\begin{pmatrix}6&5&1&2\\1&7&0&2\\0&4&7&5\\2&0&1&5\end{pmatrix} \]
+                  的谱半径 \(\rho(A)&lt;13\)。</p>
+                <details class="solution"><summary><span>查看提示</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>各行去心和：\(R_1=8,R_2=3,R_3=9,R_4=3\)；\(\infty\)-范数给出 \(\rho(A)\le\|A\|_\infty=\max(14,10,16,8)=16\)，不够。用定理 5.11 取合适 \(\alpha\)（或列和 \(R_i(A^{\mathrm T})=3,9,2,9\)），则
+                    \[ |\lambda-a_{ii}|\le R_i(A)^\alpha R_i(A^{\mathrm T})^{1-\alpha}, \]</p>
+                  <p>四个界取 \(6+8^\alpha3^{1-\alpha}\)、\(7+3^\alpha9^{1-\alpha}\)、\(7+9^\alpha2^{1-\alpha}\)、\(5+3^\alpha9^{1-\alpha}\)；选取 \(\alpha\)（如 \(\alpha=1/2\)：\(6+\sqrt{24}\approx10.9,\ 7+\sqrt{27}\approx12.2,\ 7+\sqrt{18}\approx11.2,\ 5+\sqrt{27}\approx10.2\)）最大值 \(&lt;13\)，故 \(\rho(A)&lt;13\)。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 本节小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结与自检</h2>
+            <div class="summary-block">
+              <p>不解特征方程，只用矩阵元素就能圈定所有特征值：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>工具</th><th>给出的界</th></tr>
+                  <tr><td>定理 5.1（Hirsch）</td><td>实矩阵 \(|\operatorname{Im}\lambda|\le M\sqrt{n(n-1)/2}\)，\(M=\max|a_{rs}-a_{sr}|/2\)</td></tr>
+                  <tr><td>定理 5.2</td><td>\(|\lambda|\le\|A\|_{m_\infty}\)，\(|\operatorname{Re}\lambda|\le\tfrac12\|A+A^{\mathrm H}\|_{m_\infty}\)，\(|\operatorname{Im}\lambda|\le\tfrac12\|A-A^{\mathrm H}\|_{m_\infty}\)</td></tr>
+                  <tr><td>Schur (5.5)</td><td>\(\sum|\lambda_i|^2\le\|A\|_F^2\)，等号 ⇔ 正规</td></tr>
+                  <tr><td>Hadamard (5.4)</td><td>\(|\det A|\le\prod\|a_{\cdot j}\|_2\)，等号 ⇔ 列正交</td></tr>
+                  <tr><td>严格对角占优</td><td>\(\det A\ne0\)；乘积模夹逼 (5.1.5)；对角元为正则特征值有正实部</td></tr>
+                  <tr><td><strong>Gerschgorin</strong></td><td>\(\lambda\in\cup G_i\)；\(k\) 个连通圆盘恰含 \(k\) 个特征值；\(DAD^{-1}\) 可收缩隔离</td></tr>
+                  <tr><td>Ostrowski</td><td>\(|\lambda-a_{ii}|\le R_i(A)^\alpha R_i(A^{\mathrm T})^{1-\alpha}\)；Cassini 卵形</td></tr>
+                  <tr><td>Bauer–Fike</td><td>可对角化矩阵受扰 \(\min|\lambda_i-\mu|\le\|P^{-1}QP\|\)；残差界含条件数 \(\kappa(P)\)</td></tr>
+                </table>
+              </div>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>用"最大分量"法自己证明一遍 Gerschgorin 第一定理；为什么证明中必须取模最大的那个分量？</li>
+                  <li>定理 5.7 的证明为什么要引入连续参数 \(u\)？如果直接对 \(A\) 论证，哪一步过不去？例 5.6 说明连通部分的计数有什么"不能加强"之处？</li>
+                  <li>对角相似 \(DAD^{-1}\) 为什么能收缩某一个圆盘却不改变特征值？放大一个圆、缩小其余圆时半径如何按 \(\alpha_i/\alpha_j\) 变化？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="../ch4/4.4-svd.html"><span class="ln-dir">上一章</span><span class="ln-ttl">第 4 章 §4.4 矩阵的奇异值分解</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="5.2-generalized-eigenproblem.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§5.2 广义特征值问题</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

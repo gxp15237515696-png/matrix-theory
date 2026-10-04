@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§4.2 矩阵的 QR 分解 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §4.2：Givens 初等旋转矩阵、Householder 初等反射矩阵、实(复)非奇异矩阵的 QR 正交三角分解（定理 4.6–4.10）、Schmidt 正交化求法、与 Hessenberg 矩阵的正交相似">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§4.2 矩阵的 QR 分解</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="4.2" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 4 章 矩阵分解</a><span class="sep" aria-hidden="true">/</span>
+            <span>§4.2 矩阵的 QR 分解</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 4 章 · 矩阵分解</div>
+            <h1>§4.2 矩阵的 QR 分解</h1>
+            <p class="lede">LU 分解用<strong>三角</strong>消元矩阵，QR 分解改用<strong>正交</strong>矩阵——两类基本工具：Givens <strong>旋转</strong>矩阵（平面转动，\(\det=1\)）与 Householder <strong>反射</strong>矩阵（超平面对称，\(\det=-1\)）。它们都能把任意非零向量旋/反射到坐标轴方向，从而逐列把矩阵化为上三角；由于正交矩阵不放大误差，QR 分解是数值最稳定的分解，也是 QR 算法求特征值、最小二乘求解的基础。本节最后把任意方阵<strong>正交相似</strong>到 Hessenberg 形。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.196–220</strong></span>
+              <span class="chip">建议 <strong>4 学时</strong></span>
+              <span class="chip">定义 <strong>4 个</strong></span>
+              <span class="chip">定理 <strong>10 个</strong></span>
+              <span class="chip">例题 <strong>6 道</strong></span>
+            </div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>写出 Givens 矩阵 \(T_{ij}(c,s)\) 并验证其正交性、\(\det=1\)，用它把向量两坐标化为 \((r,0)\)；</li>
+                  <li>写出 Householder 矩阵 \(H=I-2uu^{\mathrm T}\) 及其五条性质，构造反射方向 \(u=(x-|x|z)/|x-|x|z|\)；</li>
+                  <li>陈述 QR 分解定义与定理 4.6，用 Schmidt 正交化、Givens、Householder 三种方法求 QR；</li>
+                  <li>说明 QR 分解除对角酉因子外唯一；</li>
+                  <li>知道列满秩长方阵的推广（定理 4.7）与 Hessenberg 正交相似（定理 4.11、4.12）。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>Givens / Householder 的构造；</li>
+                      <li>QR 定义与存在性；</li>
+                      <li>Schmidt 法求 QR；</li>
+                      <li>三法的数值特点。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>Householder 中 \(u\) 的归一化与符号；</li>
+                      <li>逐列消元时的嵌入矩阵；</li>
+                      <li>旋转=两个反射之积。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 4 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>Givens 旋转、定理 4.3、例 4.4</td><td class="num">p.196–199</td></tr>
+                    <tr><td class="num">2</td><td>Householder 反射、定理 4.4、例 4.5</td><td class="num">p.199–203</td></tr>
+                    <tr><td class="num">3</td><td>QR 分解定理与三法、例 4.6–4.8</td><td class="num">p.203–215</td></tr>
+                    <tr><td class="num">4</td><td>Hessenberg 正交相似、例 4.9、习题</td><td class="num">p.215–220</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 200" role="img" aria-label="QR 分解脉络图">
+                    <defs><marker id="m42" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="30" y="28" width="180" height="48"/><rect x="250" y="28" width="180" height="48"/><rect x="470" y="28" width="180" height="48"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="120" y="50">Givens 旋转</text><text x="120" y="67" font-size="11" fill="#666">Tᵢⱼ，det=1，正交</text>
+                      <text x="340" y="50">Householder 反射</text><text x="340" y="67" font-size="11" fill="#666">H=I−2uuᵀ，det=−1</text>
+                      <text x="560" y="50">向量 → 坐标轴</text><text x="560" y="67" font-size="11" fill="#666">Tx=|x|e₁</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m42)"><line x1="210" y1="52" x2="248" y2="52"/><line x1="430" y1="52" x2="468" y2="52"/></g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="250" y="126" width="340" height="50"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13.5" text-anchor="middle">
+                      <text x="420" y="148">A = QR</text>
+                      <text x="420" y="167" font-size="11.5" fill="#666">Q 正交（酉）× R 非奇异上三角；除对角酉因子外唯一</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m42)"><path d="M560 80 C530 110 480 118 470 124" stroke-dasharray="4 4"/></g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、Givens 变换 ================= -->
+          <section class="section" id="sec-givens">
+            <h2 class="sec-title"><span class="cn">一</span>Givens 变换与 Householder 变换</h2>
+
+            <h3 class="sub-title" id="givens-matrix">1. Givens 矩阵（初等旋转矩阵）</h3>
+            <p>平面中向量 \(x\) 顺时针旋转 \(\theta\) 的变换为
+              <div class="eq-scroll">\[ y=\begin{pmatrix}\cos\theta&\sin\theta\\-\sin\theta&\cos\theta\end{pmatrix}x=Tx, \]</div>
+              旋转不改变向量的长度，故 \(T\) 正交且 \(\det T=1\)。推广到 \(n\) 维，在坐标平面 \([e_i,e_j]\) 内旋转：</p>
+            <section class="card def" id="def-4-4">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 4.4</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设实数 \(c,s\) 满足 \(c^2+s^2=1\)，称
+                  <div class="eq-scroll">\[
+                  T_{ij}=T_{ij}(c,s)=
+                  \begin{pmatrix}
+                  1&&&&\\&\ddots&&&\\&&c&\cdots&s\\&&\vdots&\ddots&\vdots\\&&-s&\cdots&c\\&&&&\ddots&\\&&&&&1
+                  \end{pmatrix}
+                  \begin{matrix}\\\\(i)\\\\(j)\end{matrix}
+                  \tag{4.2.1}
+                  \]</div>
+                  为 <strong>Givens（初等旋转）矩阵</strong>（仅 \(i,j\) 两行两列处是 \(\begin{pmatrix}c&s\\-s&c\end{pmatrix}\)，其余同单位阵）。</p>
+              </div>
+            </section>
+            <p><strong>性质 1：</strong>\(T_{ij}\) 是正交矩阵：
+              <div class="eq-scroll">\[ [T_{ij}(c,s)]^{-1}=[T_{ij}(c,s)]^{\mathrm T}=T_{ij}(c,-s),\qquad \det T_{ij}=1. \tag{4.2.2} \]</div>
+              <strong>性质 2：</strong>\(y=T_{ij}x\) 只改变第 \(i,j\) 两个分量：
+              <div class="eq-scroll">\[ \eta_i=c\xi_i+s\xi_j,\quad \eta_j=-s\xi_i+c\xi_j,\quad \eta_k=\xi_k\ (k\ne i,j). \tag{4.2.3} \]</div>
+              当 \(\xi_i^2+\xi_j^2\ne0\) 时，选取
+              <div class="eq-scroll">\[ c=\frac{\xi_i}{\sqrt{\xi_i^2+\xi_j^2}},\qquad s=\frac{\xi_j}{\sqrt{\xi_i^2+\xi_j^2}}, \tag{4.2.4} \]</div>
+              便有 \(\eta_i=\sqrt{\xi_i^2+\xi_j^2}&gt;0,\ \eta_j=0\)——一次旋转恰好消去第 \(j\) 个分量。</p>
+
+            <section class="card thm" id="thm-4-3">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 4.3（有限个旋转把向量送上 e₁）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(x\ne0\)，则存在有限个 Givens 矩阵之积 \(T\)，使
+                  <div class="eq-scroll">\[ Tx=|x|\,e_1. \]</div>
+                  依次取 \(T_{12},T_{13},\ldots,T_{1n}\)，每步把下一个非零分量"吸"进第 1 分量并置该分量为 0，最后第 1 分量恰为 \(\sqrt{\sum\xi_i^2}=|x|\)。<strong>推论：</strong>任意非零 \(x\) 与单位向量 \(z\)，都存在有限个旋转之积 \(T\) 使 \(Tx=|x|\,z\)。</p>
+              </div>
+            </section>
+            <section class="card ex" id="exm-4-4">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 4.4</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">\(x=(3,4,5)^{\mathrm T}\)：先 \(T_{12}\)（\(c=3/5,s=4/5\)）得 \((5,0,5)^{\mathrm T}\)，再 \(T_{13}\)（\(c=s=1/\sqrt2\)）得 \((5\sqrt2,0,0)^{\mathrm T}=|x|e_1\)，其中 \(|x|=5\sqrt2\)。</p>
+              </div>
+            </section>
+          </section>
+          <!-- ================= 二、Householder 变换 ================= -->
+          <section class="section" id="sec-householder">
+            <h2 class="sec-title"><span class="cn">二</span>Householder 变换（初等反射）</h2>
+            <p>在 \(\R^2\) 中，把向量 \(x\) 关于"与单位向量 \(u\) 正交的直线（\(n-1\) 维超平面）"反射为 \(y\)：
+              <div class="eq-scroll">\[ y=x-2u(u^{\mathrm T}x)=(I-2uu^{\mathrm T})x=Hx. \]</div>
+            </p>
+            <section class="card def" id="def-4-5">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 4.5</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设单位列向量 \(u\in\R^n\)（\(u^{\mathrm T}u=1\)），称
+                  <div class="eq-scroll">\[ H=I-2uu^{\mathrm T} \tag{4.2.5} \]</div>
+                  为 <strong>Householder（初等反射）矩阵</strong>。</p>
+              </div>
+            </section>
+            <p>Householder 矩阵有五条性质：
+              <div class="eq-scroll">\[
+              \text{(1) }H^{\mathrm T}=H\ (\text{对称}),\qquad
+              \text{(2) }H^{\mathrm T}H=I\ (\text{正交}),
+              \]</div>
+              <div class="eq-scroll">\[
+              \text{(3) }H^2=I\ (\text{对合}),\qquad
+              \text{(4) }H^{-1}=H\ (\text{自逆}),\qquad
+              \text{(5) }\det H=-1.
+              \]</div>
+              前四条直接由定义验证；\(\det H=-1\) 是因为反射改变定向（二维原型即 \(\begin{pmatrix}1&0\\0&-1\end{pmatrix}\)）。</p>
+            <section class="card thm" id="thm-4-4">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 4.4（一次反射把 x 映到 |x|z）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">任给非零列向量 \(x\in\R^n\) 与单位列向量 \(z\in\R^n\)（\(n&gt;1\)），存在 Householder 矩阵 \(H\) 使
+                  <div class="eq-scroll">\[ Hx=|x|\,z. \]</div>
+                  当 \(x=|x|z\) 时任取与 \(x\) 正交的单位向量 \(u\) 即可；否则取
+                  <div class="eq-scroll">\[ u=\frac{x-|x|\,z}{|x-|x|\,z|}. \tag{4.2.6} \]</div>
+                  代入 \(H=I-2uu^{\mathrm T}\)，利用恒等式 \(|x-|x|z|^2=2(x-|x|z,x)\) 即得。</p>
+              </div>
+            </section>
+            <section class="card ex" id="exm-4-5">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 4.5</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">\(x=(1,2,2)^{\mathrm T}\)，\(|x|=3\)，\(x-3e_1=2(-1,1,1)^{\mathrm T}\)，取 \(u=\frac1{\sqrt3}(-1,1,1)^{\mathrm T}\)，则
+                  <div class="eq-scroll">\[ H=I-\frac23\begin{pmatrix}1&-1&-1\\-1&1&1\\-1&1&1\end{pmatrix}
+                     =\frac13\begin{pmatrix}1&2&2\\2&1&-2\\2&-2&1\end{pmatrix},\qquad Hx=3e_1. \]</div></p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-4-5">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 4.5：旋转 = 两个反射之积</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">Givens 初等旋转矩阵是两个 Householder 初等反射矩阵的乘积：取两个相差 \(\theta/2\) 角的单位法向量 \(u,v\)，直接计算 \(H_vH_u=T_{ij}\)。但反射<strong>不能</strong>由旋转之积表示，因为 \(\det H=-1\) 而 \(\det T_{ij}=1\)（旋转矩阵乘积的行列式恒为 1）。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 三、QR 分解 ================= -->
+          <section class="section" id="sec-qr">
+            <h2 class="sec-title"><span class="cn">三</span>矩阵的 QR（正交三角）分解</h2>
+            <section class="card def" id="def-4-6">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 4.6</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">实（复）非奇异矩阵 \(A\) 若能化成<strong>正交（酉）矩阵 \(Q\)</strong> 与<strong>非奇异上三角矩阵 \(R\)</strong> 之积
+                  <div class="eq-scroll">\[ A=QR, \tag{4.2.7} \]</div>
+                  则称 (4.2.7) 为 \(A\) 的 <strong>QR 分解</strong>。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-4-6">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></span>
+                <span class="card-label">定理 4.6（存在性与唯一性）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">任何 \(n\) 阶实（复）非奇异矩阵都存在 QR 分解；且<strong>除去一个对角元绝对值（模）全为 1 的对角因子外，分解唯一</strong>。</p>
+                <details class="proof">
+                  <summary><span>证明（Schmidt 正交化构造，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>非奇异 ⇒ \(n\) 个列向量 \(a_1,\ldots,a_n\) 线性无关。Schmidt 正交化得正交组 \(b_1,\ldots,b_n\)：
+                      \[ b_1=a_1,\ b_j=a_j-\sum_{i&lt;j}k_{ij}b_i,\quad k_{ij}=\frac{(a_j,b_i)}{(b_i,b_i)}, \]</p>
+                    <p>反解 \(a_j\) 并单位化 \(q_i=b_i/|b_i|\)，写成矩阵
+                      \[ A=(a_1,\ldots,a_n)=(q_1,\ldots,q_n)R=QR, \]</p>
+                    <p>其中 \(Q\) 的列标准正交（\(Q^{\mathrm T}Q=I\)），\(R\) 是对角元为 \(|b_i|&gt;0\) 的上三角阵。唯一性：若 \(QR=Q_1R_1\)，则 \(D=R_1R^{-1}=Q_1^{\mathrm T}Q\) 既上三角又正交，故 \(D\) 是对角元绝对值为 1 的对角阵，从而 \(R_1=DR,\ Q_1=QD^{-1}\)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="three-methods">三种求法对比</h3>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>方法</th><th>做法</th><th>特点</th></tr>
+                <tr><td><strong>Schmidt 正交化</strong></td><td>对 \(A\) 的列正交化、单位化，系数直接进 \(R\)</td><td>手算小规模最直接；数值上易失正交</td></tr>
+                <tr><td><strong>Givens 旋转</strong>（定理 4.8）</td><td>逐列用 \(T_{12},T_{13},\ldots\) 把次对角以下旋成 0，共有限个旋转之积 \(T\)，\(TA=R,\ Q=T^{\mathrm T}\)</td><td>每次只动两行/两列；适合稀疏矩阵、只需消个别元</td></tr>
+                <tr><td><strong>Householder 反射</strong>（定理 4.10）</td><td>每列用一个 \(H_k\) 一次把该列主元以下全部清零，\(SA=R,\ Q=S^{\mathrm T}\)</td><td>只需 \(n-1\) 个正交矩阵；稠密矩阵的标准算法，向量并行性好</td></tr>
+              </table>
+            </div>
+            <section class="card ex" id="exm-4-6">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 4.6（Schmidt 法）</span>
+              </header>
+              <div class="card-body">
+                <p>\(A=\begin{pmatrix}1&2&2\\2&1&2\\1&2&1\end{pmatrix}\)：三列为 \(a_1=(1,2,1)^{\mathrm T},a_2=(2,1,2)^{\mathrm T},a_3=(2,2,1)^{\mathrm T}\)。正交化
+                  \[ b_1=a_1,\ b_2=a_2-b_1=(1,-1,1)^{\mathrm T},\ b_3=a_3-\tfrac13b_2-\tfrac76b_1=\big(\tfrac12,0,-\tfrac12\big)^{\mathrm T}, \]</p>
+                  <p>单位化后
+                  \[ Q=\begin{pmatrix}
+                  1/\sqrt6&1/\sqrt3&1/\sqrt2\\
+                  2/\sqrt6&-1/\sqrt3&0\\
+                  1/\sqrt6&1/\sqrt3&-1/\sqrt2
+                  \end{pmatrix},\qquad
+                  R=\begin{pmatrix}\sqrt6&\sqrt6&7/\sqrt6\\&\sqrt3&1/\sqrt3\\&&1/\sqrt2\end{pmatrix},\quad A=QR. \]</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-4-8">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 4.8（用初等旋转变换求 QR）</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A\) 是 \(n\) 阶实非奇异矩阵，则存在有限个初等旋转矩阵之积 \(T\)，使 \(TA\) 为上三角矩阵；把最后得到的上三角矩阵记为 \(R\)，则</p>
+                <div class="eq-scroll">\[ A=QR,\qquad Q=T^{-1}=T^{\mathrm T}\ \text{为正交矩阵}. \]</div>
+                <p style="margin-bottom:0">证法与定理 4.6 的构造相同：第 1 步对 \(A\) 的首列 \(b^{(1)}\) 取 \(T_1\) 使 \(T_1b^{(1)}=|b^{(1)}|e_1\)，再对右下角 \(n-1\) 阶块重复，共 \(n-1\) 步。该定理可推广到复矩阵（见定理 4.9）。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-4-9">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 4.9（复情形：行列式为 1 的复初等旋转）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">任意矩阵都可以通过左连乘以若干个<strong>行列式值为 1 的复初等旋转矩阵</strong>化为上三角矩阵，且其对角线元素除最后一个外都是正的。复初等旋转矩阵（教材式 4.2.9）形如</p>
+                <div class="eq-scroll">\[ U_{ik}=\begin{pmatrix}1&&&&\\&\ddots&&&\\&&ce^{\mathrm j\theta_1}&&se^{\mathrm j\theta_2}\\&&&\ddots&\\&&-se^{-\mathrm j\theta_2}&&ce^{-\mathrm j\theta_1}\\&&&&&\ddots\\&&&&&&1\end{pmatrix}\quad(i&lt;k), \tag{4.2.9} \]</div>
+                <p>其中 \(c=\cos\theta&gt;0\)，\(s=\sin\theta&gt;0\)，且 \(\theta_1+\theta_4=\theta_2+\theta_3\)（酉性条件）；\(\det U_{ik}=e^{\mathrm j(\theta_1+\theta_4)}\)，取 \(\theta_3=-\theta_2\)（即 \(\theta_4=-\theta_1\)，教材取 \(n=0\)）时 \(\det U_{ik}=1\)，且 \(U_{ik}^{\mathrm H}U_{ik}=I\) 即 \(U_{ik}\) 是酉矩阵。给定两个不同时为零的复数 \(\alpha,\beta\)，总可选取</p>
+                <div class="eq-scroll">\[ c=\frac{|\alpha|}{\sqrt{|\alpha|^2+|\beta|^2}},\quad s=\frac{|\beta|}{\sqrt{|\alpha|^2+|\beta|^2}},\quad \theta_1=-\arg\alpha,\quad \theta_2=-\arg\beta \tag{4.2.10} \]</div>
+                <p style="margin-bottom:0">把 \((\alpha,\beta)^{\mathrm T}\) 化为 \((|\,|,0)^{\mathrm T}\) 型。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-4-10">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 4.10（Householder 方法求 QR）</span>
+              </header>
+              <div class="card-body">
+                <p>任何实非奇异矩阵 \(A=(a_{ij})_{n\times n}\) 都可通过左连乘 Householder 矩阵化为非奇异上三角矩阵，即 \(A=QR\)，其中 \(Q=S^{\mathrm T}=S^{-1}\) 为正交矩阵。</p>
+                <p style="margin-bottom:0"><strong>证明思路：</strong>由 \(\det A\ne0\)，第 1 步对首列 \(b^{(1)}=(a_{11},a_{21},\ldots,a_{n1})^{\mathrm T}\ne0\) 用定理 4.4 取 Householder 阵 \(H_1\) 使 \(H_1b^{(1)}=|b^{(1)}|e_1\)；第 2 步对 \(A^{(1)}\) 的首列 \(b^{(2)}=(a_{22}^{(1)},\ldots,a_{n2}^{(1)})^{\mathrm T}\ne0\) 取 \(H_2\)（作用在右下角 \(n-1\) 阶块上）；如此进行 \(n-1\) 步，令</p>
+                <div class="eq-scroll">\[ S=\begin{pmatrix}I_{n-2}&O\\O&H_{n-1}\end{pmatrix}\cdots\begin{pmatrix}I_2&O\\O&H_3\end{pmatrix}\begin{pmatrix}1&O\\O&H_2\end{pmatrix}H_1, \]</div>
+                <p style="margin-bottom:0">则 \(S\) 是有限个 Householder 矩阵之积（因嵌入的 \(\begin{pmatrix}I_l&O\\O&H_u\end{pmatrix}=I_n-2vv^{\mathrm T}\) 仍是 Householder 阵），且 \(SA\) 为上三角阵。</p>
+              </div>
+            </section>
+            <section class="card ex" id="exm-4-7-8">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 4.7 / 4.8（Givens / Householder）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0"><strong>例 4.7</strong> 对 \(A=\begin{pmatrix}0&1&1\\1&1&0\\1&0&1\end{pmatrix}\) 依次构造 \(T_{12},T_{13}\) 把首列 \((0,1,1)^{\mathrm T}\) 旋为 \((\sqrt2,0,0)^{\mathrm T}\)，再对右下角 2×2 块旋转，最终
+                  \[ Q=\begin{pmatrix}0&2/\sqrt6&-1/\sqrt3\\1/\sqrt2&1/\sqrt6&1/\sqrt3\\1/\sqrt2&-1/\sqrt6&-1/\sqrt3\end{pmatrix},\quad
+                     R=\begin{pmatrix}\sqrt2&1/\sqrt2&1/\sqrt2\\&3/\sqrt6&1/\sqrt6\\&&-2/\sqrt3\end{pmatrix}. \]</p>
+                <p><strong>例 4.8</strong> 对 \(A=\begin{pmatrix}3&14&9\\6&43&3\\6&22&15\end{pmatrix}\)，首列 \(b^{(1)}=(3,6,6)^{\mathrm T}\)，\(|b^{(1)}|=9\)，取 \(u=\frac1{\sqrt3}(-1,1,1)^{\mathrm T}\) 得 \(H_1\)；再对 \(A^{(1)}\) 首列 \((9,-12)^{\mathrm T}\) 取 \(H_2=\frac15\begin{pmatrix}3&-4\\-4&-3\end{pmatrix}\)，最终
+                  \[ Q=\frac1{15}\begin{pmatrix}5&-2&-14\\10&11&2\\10&-10&5\end{pmatrix},\quad
+                     R=\begin{pmatrix}9&48&15\\&15&-9\\&&-3\end{pmatrix}. \]</p>
+              </div>
+            </section>
+            <section class="card thm cor" id="thm-4-7">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2 12h20M12 2v20"/></svg></span>
+                <span class="card-label">定理 4.7（列满秩长方阵的推广）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">若 \(A\in\R^{m\times n}\)（\(m\ge n\)）的 \(n\) 个列线性无关，则有
+                  <div class="eq-scroll">\[ A=QR,\qquad Q^{\mathrm T}Q=I_n, \]</div>
+                  其中 \(Q\) 是 \(m\times n\) <strong>列标准正交</strong>矩阵，\(R\) 是 \(n\) 阶非奇异上三角阵。这是最小二乘"正规方程正交化求解"的依据：\(Rx=Q^{\mathrm T}b\)。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="qr-lab-title">动手实验：Schmidt 法 QR 分解器</h3>
+            <p>改 3×3 矩阵，实时对三列做 Gram–Schmidt 正交化，给出 \(Q,R\)，并双重验证 \(QR=A\) 与 \(Q^{\mathrm T}Q=I\)。切换到例 4.6 可与教材结果对照。</p>
+            <section class="card lab" data-qr-lab></section>
+          </section>
+
+          <!-- ================= 四、Hessenberg 正交相似 ================= -->
+          <section class="section" id="sec-hessenberg">
+            <h2 class="sec-title"><span class="cn">四</span>矩阵与 Hessenberg 矩阵的正交相似</h2>
+            <section class="card def" id="def-4-7">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 4.7：Hessenberg 矩阵</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">若 \(a_{ij}=0\ (i&gt;j+1)\)，即<strong>次对角线以下全为零</strong>，称<strong>上 Hessenberg 矩阵</strong>（教材式 (4.2.11)，图示如下）；若 \(a_{ij}=0\ (j&gt;i+1)\) 称下 Hessenberg（图示为教材 (4.2.12)，与上者互为转置）。两者兼具者为<strong>三对角矩阵</strong>：
+                  <div class="eq-scroll">\[
+                  \begin{pmatrix}
+                  a_{11}&a_{12}&a_{13}&\cdots&a_{1n}\\
+                  a_{21}&a_{22}&a_{23}&\cdots&a_{2n}\\
+                  &a_{32}&a_{33}&\ddots&\vdots\\
+                  &&\ddots&\ddots&a_{n-1,n}\\
+                  &&&a_{n,n-1}&a_{nn}
+                  \end{pmatrix}. \tag{4.2.11}
+                  \]</div></p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-4-11">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 4.11（用初等旋转正交相似于 Hessenberg 矩阵）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">任何实方阵 \(A\) 都可通过有限个初等旋转变换<strong>正交相似</strong>于上 Hessenberg 矩阵：存在正交阵 \(Q\) 使 \(QAQ^{\mathrm T}=H\)。<strong>证明思路：</strong>逐列处理——第 1 步取 \(T_1\) 使 \(T_1b^{(1)}=|b^{(1)}|e_1\)（\(b^{(1)}\) 为 \(A\) 第 1 列的后 \(n-1\) 个元素），令 \(Q_1=\begin{pmatrix}1&O\\O&T_1\end{pmatrix}\)，则 \(Q_1AQ_1^{\mathrm T}\) 的第 1 列次对角以下全为零（左右同时乘正交阵保证相似）；对右下角 \(n-1\) 阶块重复，共 \(n-2\) 步。</p>
+              </div>
+            </section>
+            <section class="card thm" id="thm-4-12">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 4.12（用初等反射正交相似于 Hessenberg 矩阵）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">任何实方阵 \(A\) 也可通过初等反射正交相似于上 Hessenberg 矩阵（用 \(n-2\) 个 Householder 矩阵，做法同定理 4.11 但每步用 \(H_k\) 而非 \(T_k\)）。<strong>推论：实对称矩阵可正交相似于对称三对角矩阵</strong>——这是 QR 算法求特征值前的标准"压缩"步骤，把迭代量从 \(O(n^3)\) 大幅降低。</p>
+              </div>
+            </section>
+            <section class="card ex" id="exm-4-9">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 4.9</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">用 Householder 变换把对称矩阵 \(A=\begin{pmatrix}1&0&1\\0&1&2\\1&2&1\end{pmatrix}\) 正交相似于三对角矩阵。首列后 \(n-1=2\) 个元为 \((0,1)^{\mathrm T}\)，取 \(u=\frac1{\sqrt2}(-1,1)^{\mathrm T}\)，\(H_1=\begin{pmatrix}0&1\\1&0\end{pmatrix}\)，令 \(Q=\diag(1,H_1)=\begin{pmatrix}1&0&0\\0&0&1\\0&1&0\end{pmatrix}\)，得
+                  <div class="eq-scroll">\[ QAQ^{\mathrm T}=\begin{pmatrix}1&1&0\\1&1&2\\0&2&1\end{pmatrix}, \]</div>
+                  确为对称三对角矩阵。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 习题 4.2 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 4.2（共 9 题）</h2>
+            <div class="ex-toolbar">
+              <span data-fold-tools="details.solution">
+                <button type="button" data-fold="open">全部展开解答</button>
+                <button type="button" data-fold="close">全部收起</button>
+              </span>
+            </div>
+
+            <article class="card task" id="ex42-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">Schmidt QR</span></header>
+              <div class="card-body">
+                <p>用 Schmidt 正交化求 \(A=\begin{pmatrix}0&1&1\\1&1&0\\1&0&1\end{pmatrix}\) 的 QR 分解。</p>
+                <details class="solution"><summary><span>解法提示</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>三列 \(a_1=(0,1,1)^{\mathrm T},a_2=(1,1,0)^{\mathrm T},a_3=(1,0,1)^{\mathrm T}\) 模均为 \(\sqrt2\)，两两内积为 1。正交化：\(b_1=a_1\)，\(b_2=a_2-\frac12b_1=(1,\frac12,-\frac12)^{\mathrm T}\)，\(b_3=a_3-\frac12b_1-\frac13b_2=(\frac23,-\frac23,\frac23)^{\mathrm T}\)。单位化排成 \(Q\)，各列模与投影系数排成上三角 \(R\)（可与例 4.7 的 Givens 结果对照，二者只差一个对角符号因子——这正是唯一性中"对角酉因子"的体现）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex42-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag tag-mid">Givens 化向量</span></header>
+              <div class="card-body">
+                <p>用 Givens 变换将 \(x=(2,3,0,5)^{\mathrm T}\) 变换为与 \(e_1\) 同方向。</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>第 3 分量已是 0 不必动。先 \(T_{12}\)：\(c=2/\sqrt{13},s=3/\sqrt{13}\)，把前两分量化为 \((\sqrt{13},0)\)；再 \(T_{14}\)：当前第 1、4 分量为 \(\sqrt{13},5\)，取 \(c=\sqrt{13}/\sqrt{38},s=5/\sqrt{38}\)，最终 \(Tx=(\sqrt{38},0,0,0)^{\mathrm T}=|x|e_1\)（\(|x|=\sqrt{4+9+25}=\sqrt{38}\)）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex42-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag">二维反射</span></header>
+              <div class="card-body">
+                <p>写出 \(\R^2\) 中向量 \(x\) 关于 \(e_1\) 正交的轴（即 \(e_2\) 轴）的反射变换。</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>反射轴为 \(e_2\) 轴，其法向单位向量 \(u=e_1=(1,0)^{\mathrm T}\)，故
+                    \[ H=I-2e_1e_1^{\mathrm T}=\begin{pmatrix}-1&0\\0&1\end{pmatrix}, \]</p>
+                    <p>即 \((\xi_1,\xi_2)^{\mathrm T}\mapsto(-\xi_1,\xi_2)^{\mathrm T}\)（关于纵轴反射）。若题意是关于 \(e_1\) 轴（横轴）反射，则取 \(u=e_2\)，\(H=\begin{pmatrix}1&0\\0&-1\end{pmatrix}\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex42-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag tag-mid">反射正交条件</span></header>
+              <div class="card-body">
+                <p>设变换 \(Hx=x-a(x,w)w\)（\(w\) 为欧氏长度 1 的向量），问 \(a\) 取何值时 \(H\) 是正交矩阵？</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(H=I-aww^{\mathrm T}\)。要求 \(H^{\mathrm T}H=I\)：
+                    \[ I-2a\,ww^{\mathrm T}+a^2w(w^{\mathrm T}w)w^{\mathrm T}=I, \]</p>
+                    <p>因 \(w^{\mathrm T}w=1\)，得 \((-2a+a^2)ww^{\mathrm T}=O\)。矩阵 \(ww^{\mathrm T}\ne O\)，故 \(a(a-2)=0\)，即 <strong>\(a=0\)（恒等，平凡）或 \(a=2\)</strong>。非平凡反射正是 \(a=2\) 的 Householder 矩阵 \(I-2ww^{\mathrm T}\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex42-5">
+              <header class="card-head"><span class="card-label">第 5 题</span><span class="tag tag-hard">保留两分量的正交阵</span></header>
+              <div class="card-body">
+                <p>已知 \(x=(\xi_1,\ldots,\xi_n)^{\mathrm T}\in\R^n\) 且 \(x-\xi_1e_1-\xi_2e_2\ne0\)，证明存在正交矩阵 \(Q\)（初等旋转之积），使 \(Qx=(\xi_1,c_2,0,\ldots,0)^{\mathrm T}\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>保持第 1 分量不动，只在坐标平面 \([e_2,e_j]\)（\(j=3,\ldots,n\)）内旋转：依次取 \(T_{23},T_{24},\ldots,T_{2n}\)，每次把第 \(j\) 个非零分量并入第 2 分量并置第 \(j\) 分量为 0（定理 4.3 作用在后 \(n-1\) 维子空间）。各旋转矩阵均正交，其积 \(Q\) 正交；全程不动 \(\xi_1\)，最后第 2 分量为 \(c_2=\sqrt{\xi_2^2+\cdots+\xi_n^2}\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex42-6">
+              <header class="card-head"><span class="card-label">第 6 题</span><span class="tag">保留首分量的反射</span></header>
+              <div class="card-body">
+                <p>已知 \(x=(\xi_1,\ldots,\xi_n)^{\mathrm T}\)，求初等反射矩阵 \(H\)，使 \(Hx=(\xi_1,\eta_2,0,\ldots,0)^{\mathrm T}\)。</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>令后 \(n-1\) 维向量 \(\tilde x=(\xi_2,\ldots,\xi_n)^{\mathrm T}\)，\(\rho=|\tilde x|=\sqrt{\xi_2^2+\cdots+\xi_n^2}\)，目标方向 \(\tilde z=e_1\in\R^{n-1}\)。由定理 4.4 取
+                    \[ \tilde u=\frac{\tilde x-\rho e_1}{|\tilde x-\rho e_1|},\quad
+                       \tilde H=I_{n-1}-2\tilde u\tilde u^{\mathrm T}, \]</p>
+                    <p>则 \(\tilde H\tilde x=(\rho,0,\ldots,0)^{\mathrm T}\)。取嵌入的块对角反射
+                    \[ H=\begin{pmatrix}1&0\\0&\tilde H\end{pmatrix}, \]</p>
+                    <p>即得 \(Hx=(\xi_1,\rho,0,\ldots,0)^{\mathrm T}\)，且 \(H\) 仍是对称正交的 Householder 矩阵。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex42-7">
+              <header class="card-head"><span class="card-label">第 7 题</span><span class="tag">Givens QR</span></header>
+              <div class="card-body">
+                <p>用 Givens 变换求 \(A=\begin{pmatrix}2&2&1\\0&2&2\\2&1&2\end{pmatrix}\) 的 QR 分解。</p>
+                <details class="solution"><summary><span>解法提示</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>首列 \((2,0,2)^{\mathrm T}\)：第 2 分量为 0，只需 \(T_{13}\)（\(c=s=1/\sqrt2\)）把它化为 \((2\sqrt2,0,0)^{\mathrm T}\)；再对所得矩阵右下角 2×2 块的首列做一次 \(T_{12}\)（嵌入到 2,3 行）消元。累积旋转 \(T=T_2T_1\)，则 \(R=TA,\ Q=T^{\mathrm T}\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex42-8">
+              <header class="card-head"><span class="card-label">第 8 题</span><span class="tag">Householder QR</span></header>
+              <div class="card-body">
+                <p>用 Householder 变换求 \(A=\begin{pmatrix}0&4&1\\1&1&1\\0&3&2\end{pmatrix}\) 的 QR 分解。</p>
+                <details class="solution"><summary><span>解法提示</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>首列 \((0,1,0)^{\mathrm T}\)，\(|b^{(1)}|=1\)，按式 (4.2.6) 构造 \(H_1\) 一次消去后两元；再对 \(A^{(1)}\) 右下角 2×2 块构造 \(H_2\)，令 \(S=\diag(1,H_2)H_1\)，则 \(R=SA,\ Q=S^{\mathrm T}\)。计算时注意 \(u\) 的符号——定理 4.4 中取 \(x-|x|e_1\) 可避免数值相消。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex42-9">
+              <header class="card-head"><span class="card-label">第 9 题</span><span class="tag tag-hard">三对角化</span></header>
+              <div class="card-body">
+                <p>用 Householder 变换把
+                  \[ A=\begin{pmatrix}0&12&16\\12&288&309\\16&309&312\end{pmatrix} \]
+                  正交相似于三对角矩阵。</p>
+                <details class="solution"><summary><span>解法提示</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>首列后两元为 \((12,16)^{\mathrm T}\)，模为 20。对该 2 维向量构造 2 阶 Householder 矩阵将其映为 \((20,0)^{\mathrm T}\)，再嵌入 \(H=\diag(1,\widetilde H)\)，计算 \(HAH^{\mathrm T}\)。因 \(A\) 对称且 \(H\) 正交对称，结果自动对称，且次对角以下清零，故必为对称三对角矩阵（参例 4.9 的步骤）。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 本节小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结与自检</h2>
+            <div class="summary-block">
+              <p>QR 分解用<strong>正交变换</strong>代替 LU 的三角变换，数值稳定且几何意义清晰：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>工具</th><th>矩阵</th><th>性质</th></tr>
+                  <tr><td>Givens 旋转</td><td>\(T_{ij}(c,s)\)，\(c^2+s^2=1\)</td><td>正交、\(\det=1\)；消一个分量；定理 4.3</td></tr>
+                  <tr><td>Householder 反射</td><td>\(H=I-2uu^{\mathrm T}\)，\(|u|=1\)</td><td>对称、正交、对合、自逆、\(\det=-1\)；定理 4.4</td></tr>
+                  <tr><td>QR 分解</td><td>\(A=QR\)，\(Q\) 正交、\(R\) 上三角非奇异</td><td>总存在；除对角酉因子外唯一（定理 4.6）；列满秩长方矩阵也成立（4.7）</td></tr>
+                  <tr><td>三法</td><td>Schmidt / Givens / Householder</td><td>分别适合手算、稀疏消元、稠密标准算法</td></tr>
+                  <tr><td>Hessenberg</td><td>\(QAQ^{\mathrm T}=H\)，次对角以下为零</td><td>任意方阵可正交相似到上 Hessenberg；对称阵→三对角</td></tr>
+                </table>
+              </div>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>给定向量 \(x\) 与目标方向 \(z\)，Householder 法向量 \(u\) 为什么取 \(x-|x|z\) 而不是 \(x+|x|z\)？数值计算中这与"避免相消"有什么关系？</li>
+                  <li>QR 分解的唯一性为什么只能到"对角元绝对值为 1 的对角因子"？试从 \(Q^{\mathrm T}Q_1=RR_1^{-1}\) 既正交又三角出发说明。</li>
+                  <li>正交相似化 Hessenberg 时为什么要<strong>左右同时</strong>乘（\(QAQ^{\mathrm T}\)）而 QR 分解只左乘（\(QA=R\)）？两者的目标有何不同？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="4.1-lu-decomposition.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§4.1 Gauss 消去法与矩阵的三角分解</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="4.3-full-rank-decomposition.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§4.3 矩阵的满秩分解</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

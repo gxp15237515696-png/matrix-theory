@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§6.5 约束广义逆和加权广义逆（选学） · 矩阵论</title>
+  <meta name="description" content="矩阵论 §6.5（选学）：约束方程组 Ax=b(x∈S)、引理9、S-约束广义逆（定义6.8）、定理6.35–6.38、例6.11；加权范数 αᴴNα、Cholesky 变换、加权{1,3}/{1,4}-逆（定理6.39–6.40）、加权 Moore-Penrose 逆 A_{MN}⁺（定理6.41）及其 Cholesky/Zlobec 表达式">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§6.5 约束广义逆和加权广义逆（选学）</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="6.5" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 6 章 广义逆矩阵</a><span class="sep" aria-hidden="true">/</span>
+            <span>§6.5 约束广义逆和加权广义逆（选学）</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 6 章 · 两个推广方向（选学）</div>
+            <h1>§6.5 约束广义逆和加权广义逆</h1>
+            <p class="lede">Penrose 广义逆建立在欧氏范数与无约束求解之上。本节沿两个方向推广：① 解被限制在子空间 \(S\) 中（<strong>约束广义逆</strong>）——核心一招是引理 9，把约束问题化为增广矩阵 \(AP_S\) 的普通问题；② 用正定矩阵 \(M,N\) 定义<strong>椭圆（加权）范数</strong> \(\|x\|_N^2=x^{\mathrm H}Nx\)（<strong>加权广义逆</strong>）——核心一招是 Cholesky 变换，把加权问题变回欧氏问题。两种推广都不引入真正的新困难。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.346–352</strong></span>
+              <span class="chip">建议 <strong>2 学时</strong></span>
+              <span class="chip">定义 <strong>1 个（6.8）</strong></span>
+              <span class="chip">定理 <strong>4.35–6.41（7 个）</strong></span>
+              <span class="chip">引理 / 例题 <strong>引理 9 / 例 6.11</strong></span>
+
+              <span class="chip">引理 <strong>1 个</strong></span>
+              <span class="chip">例题 <strong>1 道</strong></span></div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>用引理 9 把约束方程 \(Ax=b\ (x\in S)\) 化为 \(AP_Sz=b\)，写出相容判据与通解；</li>
+                  <li>陈述定义 6.8（S-约束 \(\{i,j,\cdots,l\}\)-逆）与定理 6.35–6.38；</li>
+                  <li>用例 6.11 的步骤计算 S-约束 Moore–Penrose 逆；</li>
+                  <li>写出加权范数 \(\|x\|_N\) 与 Cholesky 变换 (6.5.8)，验证 (6.5.9)(6.5.10)；</li>
+                  <li>写出加权 \(\{1,3\}\)/\(\{1,4\}\)-逆与加权 MP 逆 \(A_{MN}^+\) 的四方程 (6.5.16)，会用习题 5/6 的公式计算。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>引理 9 与 S-约束逆；</li>
+                      <li>Cholesky 去权变换；</li>
+                      <li>加权 MP 四方程。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>\(x=P_Sz\) 与自由变量 \(z\in S\)；</li>
+                      <li>权矩阵在方程中的位置（左 \(M\) 右 \(N\)）；</li>
+                      <li>习题 6 的 Zlobec 夹心形。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 2 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>约束广义逆：引理 9、定义 6.8、定理 6.35–6.38、例 6.11</td><td class="num">p.346–348</td></tr>
+                    <tr><td class="num">2</td><td>加权范数、Cholesky 变换、定理 6.39–6.41、实验与习题</td><td class="num">p.348–352</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 200" role="img" aria-label="约束与加权广义逆脉络图">
+                    <defs><marker id="m65" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b"><rect x="30" y="24" width="230" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="145" y="46">约束 Ax=b (x∈S)</text><text x="145" y="64" font-size="11" fill="#666">引理9：化为 AP_S z=b</text>
+                    </g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="320" y="24" width="200" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="420" y="46">S-约束逆 P_S(AP_S)^(...)</text><text x="420" y="64" font-size="11" fill="#666">定义6.8，定理6.35–6.38</text>
+                    </g>
+                    <g class="fm-node" fill="#f4f0e2" stroke="#a06a17"><rect x="580" y="24" width="230" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="695" y="46">加权范数 ‖x‖_N，‖r‖_M</text><text x="695" y="64" font-size="11" fill="#666">Cholesky 去权变换 (6.5.8)</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m65)"><line x1="260" y1="50" x2="318" y2="50"/><line x1="520" y1="50" x2="578" y2="50"/></g>
+                    <g class="fm-edge" marker-end="url(#m65)"><line x1="695" y1="76" x2="695" y2="116"/></g>
+                    <g class="fm-node" fill="#eef7f0" stroke="#3d7a4e"><rect x="470" y="118" width="340" height="54"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="640" y="140">加权 MP 逆 A_{MN}⁺ 与加权四方程 (6.5.16)</text><text x="640" y="158" font-size="11" fill="#666">G_N⁻¹(G_M A G_N⁻¹)⁺G_M；Zlobec 夹心形（习题6）</text>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、约束广义逆 ================= -->
+          <section class="section" id="sec-constrained">
+            <h2 class="sec-title"><span class="cn">一</span>约束广义逆</h2>
+            <p>前面的广义逆都对应"无约束"的方程组。若解被限制在子空间中：</p>
+            <div class="eq-scroll">\[ Ax=b\qquad(x\in S), \tag{6.5.1} \]</div>
+            <p>其中 \(A\in\C^{m\times n},\ b\in\C^m\)，\(S\) 是 \(\C^n\) 的子空间。处理方法有两种：一是升阶为无约束方程组 \(\begin{pmatrix}A\\P_{S^\perp}\end{pmatrix}x=\begin{pmatrix}b\\0\end{pmatrix}\)（习题 1）；二是<strong>不增加阶数</strong>、在原问题上附加约束——原方程组阶数很高时更可取。先给出关键引理。</p>
+
+            <section class="card thm" id="lem-6-9">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 3v18"/><path d="M5 8l7-5 7 5"/><path d="M5 16l7 5 7-5"/></svg></span>
+                <span class="card-label">引理 9：约束问题化为 AP_S 的普通问题</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">约束方程组 (6.5.1) 相容的充要条件是方程组</p>
+                <div class="eq-scroll">\[ AP_Sz=b \tag{6.5.2} \]</div>
+                <p style="margin-bottom:0">相容；当 (6.5.1) 相容时，\(x\) 是它的解的充要条件是</p>
+                <div class="eq-scroll">\[ x=P_Sz, \tag{6.5.3} \]</div>
+                <p style="margin-bottom:0">其中 \(z\) 是 (6.5.2) 的解。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">若 (6.5.1) 相容且 \(x\in S\) 是解，则 \(x=P_Sx\)（正交投影在 \(S\) 上不动），取 \(z=x\) 即得 \(AP_Sz=b\)。反之，若 (6.5.2) 相容且 \(z\) 是解，令 \(x=P_Sz\)，则 \(x\in S\) 且 \(Ax=AP_Sz=b\)，即 \(x\) 是约束问题的解。两种"相容"由此等价。</p>
+                </details>
+                <p style="margin-top:8px;margin-bottom:0">由 §6.4 的通解公式，约束问题的通解立得（\(y\in\C^n\) 任意）：</p>
+                <div class="eq-scroll">\[
+                x=P_S(AP_S)^{(1)}b+P_S\big(I-(AP_S)^{(1)}AP_S\big)y.
+                \]</div>
+                <p style="margin-bottom:0">可见 \(P_S(AP_S)^{(1)}\) 在约束问题中扮演的角色，正是 \(A^{(1)}\) 在无约束问题中的角色。</p>
+              </div>
+            </section>
+
+            <section class="card def" id="def-6-8">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 6.8：S-约束广义逆</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\C^{m\times n}\)，\(S\) 是 \(\C^n\) 的子空间，称</p>
+                <div class="eq-scroll">\[ P_S(AP_S)^{(i,j,\cdots,l)} \]</div>
+                <p style="margin-bottom:0">为 \(A\) 的 <strong>S-约束 \(\{i,j,\cdots,l\}\)-逆</strong>，其中 \((AP_S)^{(i,j,\cdots,l)}\in(AP_S)\{i,j,\cdots,l\}\)。</p>
+              </div>
+            </section>
+
+            <p>把 §6.4 的定理 6.27、6.30、6.32、6.33 应用于 (6.5.2)，再经引理 9 翻译回来，就得到四个平行定理（证明留给读者，思路完全相同）。</p>
+
+            <section class="card thm" id="thm-6-35-38">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.35–6.38：约束问题的四个判据</span>
+              </header>
+              <div class="card-body">
+                <div class="table-wrap">
+                  <table class="book">
+                    <tr><th>定理</th><th>对任意合适的 \(b\)，\(x=Xb\) 是约束问题 (6.5.1) 的……</th><th>充要条件</th></tr>
+                    <tr><td class="num">6.35</td><td>解（相容判据 \(AXb=b\) 与通解 \(x=Xb+(I-XA)z,\ z\in S\)）</td><td>\(X\) 是任一 S-约束 \(\{1\}\)-逆</td></tr>
+                    <tr><td class="num">6.36</td><td>极小范数解</td><td>\(X=P_S(AP_S)^{(1,4)}\)（S-约束 \(\{1,4\}\)-逆）</td></tr>
+                    <tr><td class="num">6.37</td><td>\(S\) 中使 \(\|Ax-b\|\) 最小的解（不相容时）</td><td>\(X=P_S(AP_S)^{(1,3)}\)（S-约束 \(\{1,3\}\)-逆）</td></tr>
+                    <tr><td class="num">6.38</td><td>极小范数最小二乘解</td><td>\(X=P_S(AP_S)^+\)（S-约束 Moore–Penrose 逆）</td></tr>
+                  </table>
+                </div>
+                <p style="margin-bottom:0">若子空间 \(S\) 的基已知，则可由式 (6.1.6) 求出 \(P_S\)，计算约束广义逆没有原则上的困难。</p>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-6-11">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 6.11：S-约束 Moore–Penrose 逆</span>
+              </header>
+              <div class="card-body">
+                <p>已知 \(\R^3\) 的子空间 \(S\) 由 \(\alpha=(1,1,1)^{\mathrm T}\) 张成，计算 \(A=\begin{pmatrix}1&2&0\\0&1&1\end{pmatrix}\) 的 S-约束 Moore–Penrose 逆。</p>
+                <p><strong>解</strong>　由式 (6.1.6)（向量公式 (6.2.5)）：</p>
+                <div class="eq-scroll">\[ P_S=\alpha(\alpha^{\mathrm T}\alpha)^{-1}\alpha^{\mathrm T}=\frac13\begin{pmatrix}1&1&1\\1&1&1\\1&1&1\end{pmatrix}. \]</div>
+                <p>于是</p>
+                <div class="eq-scroll">\[ AP_S=\frac13\begin{pmatrix}3&3&3\\2&2&2\end{pmatrix}=\begin{pmatrix}1\\[2pt]\tfrac23\end{pmatrix}\begin{pmatrix}1&1&1\end{pmatrix}, \]</div>
+                <p>右端是 \(AP_S\) 的满秩分解（\(F\) 列满秩、\(G\) 行满秩）。由定理 6.15(5)：</p>
+                <div class="eq-scroll">\[ (AP_S)^+=\frac1{13}\begin{pmatrix}3&2\\3&2\\3&2\end{pmatrix}. \]</div>
+                <p style="margin-bottom:0">故 \(A\) 的 S-约束 Moore–Penrose 逆为（三行相同的矩阵左乘 \(P_S\) 不改变它）</p>
+                <div class="eq-scroll">\[ P_S(AP_S)^+=\frac1{13}\begin{pmatrix}3&2\\3&2\\3&2\end{pmatrix}. \]</div>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 二、加权广义逆 ================= -->
+          <section class="section" id="sec-weighted">
+            <h2 class="sec-title"><span class="cn">二</span>加权广义逆</h2>
+            <p>实际应用中欧氏范数并不总是合适的度量。对 \(\alpha=(a_1,\cdots,a_n)^{\mathrm T}\in\C^n\)，取对角权阵 \(\Lambda=\operatorname{diag}(k_1,\cdots,k_n)\)（\(k_i&gt;0\)）：</p>
+            <div class="eq-scroll">\[ \|\alpha\|_{\Lambda}^2=\sum_{i=1}^{n}k_i|a_i|^2=\alpha^{\mathrm H}\Lambda\alpha. \]</div>
+            <p>更一般地，以<strong>正定矩阵</strong> \(N\) 定义<strong>椭圆范数</strong>：</p>
+            <div class="eq-scroll">\[ \|\alpha\|_N^2=\alpha^{\mathrm H}N\alpha. \tag{6.5.6} \]</div>
+            <p>由此产生三个加权求解问题：</p>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>情形</th><th>问题</th></tr>
+                <tr><td class="num">(1)</td><td>\(Ax=b\) 相容时求极小 \(\|\cdot\|_N\) 范数解：\(\displaystyle\min_{Ax=b}\|x\|_N\)</td></tr>
+                <tr><td class="num">(2)</td><td>\(Ax=b\) 不相容时求广义最小二乘解：\(\displaystyle\min_{x\in\C^n}\|Ax-b\|_M\)</td></tr>
+                <tr><td class="num">(3)</td><td>求矛盾方程组的极小 \(\|\cdot\|_N\) 范数广义最小二乘解：\(\displaystyle\min_{\min\|Ax-b\|_M}\|x\|_N\)</td></tr>
+              </table>
+            </div>
+
+            <h3 class="sub-title" id="cholesky-transform">Cholesky 去权变换</h3>
+            <p>正定矩阵可作 Cholesky 分解（§4.1）：\(H=G_H^{\mathrm H}G_H\)，\(G_H\) 非奇异上三角。对正定阵 \(M\in\C^{m\times m}\)、\(N\in\C^{n\times n}\)：</p>
+            <div class="eq-scroll">\[ M=G_M^{\mathrm H}G_M,\qquad N=G_N^{\mathrm H}G_N. \tag{6.5.7} \]</div>
+            <p>引入变量与矩阵变换</p>
+            <div class="eq-scroll">\[ \widetilde A=G_MAG_N^{-1},\qquad \widetilde x=G_Nx,\qquad \widetilde b=G_Mb, \tag{6.5.8} \]</div>
+            <p>直接展开即得</p>
+            <div class="eq-scroll">\[ \|Ax-b\|_M=\|\widetilde A\widetilde x-\widetilde b\|, \tag{6.5.9} \]</div>
+            <div class="eq-scroll">\[ \|x\|_N=\|\widetilde x\|. \tag{6.5.10} \]</div>
+            <p>加权问题于是<strong>原封不动地变成欧氏范数下的普通问题</strong>——这就是全部技巧。若 \(\widetilde x=Y\widetilde b\) 是变换后问题的解，则 \(x=Xb\) 是原问题的解，其中</p>
+            <div class="eq-scroll">\[ X=G_N^{-1}YG_M,\qquad Y=G_NXG_M^{-1}. \tag{6.5.13} \]</div>
+
+            <section class="card thm" id="thm-6-39">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.39：加权 {1,3}-逆（M-最小二乘）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(M\in\C^{m\times m}\) 正定。\(x=Xb\) 对所有 \(b\in\C^m\) 使 \(\|Ax-b\|_M\) 为最小的充要条件是 \(X\in\C^{n\times m}\) 满足</p>
+                <div class="eq-scroll">\[ AXA=A,\qquad (MAX)^{\mathrm H}=MAX. \tag{6.5.11} \]</div>
+                <p style="margin-bottom:0">称这样的 \(X\) 为 \(A\) 的<strong>加权 \(\{1,3\}\)-逆</strong>，记为 \(A_M^{(1,3)}\)。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">由 (6.5.8)(6.5.9) 与定理 6.32，\(\|\widetilde A\widetilde x-\widetilde b\|\) 最小当且仅当 \(\widetilde x=Y\widetilde b\) 且</p>
+                  <div class="eq-scroll">\[ \widetilde A Y\widetilde A=\widetilde A,\qquad (\widetilde A Y)^{\mathrm H}=\widetilde A Y. \tag{6.5.12} \]</div>
+                  <p>代回 \(Y=G_NXG_M^{-1}\) 型关系（此处只需 \(M\) 一侧：\(Y=G_MXG_M^{-1}\) 对作用在 \(b\) 上的算子），利用 \(G_M^{\mathrm H}G_M=M\) 即得 (6.5.11)。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-6-40">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.40：加权 {1,4}-逆（N-极小范数）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(N\in\C^{n\times n}\) 正定。若 \(Ax=b\) 相容，则使 \(\|x\|_N\) 为最小的唯一解是 \(x=Xb\)，其中 \(X\) 满足</p>
+                <div class="eq-scroll">\[ AXA=A,\qquad (NXA)^{\mathrm H}=NXA. \tag{6.5.14} \]</div>
+                <p style="margin-bottom:0">称这样的 \(X\) 为 \(A\) 的<strong>加权 \(\{1,4\}\)-逆</strong>，记为 \(A_N^{(1,4)}\)。唯一性由变换 (6.5.10) 与引理 6 保证；证明与定理 6.39 类似（用定理 6.30 与 \(N\) 一侧的变换）。</p>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-6-41">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.41：加权 Moore–Penrose 逆 A_{MN}⁺</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(M\in\C^{m\times m}\)、\(N\in\C^{n\times n}\) 均正定。则 \(x=Xb\) 使</p>
+                <div class="eq-scroll">\[ \min_{\|\,Ax-b\,\|_M\text{ 最小}}\|x\|_N \tag{6.5.15} \]</div>
+                <p style="margin-bottom:0">成立的充要条件是 \(X\) 满足<strong>加权 Penrose 四方程</strong></p>
+                <div class="eq-scroll">\[
+                \begin{cases}AXA=A,\quad XAX=X,\\(MAX)^{\mathrm H}=MAX,\\(NXA)^{\mathrm H}=NXA,\end{cases} \tag{6.5.16}
+                \]</div>
+                <p style="margin-bottom:0">称其为 \(A\) 关于权 \(M,N\) 的<strong>加权 Moore–Penrose 逆</strong>，记为 \(A_{MN}^+\)。它由变换与普通 MP 逆直接联系（习题 5）：</p>
+                <div class="eq-scroll">\[ A_{MN}^+=G_N^{-1}\big(G_MAG_N^{-1}\big)^+G_M. \]</div>
+                <div class="card note" style="margin-top:10px">
+                  <header class="card-head"><span class="card-label">退化与几何</span></header>
+                  <div class="card-body"><p style="margin-bottom:0">取 \(M=I_m,\ N=I_n\) 时四方程回到普通 Penrose 方程，\(A_{I,I}^+=A^+\)。几何上，加权最小二乘的"正交"是关于内积 \(\langle u,v\rangle_M=u^{\mathrm H}Mv\)、\(\langle x,y\rangle_N=x^{\mathrm H}Ny\) 的正交；等值面是椭球，实验台会画出 \(N\)-椭球与解直线的切点。</p></div>
+                </div>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="weighted-lab-title">动手实验：约束 / 加权最小二乘台（R²）</h3>
+            <p><strong>约束模式</strong>：指定子空间直线 \(S\)（角度 \(\theta\)），工具计算 \(P_S,\ AP_S,\ P_S(AP_S)^+\) 与约束解，并在 \(x\) 平面画出 \(S\)、无约束最小二乘解集直线与约束解点。<strong>加权模式</strong>：调权阵 \(N=\operatorname{diag}(n_1,n_2)\)，画出 \(\|x\|_N=\)常数的椭圆族与解直线的切点——切点恰为 \(x=A_N^{(1,4)}b\)，即加权极小范数解；对比欧氏解 \(A^+b\)。</p>
+            <section class="card lab" data-cw-lab></section>
+          </section>
+
+          <!-- ================= 习题 6.5 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 6.5（教材 p.351–352）</h2>
+            <div class="fold-bar no-print" data-fold-tools=".card.task">
+              <button type="button" data-fold="open">全部展开</button>
+              <button type="button" data-fold="close">全部收起</button>
+            </div>
+
+            <article class="card task" id="ex65-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">升阶等价</span></header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{m\times n},\ b\in\C^m\)，\(S\) 是 \(\C^n\) 的子空间。证明解约束问题 \(Ax=b\ (x\in S)\) 等价于解无约束方程组</p>
+                <div class="eq-scroll">\[ \begin{pmatrix}A\\P_{S^\perp}\end{pmatrix}x=\begin{pmatrix}b\\0\end{pmatrix}, \]</div>
+                <p>其中 \(P_{S^\perp}=I-P_S\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>对任意 \(x\)：\(x\in S\Leftrightarrow P_Sx=x\Leftrightarrow(I-P_S)x=0\Leftrightarrow P_{S^\perp}x=0\)。故升阶方程组的两个方程恰为 \(Ax=b\) 与"\(x\in S\)"，同时成立当且仅当 \(x\) 是约束问题的解。两方程组解集相同。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex65-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag">定理 6.36–6.38</span></header>
+              <div class="card-body">
+                <p>证明定理 6.36、6.37、6.38。</p>
+                <details class="solution"><summary><span>查看证明要点</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由引理 9，令 \(x=P_Sz\)，约束问题一一对应于 \(Bz=b\)（\(B=AP_S\)）的普通问题，且 \(x\in S\) 时 \(\|x\|=\|P_Sz\|\)。</p>
+                  <p><strong>6.36：</strong>相容时极小范数解由定理 6.30 为 \(z=B^{(1,4)}b\)，故 \(x=P_SB^{(1,4)}b\)，即 \(X=P_S(AP_S)^{(1,4)}\)；反之由定理 6.30 的逆命题对每个 \(b\) 成立即得。</p>
+                  <p><strong>6.37：</strong>\(x\in S\) 使 \(\|Ax-b\|\) 最小 \(\Leftrightarrow z\) 使 \(\|Bz-b\|\) 最小，由定理 6.32 得 \(z=B^{(1,3)}b\)，故 \(X=P_S(AP_S)^{(1,3)}\)。</p>
+                  <p><strong>6.38：</strong>极小范数最小二乘解由定理 6.33 为 \(z=B^+b\)，故 \(x=P_S(AP_S)^+b\)；逆命题同理。三定理的"反之"均因结论对所有 \(b\) 成立，依次取 \(b\) 为相应矩阵各列并引用引理 7/8 型刻画得到。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex65-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag">定理 6.40–6.41</span></header>
+              <div class="card-body">
+                <p>证明定理 6.40、6.41。</p>
+                <details class="solution"><summary><span>查看证明要点</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>用 Cholesky 变换 (6.5.8)：令 \(\widetilde A=G_MAG_N^{-1},\ \widetilde x=G_Nx,\ \widetilde b=G_Mb\)，由 (6.5.9)(6.5.10) 加权极值问题一一对应于 \(\widetilde x\) 的欧氏极值问题，且 \(x=Xb\Leftrightarrow\widetilde x=Y\widetilde b\)，其中 \(Y=G_NXG_M^{-1}\)。</p>
+                  <p><strong>6.40：</strong>相容时由定理 6.30，\(Y\) 满足 \(\widetilde A Y\widetilde A=\widetilde A,\ (\widetilde A Y)^{\mathrm H}\) 相应的极小范数条件实为 \((Y\widetilde A)^{\mathrm H}=Y\widetilde A\)；代回并左乘 \(G_N^{\mathrm H}G_N=N\)、右整理 \(G_N\) 得 \(AXA=A\) 与 \((NXA)^{\mathrm H}=NXA\)（\(\widetilde x\) 一侧对应 \(X\) 右乘 \(A\) 的乘积）。唯一性由变换可逆与引理 6 得到。</p>
+                  <p><strong>6.41：</strong>由定理 6.33，\(Y=\widetilde A^+\) 满足普通四方程；逐方程代回 \(\widetilde A=G_MAG_N^{-1}\)、\(Y=G_NXG_M^{-1}\)，利用 \(G_M^{\mathrm H}G_M=M,\ G_N^{\mathrm H}G_N=N\) 化简：(i)(ii) 中的三角因子直接消去，(iii)(iv) 分别成为 \((MAX)^{\mathrm H}=MAX\)、\((NXA)^{\mathrm H}=NXA\)，即 (6.5.16)。反之同样代回即可。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex65-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag tag-mid">加权极小范数解</span></header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{m\times n},\ b\in R(A)\)，又设 \(N\in\C^{n\times n}\) 正定。证明问题 \(\displaystyle\min_{Ax=b}\|x\|_N\) 有唯一极小因子</p>
+                <div class="eq-scroll">\[ x_0=N^{-1}A^{\mathrm H}(AN^{-1}A^{\mathrm H})^{(1)}b, \]</div>
+                <p>且极小值为 \(\sqrt{b^{\mathrm H}(AN^{-1}A^{\mathrm H})^{(1)}b}\)，其中 \((AN^{-1}A^{\mathrm H})^{(1)}\in(AN^{-1}A^{\mathrm H})\{1\}\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>取 \(N\) 的 Cholesky 分解 \(N=G_N^{\mathrm H}G_N\)，令 \(\widetilde x=G_Nx,\ C=AG_N^{-1}\)。由 (6.5.10)，问题化为相容方程 \(C\widetilde x=b\) 的欧氏极小范数解：\(\widetilde x=C^{(1,4)}b=C^+b\)（相容时 (6.4.19) 与定理 6.30 一致），故 \(x_0=G_N^{-1}(AG_N^{-1})^+b\)。对行方向用式 (6.2.4) 的推广形式（或直接验证）：\(G_N^{-1}(AG_N^{-1})^+=N^{-1}A^{\mathrm H}(AN^{-1}A^{\mathrm H})^{(1)}\)，即得 \(x_0\) 的公式；与所选 \(\{1\}\)-逆无关（代入 \(b=Au\) 可见）。极小值：\(\|x_0\|_N^2=x_0^{\mathrm H}Nx_0=b^{\mathrm H}(AN^{-1}A^{\mathrm H})^{(1)}b\)（相容时该二次型与逆的选取无关），开方即得。唯一性由引理 6 的加权版本（正定内积下的正交直和 \(R_N(A^{\mathrm H})\oplus N(A)\)）保证。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex65-5">
+              <header class="card-head"><span class="card-label">第 5 题</span><span class="tag">Cholesky 表达式</span></header>
+              <div class="card-body">
+                <p>证明 \(A_{MN}^+=G_N^{-1}(G_MAG_N^{-1})^+G_M\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>令 \(\widetilde A=G_MAG_N^{-1}\)、\(X=G_N^{-1}\widetilde A^+G_M\)。把 \(X\) 代入加权四方程 (6.5.16) 逐条验证（以 (iii) 为例）：\(MAX=MG_M^{-1}?\) 直接展开——\(MAX=M\,A\,G_N^{-1}\widetilde A^+G_M=G_M^{\mathrm H}(G_MAG_N^{-1})\widetilde A^+G_M=G_M^{\mathrm H}\widetilde A\widetilde A^+G_M\)，而 \(\widetilde A\widetilde A^+\) Hermite，故整体 Hermite；(i)(ii)(iv) 同理（用 \(G_N^{\mathrm H}G_N=N\)）。由加权四方程解的唯一性（定理 6.41），\(X=A_{MN}^+\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex65-6">
+              <header class="card-head"><span class="card-label">第 6 题</span><span class="tag tag-hard">Zlobec 夹心表达式</span></header>
+              <div class="card-body">
+                <p>利用 Zlobec 公式 (6.3.6) 证明</p>
+                <div class="eq-scroll">\[ A_{MN}^+=N^{-1}A^{\mathrm H}MA\,(A^{\mathrm H}MAN^{-1}A^{\mathrm H}MA)^{(1)}A^{\mathrm H}M. \]</div>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由习题 5，\(A_{MN}^+=G_N^{-1}\widetilde A^+G_M\)，其中 \(\widetilde A=G_MAG_N^{-1}\)。对 \(\widetilde A^+\) 用 Zlobec 公式 (6.3.6)：</p>
+                  <p>\[ \widetilde A^+=\widetilde A^{\mathrm H}\widetilde A\,(\widetilde A^{\mathrm H}\widetilde A\,\widetilde A^{\mathrm H}\widetilde A)^{(1)}\widetilde A^{\mathrm H}. \]</p>
+                  <p>代入 \(\widetilde A^{\mathrm H}=G_N^{-\mathrm H}A^{\mathrm H}G_M^{\mathrm H}\)（记 \(G_N^{-\mathrm H}=(G_N^{-1})^{\mathrm H}\)），并用 \(G_M^{\mathrm H}G_M=M\)、\(G_N^{-1}G_N^{-\mathrm H}=N^{-1}\) 逐层合并：左端 \(G_N^{-1}\widetilde A^{\mathrm H}\widetilde A=N^{-1}A^{\mathrm H}MA\,G_N^{-1}\)；中间块 \(\widetilde A^{\mathrm H}\widetilde A\widetilde A^{\mathrm H}\widetilde A=G_N^{-\mathrm H}(A^{\mathrm H}MAN^{-1}A^{\mathrm H}MA)G_N^{-1}\)，由 \((PBQ)^{(1)}=Q^{-1}B^{(1)}P^{-1}\) 其 \(\{1\}\)-逆为 \(G_N(A^{\mathrm H}MAN^{-1}A^{\mathrm H}MA)^{(1)}G_N^{\mathrm H}\)；右端 \(\widetilde A^{\mathrm H}G_M=G_N^{-\mathrm H}A^{\mathrm H}M\)。三段相乘时 \(G_N^{-1}\) 与 \(G_N\)、\(G_N^{\mathrm H}\) 与 \(G_N^{-\mathrm H}\) 相继消去，整理即得</p>
+                  <p>\[ A_{MN}^+=N^{-1}A^{\mathrm H}MA\,(A^{\mathrm H}MAN^{-1}A^{\mathrm H}MA)^{(1)}A^{\mathrm H}M. \]</p>
+                  <p>该式只用一个普通 \(\{1\}\)-逆与矩阵乘法，是 Zlobec 公式在加权情形的对应物；结果与中间 \(\{1\}\)-逆的选取无关。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结</h2>
+            <div class="summary-block">
+              <p>两个推广方向，同一种化归思想：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>对象</th><th>关键工具</th><th>结论</th></tr>
+                  <tr><td>约束问题 \(Ax=b\ (x\in S)\)</td><td>引理 9：\(x=P_Sz,\ AP_Sz=b\)</td><td>S-约束逆 \(P_S(AP_S)^{(i,\cdots)}\)（定义 6.8）；定理 6.35–6.38 平行于 §6.4</td></tr>
+                  <tr><td>例 6.11</td><td>\(P_S=\alpha(\alpha^{\mathrm T}\alpha)^{-1}\alpha^{\mathrm T}\) + 满秩分解</td><td>\(P_S(AP_S)^+=\tfrac1{13}[[3,2],[3,2],[3,2]]\)</td></tr>
+                  <tr><td>加权范数</td><td>\(\|x\|_N^2=x^{\mathrm H}Nx\)（正定权）</td><td>椭圆范数；对角权 \(\Lambda\) 是其特例</td></tr>
+                  <tr><td>去权变换</td><td>\(\widetilde A=G_MAG_N^{-1},\ \widetilde x=G_Nx,\ \widetilde b=G_Mb\)</td><td>\(\|Ax-b\|_M=\|\widetilde A\widetilde x-\widetilde b\|,\ \|x\|_N=\|\widetilde x\|\)</td></tr>
+                  <tr><td>加权 \(\{1,3\}\)/\(\{1,4\}\)-逆</td><td>(6.5.11) / (6.5.14)</td><td>\((MAX)^{\mathrm H}=MAX\) / \((NXA)^{\mathrm H}=NXA\)</td></tr>
+                  <tr><td>加权 MP 逆</td><td>加权四方程 (6.5.16)</td><td>\(A_{MN}^+=G_N^{-1}(G_MAG_N^{-1})^+G_M\)（习题 5）；Zlobec 形（习题 6）</td></tr>
+                </table>
+              </div>
+              <p style="margin-top:12px"><strong>承上启下：</strong>§6.6 是本章最后一个选学专题——Drazin 逆。它推广的方向不同：保留方阵逆的<strong>交换性、幂法则、特征值倒数</strong>等性质，用于奇异线性常/差分微分方程组求解。</p>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>为什么约束问题只需把 \(A\) 换成 \(AP_S\)，而通解里的自由项要写成 \(P_S(I-(AP_S)^{(1)}AP_S)y\)？少了外面的 \(P_S\) 会怎样？</li>
+                  <li>Cholesky 变换为什么能同时消去两个权？验证 (6.5.9) 时 \(G_M\) 出现在误差的哪一侧，验证 (6.5.10) 时 \(G_N\) 呢？</li>
+                  <li>加权四方程中为什么 (iii) 配 \(M\) 而 (iv) 配 \(N\)？取 \(M=I,N=I\) 后四方程变成什么？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="6.4-linear-systems.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§6.4 广义逆矩阵与线性方程组求解</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="6.6-drazin-inverse.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§6.6 Drazin 广义逆（选学）</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§6.1 投影矩阵 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §6.1：投影算子与投影矩阵（定义 6.1–6.2）、幂等刻画（定理 6.1）、构造公式 (6.1.5)、正交投影算子与正交投影矩阵（定义 6.3）、幂等 Hermite 刻画（定理 6.2）、公式 P_L=X(X^HX)^{-1}X^H (6.1.6)、例 6.1–6.2">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§6.1 投影矩阵</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="6.1" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 6 章 广义逆矩阵</a><span class="sep" aria-hidden="true">/</span>
+            <span>§6.1 投影矩阵</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 6 章 · 广义逆矩阵 · 起点</div>
+            <h1>§6.1 投影矩阵</h1>
+            <p class="lede">逆矩阵只对非奇异方阵存在，而应用中出现的大量是<strong>奇异阵、长方阵</strong>。广义逆的第一步不是"造逆"，而是"造投影"：把全空间沿互补子空间 \(M\) 劈到子空间 \(L\) 上的算子 \(P_{L,M}\)。它的矩阵恰是<strong>幂等矩阵</strong>（\(P^2=P\)）；当 \(M=L^\perp\) 时得到正交投影，矩阵进一步是<strong>幂等 Hermite 矩阵</strong>，并有显式公式 \(P_L=X(X^{\mathrm H}X)^{-1}X^{\mathrm H}\)。幂等矩阵将在 §6.2 中扮演"单位矩阵"的角色。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.290–296</strong></span>
+              <span class="chip">建议 <strong>2 学时</strong></span>
+              <span class="chip">定义 <strong>3 个</strong></span>
+              <span class="chip">定理 <strong>2 个 + 引理 1</strong></span>
+              <span class="chip">例题 <strong>2 道</strong></span>
+
+              <span class="chip">引理 <strong>1 个</strong></span></div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>由直和分解 \(x=y+z\) 说出投影算子 \(P_{L,M}\) 与投影矩阵的定义，指出 \(R(P)=L,\ N(P)=M\)；</li>
+                  <li>陈述并证明定理 6.1：\(P\) 是投影矩阵 \(\Leftrightarrow\) \(P\) 幂等，及对应 \(P=P_{R(P),N(P)}\)；</li>
+                  <li>用公式 (6.1.5) \(P_{L,M}=(X,O)(X,Y)^{-1}\) 由基构造投影矩阵；</li>
+                  <li>陈述定理 6.2：正交投影矩阵 \(\Leftrightarrow\) 幂等 Hermite 矩阵；</li>
+                  <li>用公式 (6.1.6) \(P_L=X(X^{\mathrm H}X)^{-1}X^{\mathrm H}\) 计算正交投影并求投影向量。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>投影算子 / 投影矩阵定义；</li>
+                      <li>幂等刻画（定理 6.1）；</li>
+                      <li>正交投影公式 (6.1.6)。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>直和分解唯一性 ⇒ 算子线性；</li>
+                      <li>引理 1 的秩论证 \(N(A)=R(I-A)\)；</li>
+                      <li>斜投影与正交投影的区别（\(M\) 是否取 \(L^\perp\)）。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 2 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>章引言、投影算子与投影矩阵、定理 6.1、构造公式、例 6.1</td><td class="num">p.290–294</td></tr>
+                    <tr><td class="num">2</td><td>正交投影、定理 6.2、公式 (6.1.6)、例 6.2、实验与习题</td><td class="num">p.294–296</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 210" role="img" aria-label="投影矩阵脉络图">
+                    <defs><marker id="m61" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="30" y="26" width="200" height="52"/><rect x="320" y="26" width="200" height="52"/><rect x="610" y="26" width="200" height="52"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="130" y="48">直和分解 x=y+z</text><text x="130" y="66" font-size="11" fill="#666">L⊕M=Cⁿ，y=P x</text>
+                      <text x="420" y="48">投影算子 P_{L,M}</text><text x="420" y="66" font-size="11" fill="#666">R(P)=L，N(P)=M</text>
+                      <text x="710" y="48">投影矩阵</text><text x="710" y="66" font-size="11" fill="#666">标准基下的矩阵</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m61)"><line x1="230" y1="52" x2="318" y2="52"/><line x1="520" y1="52" x2="608" y2="52"/></g>
+                    <g class="fm-edge" marker-end="url(#m61)"><line x1="710" y1="78" x2="710" y2="118"/></g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="560" y="120" width="300" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="710" y="142">定理 6.1：幂等 ⇔ 投影矩阵</text><text x="710" y="160" font-size="11" fill="#666">P=P_{R(P),N(P)}，一一对应</text>
+                    </g>
+                    <g class="fm-node" fill="#eef7f0" stroke="#3d7a4e"><rect x="140" y="120" width="300" height="52"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="290" y="142">定理 6.2：M=L⊥ 时正交投影</text><text x="290" y="160" font-size="11" fill="#666">幂等 Hermite ⇔ P_L=X(X^HX)⁻¹X^H</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m61)"><line x1="560" y1="146" x2="442" y2="146"/></g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 章引言 ================= -->
+          <section class="section" id="sec-intro">
+            <h2 class="sec-title"><span class="cn">引</span>章引言：为什么要广义逆</h2>
+            <p>通常的逆矩阵 \(A^{-1}\) 仅对非奇异方阵存在。然而在理论与实际问题（特别是数学规划与最小二乘问题）中，<strong>奇异矩阵和长方矩阵</strong>的"逆"往往是必须研究的对象。一个合理的"广义逆"应当满足三条要求：</p>
+            <div class="card note" id="note-3cond">
+              <header class="card-head"><span class="card-label">广义逆的三条要求</span></header>
+              <div class="card-body">
+                <ol style="margin-bottom:0">
+                  <li>对<strong>奇异矩阵乃至长方矩阵</strong>也存在；</li>
+                  <li>具有通常逆矩阵的<strong>部分性质</strong>；</li>
+                  <li>当 \(A\) 非奇异时，<strong>退化为通常的逆矩阵</strong> \(A^{-1}\)。</li>
+                </ol>
+              </div>
+            </div>
+            <p>1920 年 E. H. Moore 首先提出广义逆矩阵的概念；1955 年 Penrose 给出了更明确的定义。广义逆矩阵已在数理统计、系统理论、最优控制、数学规划等领域获得重要应用。本章讨论 \(m\times n\) 复矩阵的 Penrose 广义逆，而本节先研究它的几何底座——<strong>投影矩阵</strong>。</p>
+          </section>
+
+          <!-- ================= 一、投影算子与投影矩阵 ================= -->
+          <section class="section" id="sec-proj-op">
+            <h2 class="sec-title"><span class="cn">一</span>投影算子与投影矩阵</h2>
+            <p>设 \(L,M\) 是 \(\C^n\) 的子空间，且 \(L\oplus M=\C^n\)。于是任意 \(x\in\C^n\) 都可<strong>唯一</strong>地分解为</p>
+            <div class="eq-scroll">\[ x=y+z,\qquad y\in L,\quad z\in M. \tag{6.1.1} \]</div>
+            <p>称 \(y\) 为 \(x\) 在 \(L\) 上沿 \(M\) 的<strong>投影</strong>。把"取投影"这件事看成映射，就得到投影算子。</p>
+
+            <section class="card def" id="def-6-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 6.1：投影算子</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(L\oplus M=\C^n\)。由式 (6.1.1)，映射 \(x\mapsto y\)（\(y\) 为 \(x\) 在 \(L\) 上沿 \(M\) 的投影）称为 \(\C^n\) 上的<strong>投影算子</strong>，记为 \(P_{L,M}\)，即 \(P_{L,M}x=y\)。</p>
+              </div>
+            </section>
+
+            <p><strong>基本性质。</strong>投影算子把全空间映到 \(L\) 上；当 \(x\in L\) 时 \(P_{L,M}x=x\)；当 \(x\in M\) 时 \(P_{L,M}x=0\)。因此</p>
+            <div class="eq-scroll">\[ R(P_{L,M})=L,\qquad N(P_{L,M})=M. \]</div>
+            <p>它还是<strong>线性算子</strong>：设 \(x_1=y_1+z_1,\ x_2=y_2+z_2\)，则 \(\lambda x_1+\mu x_2=(\lambda y_1+\mu y_2)+(\lambda z_1+\mu z_2)\)，而 \(\lambda y_1+\mu y_2\in L,\ \lambda z_1+\mu z_2\in M\)，由分解的唯一性即得 \(P_{L,M}(\lambda x_1+\mu x_2)=\lambda P_{L,M}x_1+\mu P_{L,M}x_2\)（习题 6.1 第 1 题）。</p>
+
+            <section class="card def" id="def-6-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 6.2：投影矩阵</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">投影算子 \(P_{L,M}\) 在 \(\C^n\) 的基 \(e_1,e_2,\cdots,e_n\) 下的矩阵称为<strong>投影矩阵</strong>，仍记为 \(P_{L,M}\)。</p>
+              </div>
+            </section>
+
+            <p>回忆：满足 \(A^2=A\) 的方阵 \(A\) 称为<strong>幂等矩阵</strong>。投影矩阵正是幂等矩阵，反之亦然——这是本节的第一个核心结论，证明需要一个秩的引理。</p>
+
+            <section class="card thm" id="lem-6-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M12 3v18"/><path d="M5 8l7-5 7 5"/><path d="M5 16l7 5 7-5"/></svg></span>
+                <span class="card-label">引理 1：幂等阵的零空间与值域</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{n\times n}\) 是幂等矩阵，则</p>
+                <div class="eq-scroll">\[ N(A)=R(I-A). \]</div>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>由 \(A(I-A)=A-A^2=O\) 知，对任意 \(y=(I-A)u\in R(I-A)\) 有 \(Ay=A(I-A)u=0\)，即
+                    \[ R(I-A)\subset N(A). \tag{6.1.2} \]</p>
+                  <p>再比维数：由包含关系 \(\dim R(I-A)\le\dim N(A)=n-\dim R(A)\)，即 \(\operatorname{rank}(I-A)\le n-\operatorname{rank}A\)；另一方面 \(I=A+(I-A)\) 给出 \(n\le\operatorname{rank}A+\operatorname{rank}(I-A)\)。两式合并得 \(\operatorname{rank}(I-A)=n-\operatorname{rank}A\)，于是 \(\dim R(I-A)=\dim N(A)\)，包含关系升级为相等。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-6-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.1：投影矩阵 ⇔ 幂等矩阵</span>
+              </header>
+              <div class="card-body">
+                <p>\(n\) 阶矩阵 \(P\) 为投影矩阵的<strong>充要条件</strong>是 \(P\) 为幂等矩阵。从而 \(n\) 阶幂等矩阵与 \(n\) 阶投影矩阵一一对应，且 \(P=P_{R(P),N(P)}\)。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p><strong>必要性。</strong>设 \(P=P_{L,M}\)。对 \(x=y+z\) 有 \(Px=y\in L\)，故 \(P^2x=Py=y=Px\)，即 \(P^2=P\)。</p>
+                  <p><strong>充分性。</strong>设 \(P^2=P\)。任意 \(x\) 可写为</p>
+                  <div class="eq-scroll">\[ x=Px+(I-P)x. \tag{6.1.3} \]</div>
+                  <p>其中 \(Px\in R(P)\)；由引理 1，\((I-P)x\in R(I-P)=N(P)\)。故 \(\C^n=R(P)+N(P)\)。再证直和：若 \(u\in R(P)\cap N(P)\)，则 \(u=Pv\) 且 \(Pu=0\)，于是 \(u=Pv=P^2v=P(Pv)=Pu=0\)。故 \(\C^n=R(P)\oplus N(P)\)，而式 (6.1.3) 正是 \(x\) 沿该直和的分解，其 \(R(P)\) 分量恰为 \(Px\)，即 \(P=P_{R(P),N(P)}\) 是投影矩阵。</p>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="construct">由子空间的基构造投影矩阵</h3>
+            <p>设 \(\dim L=r,\ \dim M=n-r\)，取 \(L\) 的基 \(x_1,\cdots,x_r\) 与 \(M\) 的基 \(y_1,\cdots,y_{n-r}\)。由投影算子的性质</p>
+            <div class="eq-scroll">\[ Px_i=x_i\ (i=1,\cdots,r),\qquad Py_j=0\ (j=1,\cdots,n-r). \tag{6.1.4} \]</div>
+            <p>记 \(X=(x_1,\cdots,x_r),\ Y=(y_1,\cdots,y_{n-r})\)，式 (6.1.4) 合并为 \(P\,(X,Y)=(X,O)\)。由于 \(L\oplus M=\C^n\)，方阵 \((X,Y)\) 可逆，故</p>
+            <div class="eq-scroll">\[ P_{L,M}=(X,O)\,(X,Y)^{-1}. \tag{6.1.5} \]</div>
+            <div class="card note" id="note-idem-role">
+              <header class="card-head"><span class="card-label">注：幂等矩阵的地位</span></header>
+              <div class="card-body">
+                <p style="margin-bottom:0">定理 6.1 表明幂等矩阵在广义逆矩阵理论中将起<strong>单位矩阵</strong>的作用：单位矩阵是"往全空间上投影"的投影矩阵，而一般幂等矩阵是"往子空间上投影"的投影矩阵。这一观点贯穿 §6.2–§6.5。</p>
+              </div>
+            </div>
+
+            <section class="card ex" id="exm-6-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 6.1：R² 中的斜投影矩阵</span>
+              </header>
+              <div class="card-body">
+                <p>在 \(\R^2\) 中，\(L\) 由 \((1,0)^{\mathrm T}\) 张成，\(M\) 由 \((1,-1)^{\mathrm T}\) 张成。求投影矩阵 \(P_{L,M}\)。</p>
+                <p><strong>解</strong>　取 \(X=\begin{pmatrix}1\\0\end{pmatrix},\ Y=\begin{pmatrix}1\\-1\end{pmatrix}\)，则 \((X,Y)=\begin{pmatrix}1&1\\0&-1\end{pmatrix}\)，其逆为 \(\begin{pmatrix}1&1\\0&-1\end{pmatrix}\)（该阵的逆是自身）。由式 (6.1.5)：</p>
+                <div class="eq-scroll">\[ P_{L,M}=(X,O)(X,Y)^{-1}=\begin{pmatrix}1&0\\0&0\end{pmatrix}\begin{pmatrix}1&1\\0&-1\end{pmatrix}=\begin{pmatrix}1&1\\0&0\end{pmatrix}. \]</div>
+                <p style="margin-bottom:0">验证：\(P^2=P\)（幂等 ✓）；\(P\begin{pmatrix}1\\0\end{pmatrix}=\begin{pmatrix}1\\0\end{pmatrix}\)（\(L\) 上不动 ✓）；\(P\begin{pmatrix}1\\-1\end{pmatrix}=\begin{pmatrix}0\\0\end{pmatrix}\)（\(M\) 上为零 ✓）。注意 \(P^{\mathrm T}\ne P\)：这是<strong>斜</strong>投影。</p>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 二、正交投影 ================= -->
+          <section class="section" id="sec-orth-proj">
+            <h2 class="sec-title"><span class="cn">二</span>正交投影算子与正交投影矩阵</h2>
+            <p>投影算子的一个重要子类是取 \(M=L^\perp\) 的情形。</p>
+
+            <section class="card def" id="def-6-3">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 6.3：正交投影算子与正交投影矩阵</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(L\) 是 \(\C^n\) 的子空间。称沿着 \(L^\perp\) 到 \(L\) 的投影算子 \(P_{L,L^\perp}\) 为<strong>正交投影算子</strong>，简记为 \(P_L\)；它在基 \(e_1,\cdots,e_n\) 下的矩阵称为<strong>正交投影矩阵</strong>，记为 \(P_L\)。</p>
+              </div>
+            </section>
+
+            <p>正交投影矩阵不仅是幂等矩阵，而且还是 Hermite 矩阵；反之亦然。</p>
+
+            <section class="card thm" id="thm-6-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">定理 6.2：正交投影矩阵 ⇔ 幂等 Hermite 矩阵</span>
+              </header>
+              <div class="card-body">
+                <p>矩阵 \(P\) 为正交投影矩阵的<strong>充要条件</strong>是 \(P\) 为幂等 Hermite 矩阵。从而 \(n\) 阶幂等 Hermite 矩阵与 \(n\) 阶正交投影矩阵一一对应。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p><strong>必要性。</strong>设 \(P=P_L\)。由定理 6.1 它是幂等的。将任意 \(x\) 分解为 \(x=y+z,\ y\in L,\ z\in L^\perp\)，则 \(Px=y\in L,\ (I-P)x=z\in L^\perp\)，二者正交：\(x^{\mathrm H}P^{\mathrm H}(I-P)x=0\)。由 \(x\) 的任意性得 \(P^{\mathrm H}(I-P)=O\)，即 \(P^{\mathrm H}=P^{\mathrm H}P\)。对 \(P^{\mathrm H}P=P\) 取共轭转置得 \(P^{\mathrm H}P=P^{\mathrm H}\)，与 \(P^{\mathrm H}=P^{\mathrm H}P\) 比较即得 \(P^{\mathrm H}=P\)，故 \(P\) 是幂等 Hermite 矩阵。</p>
+                  <p><strong>充分性。</strong>设 \(P\) 幂等且 \(P^{\mathrm H}=P\)。由定理 6.1，\(P=P_{R(P),N(P)}\)。而 \(N(P)=N(P^{\mathrm H})=R(P)^\perp\)（因 \(Px=0\Leftrightarrow x^{\mathrm H}P^{\mathrm H}=0\) 对 \(R(P)\) 中一切向量成立），故 \(P=P_{R(P),R(P)^\perp}=P_{R(P)}\) 是正交投影矩阵。</p>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="pl-formula">正交投影矩阵的显式公式</h3>
+            <p>设 \(\dim L=r\)，取 \(L\) 的基 \(x_1,\cdots,x_r\) 与 \(L^\perp\) 的基 \(y_1,\cdots,y_{n-r}\)，作分块矩阵 \(X=(x_1,\cdots,x_r),\ Y=(y_1,\cdots,y_{n-r})\)。显然 \(X^{\mathrm H}Y=O\)，故 \((X,Y)^{\mathrm H}(X,Y)=\begin{pmatrix}X^{\mathrm H}X&O\\O&Y^{\mathrm H}Y\end{pmatrix}\)。代入式 (6.1.5) 并用分块求逆：</p>
+            <div class="eq-scroll">\[
+            P_L=(X,O)(X,Y)^{-1}=(X,O)\big[(X,Y)^{\mathrm H}(X,Y)\big]^{-1}(X,Y)^{\mathrm H}
+            =(X,O)\begin{pmatrix}(X^{\mathrm H}X)^{-1}&O\\O&(Y^{\mathrm H}Y)^{-1}\end{pmatrix}\begin{pmatrix}X^{\mathrm H}\\Y^{\mathrm H}\end{pmatrix}
+            \]</div>
+            <div class="eq-scroll">\[ P_L=X(X^{\mathrm H}X)^{-1}X^{\mathrm H}. \tag{6.1.6} \]</div>
+            <p>注意右端只依赖 \(L\) 的基 \(X\)：<strong>正交投影矩阵由子空间 \(L\) 完全决定</strong>（斜投影则还要指定 \(M\)）。几何上 \(P_Lx\) 是 \(x\) 在 \(L\) 中的"垂足"，即 \(L\) 中距 \(x\) 最近的点（ residual \(x-P_Lx\perp L\)）。</p>
+
+            <section class="card ex" id="exm-6-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 6.2：R³ 中平面的正交投影</span>
+              </header>
+              <div class="card-body">
+                <p>在 \(\R^3\) 中 \(L\) 由 \(\alpha=(1,2,0)^{\mathrm T}\) 与 \(\beta=(0,1,1)^{\mathrm T}\) 张成。求正交投影矩阵 \(P_L\)，及向量 \(x=(1,2,3)^{\mathrm T}\) 沿 \(L^\perp\) 到 \(L\) 的投影。</p>
+                <p><strong>解</strong>　取 \(X=\begin{pmatrix}1&0\\2&1\\0&1\end{pmatrix}\)，则 \(X^{\mathrm H}X=\begin{pmatrix}5&2\\2&2\end{pmatrix}\)，\((X^{\mathrm H}X)^{-1}=\dfrac16\begin{pmatrix}2&-2\\-2&5\end{pmatrix}\)。由式 (6.1.6)：</p>
+                <div class="eq-scroll">\[ P_L=X(X^{\mathrm H}X)^{-1}X^{\mathrm H}=\frac16\begin{pmatrix}2&2&-2\\2&5&1\\-2&1&5\end{pmatrix}. \]</div>
+                <p style="margin-bottom:0">于是 \(x\) 在 \(L\) 上的投影为 \(P_Lx=\dfrac16\begin{pmatrix}2&2&-2\\2&5&1\\-2&1&5\end{pmatrix}\begin{pmatrix}1\\2\\3\end{pmatrix}=\dfrac16\begin{pmatrix}0\\15\\15\end{pmatrix}=\left(0,\ \tfrac52,\ \tfrac52\right)^{\mathrm T}\)。验证残差 \(x-P_Lx=(1,-\tfrac12,\tfrac12)^{\mathrm T}\) 与 \(\alpha,\beta\) 的内积均为 \(0\)：确实垂直于 \(L\)。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="proj-lab-title">动手实验：投影矩阵工作台</h3>
+            <p>两个模式：<strong>斜投影</strong>（\(\R^2\)，指定 \(L,M\) 两方向，按式 (6.1.5) 算 \(P_{L,M}\)，画板显示 \(x,\ Px,\ x-Px\) 与两条方向线）；<strong>正交投影</strong>（\(\R^3\)，指定 \(L\) 的基 \(\alpha,\beta\)，按式 (6.1.6) 算 \(P_L\)）。工具实时报告幂等性 \(\|P^2-P\|\) 与 Hermite 性 \(\|P-P^{\mathrm T}\|\)：斜投影前者为 0 而后者一般非 0，正交投影两者皆为 0——定理 6.1 与定理 6.2 的数值对照。</p>
+            <section class="card lab" data-proj-lab></section>
+          </section>
+
+          <!-- ================= 习题 6.1 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 6.1（教材 p.296）</h2>
+            <div class="fold-bar no-print" data-fold-tools=".card.task">
+              <button type="button" data-fold="open">全部展开</button>
+              <button type="button" data-fold="close">全部收起</button>
+            </div>
+
+            <article class="card task" id="ex61-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">线性性</span></header>
+              <div class="card-body">
+                <p>设 \(L,M\) 是 \(\C^n\) 的子空间，且 \(L\oplus M=\C^n\)。证明投影算子 \(P_{L,M}\) 是线性算子。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>设 \(x_i=y_i+z_i\)（\(y_i\in L,z_i\in M\)，\(i=1,2\)），则 \(\lambda x_1+\mu x_2=(\lambda y_1+\mu y_2)+(\lambda z_1+\mu z_2)\)，其中第一项属 \(L\)、第二项属 \(M\)。直和分解唯一，故该分解就是 \(\lambda x_1+\mu x_2\) 的分解，其 \(L\) 分量为 \(\lambda y_1+\mu y_2\)，即 \(P_{L,M}(\lambda x_1+\mu x_2)=\lambda y_1+\mu y_2=\lambda P_{L,M}x_1+\mu P_{L,M}x_2\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex61-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag">封闭性</span></header>
+              <div class="card-body">
+                <p>若 \(P\) 是投影矩阵，证明 \(P^{\mathrm H},\ I-P,\ T^{-1}PT\)（\(T\) 为非奇异矩阵）均为投影矩阵。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由定理 6.1 只需验证幂等：\((P^{\mathrm H})^2=(P^2)^{\mathrm H}=P^{\mathrm H}\)；\((I-P)^2=I-2P+P^2=I-P\)；\((T^{-1}PT)^2=T^{-1}P^2T=T^{-1}PT\)。三者皆幂等，故皆为投影矩阵。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex61-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag">互补投影</span></header>
+              <div class="card-body">
+                <p>证明 \(I-P_{L,M}=P_{M,L}\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>对 \(x=y+z\)（\(y\in L,z\in M\)）：\((I-P_{L,M})x=x-y=z\)。而 \(z\) 正是 \(x\) 在 \(M\) 上沿 \(L\) 的投影（把分解换序为 \(x=z+y\) 即见），即 \(P_{M,L}x=z\)。由 \(x\) 任意得 \(I-P_{L,M}=P_{M,L}\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex61-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag tag-mid">投影矩阵的加减乘</span></header>
+              <div class="card-body">
+                <p>设 \(P_1,P_2\) 均为投影矩阵。证明：(1) \(P=P_1+P_2\) 是投影矩阵的充要条件是 \(P_1P_2=P_2P_1=O\)；(2) \(P=P_1-P_2\) 是投影矩阵的充要条件是 \(P_1P_2=P_2P_1=P_2\)；(3) 若 \(P_1P_2=P_2P_1\)，则 \(P=P_1P_2\) 是投影矩阵。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由定理 6.1，"是投影矩阵"等价于"幂等"。</p>
+                  <p>(1) \((P_1+P_2)^2=P_1+P_2+P_1P_2+P_2P_1\)，故幂等 \(\Leftrightarrow P_1P_2+P_2P_1=O\)。充分性显然。必要性：对该式左乘 \(P_1\) 得 \(P_1P_2+P_1P_2P_1=O\)，右乘 \(P_1\) 得 \(P_1P_2P_1+P_2P_1=O\)，两式相减得 \(P_1P_2=P_2P_1\)，代回原式得 \(2P_1P_2=O\)，即 \(P_1P_2=P_2P_1=O\)。</p>
+                  <p>(2) \((P_1-P_2)^2=P_1-P_1P_2-P_2P_1+P_2\)，故幂等 \(\Leftrightarrow P_1P_2+P_2P_1=2P_2\)。充分性显然。必要性：左乘 \(P_2\) 得 \(P_2P_1P_2+P_2P_1=2P_2\)，右乘 \(P_2\) 得 \(P_1P_2+P_2P_1P_2=2P_2\)，相减得 \(P_2P_1=P_1P_2\)，代回得 \(P_1P_2=P_2=P_2P_1\)。</p>
+                  <p>(3) \((P_1P_2)^2=P_1P_2P_1P_2=P_1P_1P_2P_2=P_1P_2\)（用交换性把中间两因子换位），幂等。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex61-5">
+              <header class="card-head"><span class="card-label">第 5 题</span><span class="tag">谱</span></header>
+              <div class="card-body">
+                <p>设 \(P\) 是投影矩阵，证明 \(P\) 的特征值为 1 或 0。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>设 \(Px=\lambda x,\ x\ne0\)。则 \(\lambda^2x=P^2x=Px=\lambda x\)，故 \((\lambda^2-\lambda)x=0\)，由 \(x\ne0\) 得 \(\lambda^2=\lambda\)，即 \(\lambda\in\{0,1\}\)。（几何解释：\(L\) 中向量不动给出 1，\(M\) 中向量归零给出 0。）</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex61-6">
+              <header class="card-head"><span class="card-label">第 6 题</span><span class="tag">半正定</span></header>
+              <div class="card-body">
+                <p>设 \(P\) 是正交投影矩阵，证明 \(P\) 是半正定的。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由定理 6.2，\(P^2=P,\ P^{\mathrm H}=P\)。于是对任意 \(x\)：\(x^{\mathrm H}Px=x^{\mathrm H}P^2x=x^{\mathrm H}P^{\mathrm H}Px=(Px)^{\mathrm H}(Px)=\|Px\|_2^2\ge0\)。故 \(P\) 半正定。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex61-7">
+              <header class="card-head"><span class="card-label">第 7 题</span><span class="tag tag-mid">R³ 计算</span></header>
+              <div class="card-body">
+                <p>设 \(\R^3\) 的子空间 \(L\) 由向量 \(e_1=(1,0,0)^{\mathrm T}\) 张成。(1) 若子空间 \(M\) 由 \(\alpha=(1,1,0)^{\mathrm T}\) 和 \(\beta=(1,1,1)^{\mathrm T}\) 张成，求投影矩阵 \(P_{L,M}\) 和向量 \(x=(2,3,1)^{\mathrm T}\) 沿着 \(M\) 到 \(L\) 的投影；(2) 求正交投影矩阵 \(P_L\) 和向量 \(x=(2,3,1)^{\mathrm T}\) 在 \(L\) 上的投影。</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>(1) \(X=\begin{pmatrix}1\\0\\0\end{pmatrix},\ Y=\begin{pmatrix}1&1\\1&1\\0&1\end{pmatrix}\)，\((X,Y)=\begin{pmatrix}1&1&1\\0&1&1\\0&0&1\end{pmatrix}\)，其逆为 \(\begin{pmatrix}1&-1&0\\0&1&-1\\0&0&1\end{pmatrix}\)。由式 (6.1.5)，\(P_{L,M}=(X,O)(X,Y)^{-1}=\begin{pmatrix}1&-1&0\\0&0&0\\0&0&0\end{pmatrix}\)。于是 \(P_{L,M}x=(2-3,0,0)^{\mathrm T}=(-1,0,0)^{\mathrm T}\)。验证：\(x-P_{L,M}x=(3,3,1)^{\mathrm T}=2\alpha+\beta\in M\) ✓。</p>
+                  <p>(2) \(L^\perp\) 为后两坐标面，\(P_L=e_1e_1^{\mathrm T}=\begin{pmatrix}1&0&0\\0&0&0\\0&0&0\end{pmatrix}\)（亦可用式 (6.1.6)：\(X^{\mathrm H}X=1\)）。\(P_Lx=(2,0,0)^{\mathrm T}\)，残差 \((0,3,1)^{\mathrm T}\perp e_1\) ✓。比较两问：同一个 \(L\)，换不同的补空间，投影结果从 \((2,0,0)^{\mathrm T}\) 变成 \((-1,0,0)^{\mathrm T}\)——斜投影依赖 \(M\)，正交投影不依赖。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结</h2>
+            <div class="summary-block">
+              <p>投影矩阵是"直和分解"的矩阵化身，幂等性是它的代数指纹：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>对象</th><th>结论</th></tr>
+                  <tr><td>投影算子 \(P_{L,M}\)（定义 6.1）</td><td>\(x=y+z\mapsto y\)；\(R(P)=L,\ N(P)=M\)；线性</td></tr>
+                  <tr><td>投影矩阵（定义 6.2）</td><td>定理 6.1：幂等 \(\Leftrightarrow\) 投影矩阵；\(P=P_{R(P),N(P)}\)</td></tr>
+                  <tr><td>构造公式 (6.1.5)</td><td>\(P_{L,M}=(X,O)(X,Y)^{-1}\)，\(X,Y\) 为 \(L,M\) 的基</td></tr>
+                  <tr><td>正交投影（定义 6.3）</td><td>定理 6.2：幂等 Hermite \(\Leftrightarrow\) 正交投影矩阵</td></tr>
+                  <tr><td>显式公式 (6.1.6)</td><td>\(P_L=X(X^{\mathrm H}X)^{-1}X^{\mathrm H}\)，只依赖 \(L\)</td></tr>
+                  <tr><td>引理 1</td><td>幂等 \(\Rightarrow N(A)=R(I-A)\)（秩论证）</td></tr>
+                </table>
+              </div>
+              <p style="margin-top:12px"><strong>承上启下：</strong>§4.3 的满秩分解给出了 \((X,Y)\) 型可逆分块的来源；§2.3 的正交补给出 \(L^\perp\)。下一节 §6.2 将看到：Penrose 方程 (iii)(iv) 说的正是"\(AX\) 与 \(XA\) 是正交投影矩阵"，本节的定理 6.2 是 Moore–Penrose 逆等价定义的几何钥匙。</p>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>为什么"分解唯一"同时保证了投影算子的良定义与线性？若 \(L+M=\C^n\) 但 \(L\cap M\ne\{0\}\)，哪一步会失败？</li>
+                  <li>定理 6.1 的充分性证明中，式 (6.1.3) 与引理 1 各起了什么作用？直和性 \(R(P)\cap N(P)=\{0\}\) 用到了幂等的哪一次？</li>
+                  <li>斜投影矩阵与正交投影矩阵的代数差别只有一个条件（\(P^{\mathrm H}=P\)），几何差别是什么？为什么 (6.1.6) 的右端与 \(L^\perp\) 的基 \(Y\) 无关？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="../ch5/5.4-kronecker-product.html"><span class="ln-dir">上一章</span><span class="ln-ttl">第 5 章 §5.4 矩阵的直积及其应用（选学）</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="6.2-penrose-existence.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§6.2 广义逆矩阵的存在、性质及构造方法</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

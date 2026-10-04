@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§7.1 正定矩阵与正稳定矩阵（选学） · 矩阵论</title>
+  <meta name="description" content="矩阵论 §7.1（选学）：Hermite 正定/半正定矩阵、特征值与 PᴴP 与顺序主子式判别、同时合同对角化（例7.1）、det 不等式（例7.2）、Loewner 序与矩阵不等式八条、Schwarz 矩阵不等式；正稳定矩阵（Lyapunov）、谱判据、Cayley 变换、强稳定/D-稳定/V.L.稳定、低阶与三对角判据">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§7.1 正定矩阵与正稳定矩阵（选学）</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="7.1" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 7 章 若干特殊矩阵类介绍</a><span class="sep" aria-hidden="true">/</span>
+            <span>§7.1 正定矩阵与正稳定矩阵（选学）</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 7 章 · 选学章开篇</div>
+            <h1>§7.1 正定矩阵与正稳定矩阵</h1>
+            <p class="lede">特殊矩阵类是"有实际背景、性质可计算"的矩阵家族：差分逼近给出三对角/对角占优阵，曲线拟合给出 Toeplitz/Hankel 阵，投入产出给出 M 矩阵，控制系统稳定性给出<strong>正稳定矩阵</strong>，Markov 链给出随机矩阵。本节聚焦两类最基础的：<strong>Hermite 正定矩阵</strong>（二次型恒正，对应 §4.1 的 Cholesky 分解与 §6.5 的加权范数）与<strong>正稳定矩阵</strong>（特征值全在右半平面，对应 Lyapunov 稳定性理论），并系统整理 Loewner 序下的矩阵不等式。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.365–377</strong></span>
+              <span class="chip">建议 <strong>2 学时</strong></span>
+              <span class="chip">例题 <strong>2.1–7.2</strong></span>
+              <span class="chip">判别法 <strong>4+3 条</strong></span>
+              <span class="chip">稳定性 <strong>4 个概念</strong></span>
+
+              <span class="chip">定义 <strong>2 个</strong></span></div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>陈述正定/半正定的二次型定义，熟练使用四种判别法（特征值、\(P^{\mathrm H}P\)、顺序主子式、合同）；</li>
+                  <li>掌握正定阵的基本运算性质（倍数、和、逆、合同、可交换乘积）；</li>
+                  <li>理解 Loewner 序 \(A\ge B\)，会用八条矩阵不等式，特别是 Schwarz 矩阵不等式；</li>
+                  <li>陈述正稳定矩阵的 Lyapunov 定义与谱判据，会用 Cayley 变换条件；</li>
+                  <li>区分强稳定、D-稳定、V.L.稳定及其包含关系；会判二阶矩阵稳定性。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>四种正定性判别法；</li>
+                      <li>Loewner 序与矩阵不等式；</li>
+                      <li>正稳定的谱判据。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>"不可比较"的正定阵；</li>
+                      <li>正稳定的左右半平面符号约定；</li>
+                      <li>同时合同对角化。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 2 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>正定矩阵：定义、判别法、同时合同对角化（例 7.1）、行列式不等式（例 7.2）</td><td class="num">p.365–368</td></tr>
+                    <tr><td class="num">2</td><td>Loewner 序与矩阵不等式；正稳定矩阵（Lyapunov、Cayley、强/D-/V.L.稳定、低阶判据）、实验与习题</td><td class="num">p.368–377</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 200" role="img" aria-label="正定与正稳定脉络图">
+                    <defs><marker id="m71" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b"><rect x="40" y="24" width="200" height="54"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="140" y="46">Hermite 正定 A</text><text x="140" y="64" font-size="11" fill="#666">xᴴAx&gt;0（7.1.2）</text>
+                    </g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="300" y="24" width="220" height="54"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="410" y="46">四种判别：谱 / PᴴP /</text><text x="410" y="64" font-size="11" fill="#666">顺序主子式 / Cholesky</text>
+                    </g>
+                    <g class="fm-node" fill="#f4f0e2" stroke="#a06a17"><rect x="580" y="24" width="220" height="54"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="12.5" text-anchor="middle">
+                      <text x="690" y="46">Loewner 序与不等式</text><text x="690" y="64" font-size="11" fill="#666">Schur 补 / Schwarz</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m71)"><line x1="240" y1="51" x2="298" y2="51"/><line x1="520" y1="51" x2="578" y2="51"/></g>
+                    <g class="fm-node" fill="#eef7f0" stroke="#3d7a4e"><rect x="250" y="126" width="340" height="54"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="420" y="148">正稳定矩阵（Lyapunov）</text><text x="420" y="166" font-size="11" fill="#666">Re λᵢ&gt;0 ⇔ AW+WAᵀ 正定 ⇔ Cayley 变换收敛</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m71)"><line x1="410" y1="78" x2="410" y2="124"/></g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 章引言：特殊矩阵家族 ================= -->
+          <section class="section" id="sec-family">
+            <h2 class="sec-title"><span class="cn">引</span>第 7 章要认识的矩阵家族</h2>
+            <p>"特殊矩阵"指元素数值或所具性质上有特性的矩阵：单位阵、初等阵、置换阵、对角/三角/三对角/带状阵、对称/次对称/中心对称阵、Hermite 阵、正交阵、酉阵、非负阵、Givens 旋转阵、Householder 阵等都是熟知的成员。再如<strong>周期 Jacobi 矩阵</strong> \(L\) 与<strong>反周期 Jacobi 矩阵</strong> \(L_{-1}\)（三对角外加两个角元 \(b_n\) 与 \(-b_n\)，\(b_i&gt;0\)），抹去末行末列得样条插值中常见的 Jacobi 矩阵 \(J_{n-1}\)。本章按实际背景依次介绍：正定/正稳定（本节）、对角占优（§7.2）、非负（§7.3）、M 矩阵与广义 M 矩阵（§7.4）、Toeplitz 及其有关矩阵（§7.5）、其他特殊矩阵（§7.6）。</p>
+          </section>
+
+          <!-- ================= 一、正定矩阵 ================= -->
+          <section class="section" id="sec-pd">
+            <h2 class="sec-title"><span class="cn">一</span>正定矩阵及一些矩阵不等式</h2>
+
+            <section class="card def" id="def-pd">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义：Hermite 半正定与正定</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A\) 是 \(n\) 阶 Hermite 矩阵。若对任意复 \(n\) 维列向量 \(x\ne0\) 都有</p>
+                <div class="eq-scroll">\[ x^{\mathrm H}Ax\ge0, \tag{7.1.1} \]</div>
+                <p>则称 \(A\) 为 <strong>Hermite 半正定（教材称非负定）矩阵</strong>；若对任意 \(x\ne0\) 都有</p>
+                <div class="eq-scroll">\[ x^{\mathrm H}Ax>0, \tag{7.1.2} \]</div>
+                <p style="margin-bottom:0">则称 \(A\) 为 <strong>Hermite 正定矩阵</strong>（实情形即对称正定阵）。单位阵 \(I\) 就是正定阵。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="pd-basic">基本运算性质</h3>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>运算</th><th>结论</th></tr>
+                <tr><td>正数倍</td><td>\(A\) 正定、\(k&gt;0\) 为正常数 \(\Rightarrow kA\) 正定</td></tr>
+                <tr><td>和</td><td>\(A,B\) 都正定 \(\Rightarrow A+B\) 正定（半正定情形：半正定 + 半正定仍为半正定）</td></tr>
+                <tr><td>逆</td><td>\(A\) 正定 \(\Rightarrow A^{-1}\) 正定（特征值取倒数仍正）</td></tr>
+                <tr><td>合同</td><td>\(A\) 正定、\(C\) 为 \(n\times m\) <strong>列满秩</strong>阵 \(\Rightarrow C^{\mathrm H}AC\) 正定（\(m\le n\)）</td></tr>
+                <tr><td>迹</td><td>\(A\) 正定（半正定）\(\Rightarrow\mathrm{tr}A&gt;\lambda_i(A)\)（\(\ge\)）(7.1.3)</td></tr>
+              </table>
+            </div>
+
+            <h3 class="sub-title" id="pd-tests">四种判别法</h3>
+            <section class="card thm" id="thm-pd-tests">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">正定（半正定）的等价判别</span>
+              </header>
+              <div class="card-body">
+                <p><strong>判别一（谱）。</strong>Hermite 阵 \(A\) 正定 \(\Leftrightarrow\) 特征值全正；半正定 \(\Leftrightarrow\) 特征值全非负。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p>若 \(Ax=\lambda x\)，则 \(0&lt;x^{\mathrm H}Ax=x^{\mathrm H}\lambda x=\lambda\|x\|^2\)，故 \(\lambda&gt;0\)。反之由 §1.3 存在酉阵 \(U\) 使 \(A=U\operatorname{diag}(\lambda_i)U^{\mathrm H}\)，\(\lambda_i&gt;0\) 时对任意 \(x\ne0\)，令 \(y=U^{\mathrm H}x\ne0\)，则 \(x^{\mathrm H}Ax=y^{\mathrm H}\operatorname{diag}(\lambda_i)y=\sum\lambda_i|y_i|^2&gt;0\)。</p>
+                </details>
+                <p><strong>判别二（平方根与 \(P^{\mathrm H}P\)）。</strong>\(A\) 正定（半正定）\(\Leftrightarrow\) 存在非奇异（\(n\) 阶）矩阵 \(P\) 使</p>
+                <div class="eq-scroll">\[ A=P^{\mathrm H}P; \tag{7.1.4} \]</div>
+                <p>进一步存在正定（半正定）矩阵 \(B\) 使</p>
+                <div class="eq-scroll">\[ A=B^2. \tag{7.1.4′} \]</div>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">取 \(P=\operatorname{diag}(\sqrt{\lambda_i})U^{\mathrm H}\) 即 \(A=P^{\mathrm H}P\)；令 \(B=U\operatorname{diag}(\sqrt{\lambda_i})U^{\mathrm H}\) 则 \(A=B^2\) 且 \(B\) 正定。反之 \(x^{\mathrm H}Ax=(Px)^{\mathrm H}(Px)=\|Px\|^2&gt;0\)。</p>
+                </details>
+                <p><strong>判别三（顺序主子式，Sylvester 判据）。</strong>Hermite 阵 \(A\) 正定 \(\Leftrightarrow\) \(n\) 个顺序主子式之值全为正。</p>
+                <p style="margin-bottom:0"><strong>判别四（Cholesky）。</strong>\(A\) 正定 \(\Leftrightarrow\) 存在非奇异上三角阵 \(G_H\) 使 \(A=G_H^{\mathrm H}G_H\)（§4.1 的 Cholesky 分解），等价于 Gauss 消元无需换行即可到底且所有主元为正。</p>
+              </div>
+            </section>
+
+            <p><strong>可交换的乘积仍正定：</strong>若 \(A,C\) 均为 \(n\) 阶正定阵且 \(AC=CA\)，则 \(AC\) 正定。</p>
+            <details class="proof"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+              <p>\((AC)^{\mathrm H}=C^{\mathrm H}A^{\mathrm H}=CA=AC\)，故 \(AC\) 是 Hermite 阵。取正定平方根 \(A=B^2\)（\(B\) 正定），则 \(B^{-1}(AC)B=BCB\)，即 \(AC\) 与 \(BCB=B^{\mathrm H}CB\) 相似（合同），后者特征值全正，故 \(AC\) 特征值全正。若把条件改为 \(A,C\) 半正定且可交换，结论为 \(AC\) 半正定。</p>
+            </details>
+
+            <section class="card ex" id="exm-7-1">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 7.1：同时合同对角化</span>
+              </header>
+              <div class="card-body">
+                <p>若 \(A,B\) 都是 \(n\) 阶 Hermite 阵且 \(B\) 正定，则存在非奇异矩阵 \(Q\)，使</p>
+                <div class="eq-scroll">\[ Q^{\mathrm H}BQ=I, \tag{7.1.5} \]</div>
+                <div class="eq-scroll">\[ Q^{\mathrm H}AQ=\operatorname{diag}(\lambda_1,\cdots,\lambda_n). \tag{7.1.5′} \]</div>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">由 (7.1.4) 写 \(B=P^{\mathrm H}P\)，则</p>
+                  <div class="eq-scroll">\[ (P^{-1})^{\mathrm H}BP^{-1}=I; \tag{7.1.6} \]</div>
+                  <p>\((P^{-1})^{\mathrm H}AP^{-1}\) 是 Hermite 阵，酉对角化为 \(U^{\mathrm H}(P^{-1})^{\mathrm H}AP^{-1}U=\operatorname{diag}(\lambda_i)\)。令 \(Q=P^{-1}U\) 即非奇异，并验得两式。这是广义特征值问题 \(Ax=\lambda Bx\) 的理论基础。</p>
+                </details>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-7-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/></svg></span>
+                <span class="card-label">例 7.2：行列式的递降不等式</span>
+              </header>
+              <div class="card-body">
+                <p>若 \(A=(a_{ij})\in\C^{n\times n}\) 正定，\(A_{n-1}\) 为其 \(n-1\) 阶顺序主子矩阵，则</p>
+                <div class="eq-scroll">\[ \det A\le a_{nn}\det A_{n-1}, \tag{7.1.7} \]</div>
+                <p style="margin-bottom:0">等号成立当且仅当 \(a_{in}=0\ (i=1,\cdots,n-1)\)。</p>
+                <details class="proof"><summary><span>证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">分块 \(A=\begin{pmatrix}A_{n-1}&a\\ a^{\mathrm H}&a_{nn}\end{pmatrix}\)，用块行变换
+                  \(\begin{pmatrix}I&0\\-a^{\mathrm H}A_{n-1}^{-1}&1\end{pmatrix}A=\begin{pmatrix}A_{n-1}&a\\0&a_{nn}-a^{\mathrm H}A_{n-1}^{-1}a\end{pmatrix}\)（Schur 补），取行列式得 \(\det A=(a_{nn}-a^{\mathrm H}A_{n-1}^{-1}a)\det A_{n-1}\le a_{nn}\det A_{n-1}\)，等号恰在 \(a=0\) 时成立。反复使用即得 Hadamard 不等式 \(\det A\le\prod_i a_{ii}\)（习题 1）。</p>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="loewner">矩阵不等式（Loewner 序）</h3>
+            <p>设 \(A,B\) 都是 \(n\) 阶 Hermite 阵。若 \(A-B\) 为正定（半正定）矩阵，则称 <strong>\(A\) 大于 \(B\)</strong>，记 \(A&gt;B\)（<strong>\(A\) 不小于 \(B\)</strong>，记 \(A\ge B\)）；反向记为 \(B&lt;A\)、\(B\le A\)。注意这里的"&gt;""\(\ge\)"不是正矩阵/非负矩阵的元素大小记号。</p>
+            <p style="margin-bottom:0">\(A\ge B\) 的充要条件是对任意 \(x\) 都有 \(x^{\mathrm H}Ax\ge x^{\mathrm H}Bx\)（7.1.8）；当 \(A,B\) 都是实对角阵时退化为逐元素 \(a_i\ge b_i\)（7.1.9）。但<strong>任意两个同阶正定阵不一定可比较</strong>：\(A=\begin{pmatrix}1&0\\0&2\end{pmatrix}\) 与 \(B=\begin{pmatrix}2&0\\0&1\end{pmatrix}\) 互有大小特征值，\(A-B\) 不定，故 \(A\ge B\) 与 \(B\ge A\) 都不成立。</p>
+
+            <section class="card note" id="loewner-props">
+              <header class="card-head"><span class="card-label">Loewner 序的常用性质</span></header>
+              <div class="card-body">
+                <div class="table-wrap">
+                  <table class="book">
+                    <tr><th>#</th><th>性质</th></tr>
+                    <tr><td class="num">(1)</td><td>传递性：\(A\ge B,\ B\ge C\Rightarrow A\ge C\)</td></tr>
+                    <tr><td class="num">(2)</td><td>正数倍线性：\(A\ge B,\ k&gt;0\Rightarrow kA\ge kB\)</td></tr>
+                    <tr><td class="num">(3)</td><td>可加：\(A_1\ge B_1,\ A_2\ge B_2\Rightarrow A_1+A_2\ge B_1+B_2\)</td></tr>
+                    <tr><td class="num">(4)</td><td>合同保序：\(A\ge B\Rightarrow P^{\mathrm H}AP\ge P^{\mathrm H}BP\)</td></tr>
+                    <tr><td class="num">(5)</td><td>半正定阵满足 \(A\le(\mathrm{tr}A)I\)（7.1.10）</td></tr>
+                    <tr><td class="num">(6)</td><td>可交换时平方保序：\(A,B\) 正定（或半正定）、\(AB=BA\)、\(A\ge B\Rightarrow A^2\ge B^2\)（7.1.11）</td></tr>
+                    <tr><td class="num">(7)</td><td>取逆反序：\(A\ge B&gt;0\Rightarrow B^{-1}\ge A^{-1}\)（7.1.12）</td></tr>
+                  </table>
+                </div>
+                <p><strong>(8) 矩阵型 Schwarz 不等式。</strong>设 \(A\) 为 \(n\times m\)、\(B\) 为 \(m\times s\) 阵，且 \(AA^{\mathrm H}\) 非奇异（此时 \(n\le m,\ \operatorname{rank}A=n\)），则</p>
+                <div class="eq-scroll">\[ B^{\mathrm H}B\ge(AB)^{\mathrm H}(AA^{\mathrm H})^{-1}(AB), \tag{7.1.13} \]</div>
+                <p style="margin-bottom:0">等号成立 \(\Leftrightarrow B=A^{\mathrm H}C\)（存在 \(n\times s\) 阵 \(C\)）。</p>
+                <details class="proof"><summary><span>证明（配平方）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <p style="margin-bottom:0">\(O\le[B-A^{\mathrm H}(AA^{\mathrm H})^{-1}AB]^{\mathrm H}[\cdots]=B^{\mathrm H}B-(AB)^{\mathrm H}(AA^{\mathrm H})^{-1}(AB)\)；右端为零矩阵恰在 \(B=A^{\mathrm H}(AA^{\mathrm H})^{-1}AB\)，即 \(B=A^{\mathrm H}C\)。取 \(A,B\) 为行、列向量时即得普通 Cauchy–Schwarz 公式 (1.3.14)；它也是最小二乘投影 \(P_{R(A^{\mathrm H})}=A^{\mathrm H}(AA^{\mathrm H})^{-1}A\)（行满秩版）的代数表达。</p>
+                </details>
+              </div>
+            </section>
+          </section>
+
+          <!-- ================= 二、正稳定矩阵 ================= -->
+          <section class="section" id="sec-stable">
+            <h2 class="sec-title"><span class="cn">二</span>正稳定矩阵</h2>
+            <p>稳定性理论由俄国数学家 Lyapunov 于 19 世纪末创立：判别线性系统的稳定性可归结为研究矩阵特征值问题。称一个矩阵<strong>稳定</strong>，即指该矩阵对应的线性系统稳定。以下矩阵均设为实矩阵 \(A\in\R^{n\times n}\)。</p>
+            <div class="card note" style="margin:10px 0">
+              <header class="card-head"><span class="card-label">符号约定（务必注意）</span></header>
+              <div class="card-body"><p style="margin-bottom:0">本书的"<strong>正稳定</strong>"指特征值实部<strong>为正</strong>（Lyapunov 的原始约定，对应微分方程 \(x'=-Ax\) 渐近稳定）；<strong>工程控制论中通常相反</strong>：称 \(x'=Ax\) 的 Hurwitz 稳定矩阵特征值实部全为<strong>负</strong>。两套语言只差一个负号，判据形式相应改号即可。</p></div>
+            </div>
+
+            <section class="card def" id="def-stable">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义：正稳定矩阵（Lyapunov）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">若存在正定矩阵 \(W\)，使 \(AW+WA^{\mathrm T}\) 为正定矩阵，则称 \(A\) 为<strong>正稳定矩阵</strong>。</p>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-stable">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></span>
+                <span class="card-label">谱判据与三个充要条件</span>
+              </header>
+              <div class="card-body">
+                <p><strong>谱判据（Lyapunov）。</strong>\(n\) 阶矩阵 \(A\) 正稳定的充要条件是每个特征值实部均正：\(\mathrm{Re}\,\lambda_i(A)&gt;0\)（工程 Hurwitz 约定为均负）。显然正定矩阵必是正稳定矩阵（实对称阵特征值全正）。</p>
+                <p style="margin-bottom:0">20 世纪 50–60 年代又给出下面三个充要条件：</p>
+                <div class="table-wrap">
+                  <table class="book">
+                    <tr><th>#</th><th>充要条件</th></tr>
+                    <tr><td class="num">(1)</td><td>\(A+I\) 非奇异，且 <strong>Cayley 变换</strong> \(G=(A+I)^{-1}(A-I)\)（7.1.14）为收敛矩阵（\(\rho(G)&lt;1\)）</td></tr>
+                    <tr><td class="num">(2)</td><td>\(A+I\) 非奇异，且存在正定阵 \(W\) 使 \(W-G^{\mathrm T}WG\) 正定（离散 Lyapunov 不等式）</td></tr>
+                    <tr><td class="num">(3)</td><td>对微分方程 \(x'=Ax\) 的任何非平凡解 \(x\) 满足 \(x^{\mathrm T}Nx\not\equiv0\) 的半正定阵 \(N\)，存在正定阵 \(M\) 使 \(AM+MA^{\mathrm T}=N\)（Lyapunov 方程）</td></tr>
+                  </table>
+                </div>
+                <p style="margin-bottom:0">条件 (1) 的直观：Cayley 变换把右半平面保形映到单位圆内（\(\lambda\mapsto(\lambda-1)/(\lambda+1)\)），于是"特征值全在右半平面"等价于"\(G\) 的特征值全在单位圆内"，即迭代 \(x_{k+1}=Gx_k\) 收敛。</p>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="stability-classes">强稳定、D-稳定、V.L.稳定</h3>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>名称</th><th>定义</th></tr>
+                <tr><td><strong>强稳定</strong></td><td>对一切非负对角阵 \(D\)，\(A+D\) 均为正稳定矩阵<br><small>教材 p.373 此处印作“\(A+D\) 为正定矩阵”，疑为误排：取 \(D=O\) 即要求 \(A\) 本身对称正定，与本页下方所引非对称例阵矛盾（该例对称部特征值约为 \(-2.56,\ 0.95,\ 19.61\)，不定）；文献通行定义为“\(A+D\) 正稳定”，按此读例阵方成立。</small></td></tr>
+                <tr><td><strong>D-稳定</strong></td><td>对一切正对角阵 \(D\)，\(AD\) 均为正稳定矩阵<br><small>教材 p.373 此处印作“存在一个正对角阵 \(D\)”，疑为误排：若按“存在”，则下方“D-稳定蕴含正稳定”不真（反例 \(A=\begin{pmatrix}-2&5\\-1&1\end{pmatrix}\) 特征值 \(-0.5\pm1.66\mathrm i\) 并非正稳定，但取 \(D=\operatorname{diag}(1,3)\) 时 \(AD\) 特征值 \(0.5\pm2.96\mathrm i\) 正稳定）；按定义与包含关系应为“对一切”（取 \(D=I\) 即得正稳定）。</small></td></tr>
+                <tr><td><strong>V.L.稳定</strong>（Volterra–Lyapunov）</td><td>存在正对角阵 \(D\)，使 \(AD+DA^{\mathrm T}\) 为正定矩阵</td></tr>
+              </table>
+            </div>
+            <p>四种稳定性的包含关系为</p>
+            <div class="eq-scroll">\[ \text{V.L.稳定}\ \longrightarrow\ \begin{matrix}\text{强稳定}\\[2pt]\text{D-稳定}\end{matrix}\ \longrightarrow\ \text{正稳定}\ \longrightarrow\ \text{（一般矩阵）}, \]</div>
+            <p style="margin-bottom:0">即 V.L.稳定蕴含强稳定与 D-稳定，强稳定与 D-稳定都蕴含正稳定（前者取 \(D=O\)、后者取 \(D=I\) 即得），但<strong>强稳定与 D-稳定之间一般无包含关系</strong>（教材：目前尚未见到）。教材给出强稳定但非 D-稳定的例 \(A=\begin{pmatrix}3&4&0\\2&3&16\\10&2&12\end{pmatrix}\)（三个特征值实部约为 \(17.47,\ 0.263,\ 0.263\)）。</p>
+
+            <h3 class="sub-title" id="low-order">低阶判据与三对角矩阵</h3>
+            <p><strong>二阶矩阵</strong> \(A=\begin{pmatrix}a&b\\c&d\end{pmatrix}\)：</p>
+            <div class="table-wrap">
+              <table class="book">
+                <tr><th>#</th><th>结论</th></tr>
+                <tr><td class="num">(7)</td><td>正稳定 \(\Leftrightarrow\det A&gt;0\) 且对角元之和 \(a+d&gt;0\)（即迹正、行列式正）</td></tr>
+                <tr><td class="num">(8)</td><td>D-（强）稳定 \(\Leftrightarrow A\in P_0^+\)（主子式非负，且同阶主子式中至少一个为正）</td></tr>
+                <tr><td class="num">(9)</td><td>V.L.稳定 \(\Leftrightarrow A\in P\)（全部主子式为正，即 \(P\) 型矩阵类）</td></tr>
+              </table>
+            </div>
+            <p><strong>三阶矩阵</strong>：正稳定的充要条件是 \(\det A&gt;0\) 且 \(\det A&gt;(A_{11}+A_{22}+A_{33})(a_{11}+a_{22}+a_{33})\)（10），其中 \(A_{ij}\) 为代数余子式；强稳定 \(\Leftrightarrow A\in P_0^+\) 且正稳定（11）；D-稳定 \(\Leftrightarrow (\sqrt{a_{11}A_{11}}+\sqrt{a_{22}A_{22}}+\sqrt{a_{33}A_{33}})^2&gt;\det A\)（12）；V.L.稳定还有用 \(P_1(y),P_2(y)\) 表达的条件（13）。此外：任一非零半正定阵 \(P\)，\(PA\) 至少有一个正对角元（5）；V.L.稳定阵的任意主子矩阵仍 V.L.稳定（6）——其他三种稳定性不具备这种"遗传性"。</p>
+            <p><strong>三对对角矩阵（Jacobi 矩阵）。</strong>对三对对角阵 \(J_n=(a_{i-1},b_i,c_i)_1^n\)（记号见 §7.5），若 \(a_ic_i&gt;0\) 则为 Jacobi 矩阵。下列 5 个命题等价：顺序主子式全为正（14）、正稳定（15）、D-稳定（16）、强稳定（17）、V.L.稳定（18）。循环矩阵（周期 Jacobi）的稳定性留待 §7.5。</p>
+            <p>稳定性的<strong>数值判定</strong>工程上多用 <strong>Routh–Hurwitz 判别法</strong>（直接由特征多项式系数判定根是否全在左/右半平面，不必求根）；用上述充要条件直接判别的方法对高阶矩阵尚不完善。</p>
+
+            <h3 class="sub-title" id="pd-lab-title">动手实验：正定与正稳定判别台</h3>
+            <p>两个模式：<strong>正定模式</strong>输入 3×3 对称阵，工具给出特征值、三个顺序主子式、Cholesky 是否可行、二次型等值线（椭圆 ⇔ 正定），并可输入第二个阵比较 Loewner 序；<strong>稳定模式</strong>输入 2×2 一般实矩阵，工具在复平面画出特征值与虚轴、计算迹/行列式判据与 Cayley 变换谱半径，直观显示"右半平面 \(\Leftrightarrow\) 单位圆内"。</p>
+            <section class="card lab" data-pd-lab></section>
+          </section>
+
+          <!-- ================= 习题 7.1 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 7.1（教材 p.376–377）</h2>
+            <div class="fold-bar no-print" data-fold-tools=".card.task">
+              <button type="button" data-fold="open">全部展开</button>
+              <button type="button" data-fold="close">全部收起</button>
+            </div>
+
+            <article class="card task" id="ex71-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">Hadamard 对角不等式</span></header>
+              <div class="card-body">
+                <p>若 \(A=(a_{ij})_{n\times n}\) 正定，证明 \(\det A\le\prod_{i=1}^n a_{ii}\)，等号成立当且仅当 \(A\) 为对角阵。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>反复使用例 7.2：\(\det A\le a_{nn}\det A_{n-1}\le a_{nn}a_{n-1,n-1}\det A_{n-2}\le\cdots\le\prod_i a_{ii}\)。每一步等号都要求当前分块的非对角列向量为零，全部等号成立当且仅当所有 \(i\ne j\) 的 \(a_{ij}=0\)，即 \(A\) 对角。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex71-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag">Hadamard 不等式</span></header>
+              <div class="card-body">
+                <p>设 \(A\) 是 \(n\) 阶实矩阵，证明 \(\det A\le\sqrt{\big(\sum_i a_{i1}^2\big)\big(\sum_i a_{i2}^2\big)\cdots\big(\sum_i a_{in}^2\big)}\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>令 \(B=A^{\mathrm T}A\)。当 \(A\) 非奇异时 \(B\) 正定，且 \(b_{jj}=\sum_i a_{ij}^2\) 是 \(A\) 第 \(j\) 列的长度平方。由第 1 题：\((\det A)^2=\det(A^{\mathrm T}A)=\det B\le\prod_j b_{jj}=\prod_j\sum_i a_{ij}^2\)，开方即得。几何意义：平行多面体体积不超过各棱长之积；等号当各列两两正交。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex71-3">
+              <header class="card-head"><span class="card-label">第 3 题</span><span class="tag">det(I+A)</span></header>
+              <div class="card-body">
+                <p>若 \(A\) 半正定，证明 \(\det(A+I)\ge1\)，且等号成立的充要条件是 \(A=O\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>谱分解 \(A=P\operatorname{diag}(\lambda_i)P^{\mathrm H}\)（\(\lambda_i\ge0\)，\(P\) 酉阵），则 \(A+I=P\operatorname{diag}(1+\lambda_i)P^{\mathrm H}\)，故 \(\det(A+I)=\prod_i(1+\lambda_i)\ge1\)；等号成立当且仅当每个 \(\lambda_i=0\)，即 \(A=O\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex71-4">
+              <header class="card-head"><span class="card-label">第 4 题</span><span class="tag tag-mid">分块行列式</span></header>
+              <div class="card-body">
+                <p>若分块矩阵 \(M=\begin{pmatrix}A&B\\ B^{\mathrm H}&D\end{pmatrix}\) 正定，证明 \(\det M\le\det A\cdot\det D\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>Schur 补 \(S=D-B^{\mathrm H}A^{-1}B\) 正定（合同变换 \(\operatorname{diag}(I,-B^{\mathrm H}A^{-1})\) 把 \(M\) 化为 \(\operatorname{diag}(A,S)\)），故 \(\det M=\det A\cdot\det S\)。由 \(S\) 正定知 \(S\le D\)（因 \(D-S=B^{\mathrm H}A^{-1}B\ge0\)），再用取行列式在 Loewner 序下的单调性（正定阵 \(0&lt;S\le D\Rightarrow\det S\le\det D\)，可由同时合同对角化得到）即得 \(\det M\le\det A\det D\)。这是 Fisher 不等式。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex71-5">
+              <header class="card-head"><span class="card-label">第 5 题</span><span class="tag">Cauchy–Schwarz</span></header>
+              <div class="card-body">
+                <p>设 \(S\) 实对称正定，证明对任意列向量 \(x,y\) 都有 \((x^{\mathrm T}Sy)^2\le(x^{\mathrm T}Sx)(y^{\mathrm T}Sy)\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由 Cholesky \(S=L^{\mathrm T}L\)，令 \(u=Lx,\ v=Ly\)，则不等式化为普通 Cauchy–Schwarz：\((u^{\mathrm T}v)^2\le\|u\|^2\|v\|^2\)。也可直接对二次型 \(q(t)=(x+ty)^{\mathrm T}S(x+ty)\ge0\) 用判别式非正得到。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex71-6">
+              <header class="card-head"><span class="card-label">第 6 题</span><span class="tag tag-mid">Schur 补正稳定</span></header>
+              <div class="card-body">
+                <p>若第 4 题的矩阵 \(M\) 为正稳定，则 \(D-B^{\mathrm H}A^{-1}B\) 亦为正稳定矩阵。</p>
+                <details class="solution"><summary><span>查看提示</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>第 4 题中的 \(M=\begin{pmatrix}A&B\\ B^{\mathrm H}&D\end{pmatrix}\) 是 Hermite 矩阵：Hermite 阵特征值全为实数，故“正稳定（特征值实部全正）”即特征值全正，亦即 \(M\) 实为正定矩阵。由第 4 题，Schur 补 \(S=D-B^{\mathrm H}A^{-1}B\) 亦为（Hermite）正定矩阵，再由“正定必正稳定”即得结论。注意：若去掉 \(A,D\) 的 Hermite 条件，命题不成立——反例 \(M=\begin{pmatrix}-1&5&2\\0&2&3\\2&3&15.2\end{pmatrix}=\begin{pmatrix}A&B\\ B^{\mathrm T}&d\end{pmatrix}\) 的特征值为 \(16.19,\ 0.005\pm0.19\mathrm i\)，实部全正（\(M\) 正稳定），但 \(S=d-B^{\mathrm T}A^{-1}B=-0.3&lt;0\) 并非正稳定。原因在于此时的消元 \(\begin{pmatrix}I&0\\-B^{\mathrm H}A^{-1}&I\end{pmatrix}M\begin{pmatrix}I&-A^{-1}B\\0&I\end{pmatrix}=\operatorname{diag}(A,S)\) 只是等价变换（右乘因子既非左乘因子之逆、亦非其共轭转置），不保持特征值，故“化为 \(\operatorname{diag}(A,S)\) 后特征值取两块之并”的论证对非 Hermite 分块不成立。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex71-7">
+              <header class="card-head"><span class="card-label">第 7 题</span><span class="tag">Minkowski 型</span></header>
+              <div class="card-body">
+                <p>设 \(A,B\) 分别是 \(n\) 阶正定和半正定矩阵，证明 \(\det(A+B)\ge\det A\)，等号成立当且仅当 \(B=O\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由例 7.1 取 \(Q\) 使 \(Q^{\mathrm H}AQ=I,\ Q^{\mathrm H}BQ=\operatorname{diag}(\mu_i)\)（\(\mu_i\ge0\)）。则 \(Q^{\mathrm H}(A+B)Q=\operatorname{diag}(1+\mu_i)\)，取行列式得 \(\det(Q^{\mathrm H}(A+B)Q)=\prod_i(1+\mu_i)\)；又由 \(Q^{\mathrm H}AQ=I\) 两端取行列式得 \(\det(Q^{\mathrm H}Q)\cdot\det A=1\)，即 \(\det(Q^{\mathrm H}Q)=1/\det A\)。于是 \(\det(A+B)=\det(Q^{\mathrm H}(A+B)Q)/\det(Q^{\mathrm H}Q)=\det A\cdot\prod_i(1+\mu_i)\)，故 \(\det(A+B)/\det A=\prod_i(1+\mu_i)\ge1\)；等号当且仅当所有 \(\mu_i=0\)，即 \(B=O\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex71-8">
+              <header class="card-head"><span class="card-label">第 8 题</span><span class="tag">Rayleigh 商</span></header>
+              <div class="card-body">
+                <p>设 \(A\) 为 \(n\) 阶实对称矩阵，\(x\) 为任一 \(n\) 维列向量，证明 \(\lambda_n x^{\mathrm T}x\le x^{\mathrm T}Ax\le\lambda_1 x^{\mathrm T}x\)，其中 \(\lambda_1,\lambda_n\) 分别为最大、最小特征值。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>正交对角化 \(A=Q\operatorname{diag}(\lambda_i)Q^{\mathrm T}\)，令 \(y=Q^{\mathrm T}x\)，则 \(x^{\mathrm T}Ax=\sum_i\lambda_i y_i^2\) 介于 \(\lambda_n\sum y_i^2\) 与 \(\lambda_1\sum y_i^2\) 之间，而 \(\sum y_i^2=x^{\mathrm T}x\)。这正是 §5.3 的 Rayleigh 商极值定理。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex71-9">
+              <header class="card-head"><span class="card-label">第 9 题</span><span class="tag tag-mid">稳定性判别</span></header>
+              <div class="card-body">
+                <p>判别矩阵的稳定性：(1) \(\begin{pmatrix}-3&-6\\4&5\end{pmatrix}\)；(2) \(\begin{pmatrix}1&2&3\\3&1&2\\2&3&1\end{pmatrix}\)。</p>
+                <details class="solution"><summary><span>查看解答</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p><strong>(1)</strong> 二阶判据：\(\mathrm{tr}A=-3+5=2&gt;0\)，\(\det A=(-3)(5)-(-6)(4)=-15+24=9&gt;0\)，满足条件 (7)，正稳定。特征值 \(\lambda^2-2\lambda+9=0\Rightarrow\lambda=1\pm2\sqrt2\,\mathrm i\)，实部均为 1。Cayley 变换谱半径 \(\rho(G)=0.816&lt;1\)。<strong>注意</strong>按工程 Hurwitz 约定（\(x'=Ax\) 稳定要求 \(\mathrm{Re}\lambda&lt;0\)）它不稳定——教材约定下结论相反。</p>
+                  <p><strong>(2)</strong> 行和均为 6，故 \(\lambda_1=6\) 是特征值；\(\mathrm{tr}A=3\)，另两特征值之和为 \(-3\)，由 \(\det A=18\) 得其积为 3，故另两根满足 \(\lambda^2+3\lambda+3=0\)，即 \(\lambda=\frac{-3\pm\sqrt3\,\mathrm i}{2}\)，实部 \(-1.5&lt;0\)。特征值不全在右半平面，<strong>不是</strong>正稳定矩阵（\(\rho(G)=2.646&gt;1\)）；按工程约定也不稳定（有正特征值 6）。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex71-10">
+              <header class="card-head"><span class="card-label">第 10 题</span><span class="tag">对角占优</span></header>
+              <div class="card-body">
+                <p>设严格（强）对角占优矩阵 \(A=(a_{ij})_{n\times n}\) 满足 \(a_{ii}&gt;0\)，证明 \(A\) 正稳定且 \(\det A&gt;0\)。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>由 Gerschgorin 圆盘定理（§5.1），\(A\) 的每个特征值落在圆盘 \(|z-a_{ii}|\le\sum_{j\ne i}|a_{ij}|\) 之并内。严格行对角占优使每个圆盘都在右半平面（圆心 \(a_{ii}&gt;0\)，半径小于圆心），故 \(\mathrm{Re}\lambda_i&gt;0\)，正稳定。同时圆盘不含原点故 \(A\) 非奇异（Levy–Desplanques）；再用连续性：令 \(A(t)=\operatorname{diag}(a_{ii})+t\cdot\)（非对角部分），\(t\in[0,1]\) 全程严格对角占优故 \(\det A(t)\ne0\)，而 \(\det A(0)=\prod a_{ii}&gt;0\)，连续不变号，故 \(\det A=\det A(1)&gt;0\)。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex71-11">
+              <header class="card-head"><span class="card-label">第 11 题</span><span class="tag tag-hard">平方保序的逆</span></header>
+              <div class="card-body">
+                <p>若 \(A\) 正定、\(B\) 半正定，且 \(A^2\ge B^2\)，证明 \(A\ge B\)（\(A,B\) 均为 Hermite 阵）。</p>
+                <details class="solution"><summary><span>查看提示</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>因 \(A\) 正定可取正定平方根 \(A^{1/2}\) 且与 \(A\) 可交换。用 Loewner 序的算子单调性：函数 \(f(t)=\sqrt t\) 在 \([0,\infty)\) 上是算子单调函数（对可同时对角化的情形显然：在共同特征基中 \(A^2\ge B^2\) 给出 \(\alpha_i^2\ge\beta_i^2\)，故 \(\alpha_i\ge|\beta_i|\ge\beta_i\)；一般情形 \(B\) 与 \(A\) 不可交换时需用算子单调函数定理或 Douglas 引理 \(B^2\le A^2\Rightarrow\overline{R}(B)\subseteq\overline{R}(A)\) 加极分解论证）。结论 \(A\ge B\)。一般"开方保序"不可与 (7.1.11) 的条件混用——后者要求 \(A,B\) 可交换。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex71-12">
+              <header class="card-head"><span class="card-label">第 12 题</span><span class="tag tag-hard">AB 相似对角</span></header>
+              <div class="card-body">
+                <p>设 \(A,B\) 均为 \(n\) 阶 Hermite 阵，且至少有一个正定，则 \(AB\) 必相似于对角矩阵。</p>
+                <details class="solution"><summary><span>查看证明</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>不妨 \(A\) 正定。取 \(A=C^2\)，\(C\) 正定可逆。则 \(AB=C(CBC)C^{-1}\)，即 \(AB\) 与 \(CBC=C^{\mathrm H}BC\) 相似；后者是 Hermite 阵（\(B\) Hermite），必可酉相似对角化，故 \(AB\) 相似于对角阵，且其特征值全为实数。这解释了为什么"一个正定阵乘一个 Hermite 阵"虽不对称却有实谱且可对角化。\(B\) 正定时同理。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结</h2>
+            <div class="summary-block">
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>主题</th><th>核心结论</th></tr>
+                  <tr><td>正定定义</td><td>\(x^{\mathrm H}Ax&gt;0\)（正定）/ \(\ge0\)（半正定）</td></tr>
+                  <tr><td>四大判别</td><td>特征值全正；\(A=P^{\mathrm H}P\)（\(P\) 非奇异）；顺序主子式全正（Sylvester）；Cholesky 存在</td></tr>
+                  <tr><td>运算</td><td>正数倍、和、逆、列满秩合同保正定；可交换乘积 \(AC\) 仍正定</td></tr>
+                  <tr><td>合同</td><td>例 7.1：\(B\) 正定时可同时 \(Q^{\mathrm H}BQ=I,\ Q^{\mathrm H}AQ=\operatorname{diag}\)</td></tr>
+                  <tr><td>行列式</td><td>\(\det A\le a_{nn}\det A_{n-1}\le\prod a_{ii}\)；Hadamard 列长版；\(\det(A+B)\ge\det A\)</td></tr>
+                  <tr><td>Loewner 序</td><td>\(A\ge B\Leftrightarrow x^{\mathrm H}Ax\ge x^{\mathrm H}Bx\)；8 条性质；Schwarz 矩阵不等式 (7.1.13)</td></tr>
+                  <tr><td>正稳定</td><td>\(\exists W&gt;0:\ AW+WA^{\mathrm T}&gt;0\Leftrightarrow\mathrm{Re}\lambda_i&gt;0\Leftrightarrow\rho((A+I)^{-1}(A-I))&lt;1\)</td></tr>
+                  <tr><td>稳定家族</td><td>强稳定 / D-稳定 / V.L.稳定，包含关系见图；二阶迹与行列式判据；Jacobi 阵五命题等价</td></tr>
+                </table>
+              </div>
+              <p style="margin-top:12px"><strong>与全书的联系：</strong>正定阵是 §4.1 Cholesky 分解的对象、§6.5 加权范数的权矩阵、§5.3 Rayleigh 商的定义域；正稳定的 Cayley 变换与 §3.3 矩阵幂级数收敛（\(\rho&lt;1\)）、§6.3 的 Neumann 展式迭代直接相通。下一节 §7.2 转向<strong>对角占优矩阵</strong>——习题 10 的 Gerschgorin 论证将被系统展开。</p>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>两个正定阵为什么可能"不可比较"？\(A\ge B\) 时 \(A^2\ge B^2\) 为什么必须要求可交换？</li>
+                  <li>正稳定的三种刻画（Lyapunov 不等式、特征值右半平面、Cayley 变换 \(\rho&lt;1\)）各自适合什么场合？工程约定为什么差一个负号？</li>
+                  <li>Schwarz 矩阵不等式 (7.1.13) 与最小二乘投影 \(P_{R(A^{\mathrm H})}\) 是什么关系？取等条件 \(B=A^{\mathrm H}C\) 的几何意义是什么？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="../ch6/6.6-drazin-inverse.html"><span class="ln-dir">上一章</span><span class="ln-ttl">第 6 章 §6.6 Drazin 广义逆（选学）</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="7.2-diagonally-dominant.html"><span class="ln-dir">下一节</span><span class="ln-ttl">§7.2 对角占优矩阵（选学）</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>

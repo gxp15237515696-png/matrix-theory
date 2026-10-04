@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="connect-src 'none'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>§2.3 范数的一些应用 · 矩阵论</title>
+  <meta name="description" content="矩阵论 §2.3：用范数判断 I−A 的非奇异性、逆矩阵的摄动与条件数、谱半径的性质、矩阵幂 Aᵏ 收敛于零的充要条件">
+  <link rel="stylesheet" href="../../vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主内容</a>
+  <div id="progress-bar" aria-hidden="true"></div>
+
+  <header class="topbar no-print">
+    <button id="nav-toggle" class="nav-toggle" aria-label="打开目录" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="tt">§2.3 范数的一些应用</span>
+  </header>
+  <div class="scrim"></div>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar no-print" data-active="2.3" aria-label="课程目录" tabindex="-1">
+      <noscript><p><a href="../../index.html">返回课程主页</a></p></noscript>
+    </aside>
+
+    <main class="content" id="main" tabindex="-1">
+      <div class="content-inner">
+        <article id="lesson-article">
+
+          <nav class="breadcrumb" aria-label="面包屑">
+            <a href="../../index.html">课程主页</a><span class="sep" aria-hidden="true">/</span>
+            <a href="../../index.html">第 2 章 范数理论及其应用</a><span class="sep" aria-hidden="true">/</span>
+            <span>§2.3 范数的一些应用</span></nav>
+
+          <header class="lesson-hero">
+            <div class="kicker">第 2 章 · 范数理论及其应用</div>
+            <h1>§2.3 范数的一些应用</h1>
+            <p class="lede">范数不只是"长度记号"，它给数值计算提供了三类可操作的判据：<strong>不看行列式，仅凭 ‖A‖&lt;1 就能断定 I−A 可逆</strong>并估计逆的大小；矩阵元素有小扰动时，用<strong>条件数</strong>估计逆矩阵的相对误差；最后用<strong>谱半径</strong>精确刻画矩阵幂 \(A^k\) 何时趋于零——这正是线性方程组迭代法收敛与否的总开关。</p>
+            <div class="chips">
+              <span class="chip">教材 <strong>p.132–138</strong></span>
+              <span class="chip">建议 <strong>3 学时</strong></span>
+              <span class="chip">定义 <strong>1 个</strong></span>
+              <span class="chip">定理 <strong>7 个</strong></span>
+              <span class="chip">例题 <strong>1 道</strong></span>
+            </div>
+          </header>
+
+          <!-- ================= 教学计划 ================= -->
+          <section class="lesson-plan" id="plan">
+            <h2 class="sr-only">教学计划</h2>
+            <div class="plan-grid">
+              <div class="plan-card pc-goal">
+                <h3><span class="pc-dot"></span>学习目标</h3>
+                <ul>
+                  <li>用 \(\|A\|&lt;1\) 判断 \(I-A\) 非奇异，并估计 \(\|(I-A)^{-1}\|\)；</li>
+                  <li>陈述逆矩阵摄动定理，用<strong>条件数</strong> \(\mathrm{cond}(A)=\|A\|\|A^{-1}\|\) 做误差分析；</li>
+                  <li>定义谱半径 \(\rho(A)\)，证明并使用 \(\rho(A)\le\|A\|\)；</li>
+                  <li>掌握 \(\rho(A^k)=[\rho(A)]^k\)，Hermite 矩阵 \(\|A\|_2=\rho(A)\)；</li>
+                  <li>陈述并运用 <strong>\(A^k\to O\Leftrightarrow\rho(A)&lt;1\)</strong>，知道"某种范数 &lt;1"是充分条件。</li>
+                </ul>
+              </div>
+              <div class="plan-card pc-key">
+                <h3><span class="pc-dot"></span>重点与难点</h3>
+                <div class="pd-cols">
+                  <div>
+                    <h4>重点</h4>
+                    <ul>
+                      <li>定理 2.6、2.7 的 Neumann 型估计；</li>
+                      <li>条件数与相对误差；</li>
+                      <li>谱半径与各范数的关系；</li>
+                      <li>幂收敛充要条件。</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4>难点</h4>
+                    <ul>
+                      <li>\(\rho(A)&lt;1\) 但所有常用范数都 ≥1 时，靠定理 2.10 构造范数；</li>
+                      <li>正规矩阵时谱范数与谱半径相等；一般矩阵可能相差很大；</li>
+                      <li>亏损矩阵的幂含多项式因子。</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="plan-card pc-time">
+                <h3><span class="pc-dot"></span>学时安排（共 3 学时）</h3>
+                <div class="table-wrap">
+                  <table class="book center">
+                    <tr><th>次序</th><th>学习内容</th><th>教材页</th></tr>
+                    <tr><td class="num">1</td><td>矩阵非奇异性条件（定理 2.6、2.7）</td><td class="num">p.132–134</td></tr>
+                    <tr><td class="num">2</td><td>逆矩阵摄动、条件数</td><td class="num">p.134–135</td></tr>
+                    <tr><td class="num">3</td><td>谱半径性质（定理 2.9、2.10，例 2.10–2.12）与习题；幂收敛判据为 §3.1 的提前引用</td><td class="num">p.135–138</td></tr>
+                  </table>
+                </div>
+              </div>
+              <div class="plan-card pc-map full">
+                <h3><span class="pc-dot"></span>知识脉络图</h3>
+                <div class="flow-map">
+                  <svg viewBox="0 0 840 220" role="img" aria-label="范数应用脉络图">
+                    <defs><marker id="m23" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8a8377"/></marker></defs>
+                    <g class="fm-node" fill="#eef4f9" stroke="#2b5f8b">
+                      <rect x="30" y="26" width="180" height="48"/><rect x="250" y="26" width="180" height="48"/><rect x="470" y="26" width="180" height="48"/>
+                    </g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13" text-anchor="middle">
+                      <text x="120" y="48">‖A‖&lt;1</text><text x="120" y="66" font-size="11" fill="#666">I−A 可逆 + 逆的估计</text>
+                      <text x="340" y="48">逆矩阵摄动</text><text x="340" y="66" font-size="11" fill="#666">cond(A)=‖A‖‖A⁻¹‖</text>
+                      <text x="560" y="48">谱半径 ρ(A)</text><text x="560" y="66" font-size="11" fill="#666">ρ≤‖A‖，Hermite 时等号</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m23)"><line x1="210" y1="50" x2="248" y2="50"/><line x1="430" y1="50" x2="468" y2="50"/></g>
+                    <g class="fm-node" fill="#faf0f1" stroke="#9e3b46"><rect x="270" y="132" width="300" height="50"/></g>
+                    <g fill="#26314a" font-family="Microsoft YaHei, sans-serif" font-size="13.5" text-anchor="middle">
+                      <text x="420" y="154">幂收敛判据 Aᵏ → O</text>
+                      <text x="420" y="173" font-size="12" fill="#666">充要条件 ρ(A)&lt;1（定理 2.10 保证可换范数）</text>
+                    </g>
+                    <g class="fm-edge" marker-end="url(#m23)"><path d="M560 76 C530 108 480 118 470 130" stroke-dasharray="4 4"/></g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================= 一、矩阵的非奇异性条件 ================= -->
+          <section class="section" id="sec-nonsingular">
+            <h2 class="sec-title"><span class="cn">一</span>矩阵的非奇异性条件</h2>
+            <p>不计算行列式，只凭范数大小就能判断 \(I-A\) 是否可逆，这是扰动分析与迭代法的基础。</p>
+
+            <section class="card thm" id="thm-2-6">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 2.6（Neumann 判据）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\C^{n\times n}\)，且对某种矩阵范数有 \(\|A\|&lt;1\)，则矩阵 \(I-A\) 非奇异，且
+                  <div class="eq-scroll">\[ \|(I-A)^{-1}\|\le\frac{\|I\|}{1-\|A\|}. \tag{2.3.1} \]</div></p>
+                <details class="proof">
+                  <summary><span>证明（反证法，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>设矩阵范数与向量范数 \(\|\cdot\|_V\) 相容（例 2.9 保证存在）。若 \(\det(I-A)=0\)，则齐次方程 \((I-A)x=\mathbf0\) 有非零解 \(x_0\)，即 \(x_0=Ax_0\)。于是
+                      \[ \|x_0\|_V=\|Ax_0\|_V\le\|A\|\,\|x_0\|_V. \]
+                      因 \(x_0\ne\mathbf0\)，\(\|x_0\|_V&gt;0\)，推出 \(\|A\|\ge1\)，与条件矛盾，故 \(I-A\) 非奇异。</p>
+                    <p>再由 \((I-A)^{-1}(I-A)=I\) 得 \((I-A)^{-1}=I+(I-A)^{-1}A\)，取范数：
+                      \[ \|(I-A)^{-1}\|\le\|I\|+\|(I-A)^{-1}\|\,\|A\|, \]
+                      移项即得 (2.3.1)（对诱导范数 \(\|I\|=1\)，分母仍为 \(1-\|A\|\)）。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-2-7">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 2.7（逆与单位矩阵的逼近程度）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">在定理 2.6 的条件下，还有
+                  <div class="eq-scroll">\[ \|I-(I-A)^{-1}\|\le\frac{\|A\|}{1-\|A\|}. \tag{2.3.2} \]</div></p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>\(I-(I-A)^{-1}=-A(I-A)^{-1}\)（由 \((I-A)-I=-A\) 右乘 \((I-A)^{-1}\) 得到）。再左乘 \(A\) 并整理：\(A(I-A)^{-1}=A+A[A(I-A)^{-1}]\)，取范数
+                      \[ \|A(I-A)^{-1}\|\le\|A\|+\|A\|\,\|A(I-A)^{-1}\|, \]
+                      由 \(\|A\|&lt;1\) 移项得 \(\|A(I-A)^{-1}\|\le\dfrac{\|A\|}{1-\|A\|}\)，故
+                      \[ \|I-(I-A)^{-1}\|=\|A(I-A)^{-1}\|\le\frac{\|A\|}{1-\|A\|}. \]</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+                <p style="margin-bottom:0" class="muted">直观含义：\(A\) 越小（越接近零矩阵），\(I-A\) 的逆越接近 \(I\)；分母 \(1-\|A\|\) 提示 \(\|A\|\) 不能太接近 1，否则估计急剧恶化。</p>
+              </div>
+            </section>
+          </section>
+          <!-- ================= 二、逆矩阵的摄动 ================= -->
+          <section class="section" id="sec-perturbation">
+            <h2 class="sec-title"><span class="cn">二</span>近似逆矩阵的误差——逆矩阵的摄动</h2>
+            <p>实际问题中矩阵元素 \(a_{ij}\) 常带误差 \(\delta a_{ij}\)，准确矩阵应是 \(A+\delta A\)（\(\delta A\) 称 <strong>摄动矩阵</strong>）。非奇异矩阵的逆在小摄动下变化多大？</p>
+            <section class="card thm" id="thm-2-8">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 2.8（摄动定理）</span>
+              </header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{n\times n}\) 非奇异，\(B\in\C^{n\times n}\)，且 \(\|A^{-1}B\|&lt;1\)，则：</p>
+                <ol class="axiom-list" style="list-style:none">
+                  <li><span class="n">1</span>\(A+B\) 非奇异；</li>
+                  <li><span class="n">2</span>记 \(F=I-(I+A^{-1}B)^{-1}\)，则
+                    <div class="eq-scroll">\[ \|F\|\le\frac{\|A^{-1}B\|}{1-\|A^{-1}B\|}; \]</div></li>
+                  <li><span class="n">3</span>逆矩阵的<strong>相对误差</strong>满足
+                    <div class="eq-scroll">\[ \frac{\|A^{-1}-(A+B)^{-1}\|}{\|A^{-1}\|}\le\frac{\|A^{-1}B\|}{1-\|A^{-1}B\|}. \tag{摄动} \]</div></li>
+                </ol>
+                <details class="proof">
+                  <summary><span>证明思路（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>因 \(\|-A^{-1}B\|=\|A^{-1}B\|&lt;1\)，由定理 2.6，\(I+A^{-1}B\) 可逆；而 \(A+B=A(I+A^{-1}B)\) 是两个可逆矩阵之积，故可逆。结论 (2) 直接用定理 2.7（把其中 \(A\) 换成 \(-A^{-1}B\)）。结论 (3) 由恒等式
+                      \[ A^{-1}-(A+B)^{-1}=[I-(I+A^{-1}B)^{-1}]A^{-1} \]
+                      取范数并代入 (2) 得到。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="condition-number">条件数 cond(A)</h3>
+            <p>令 \(B=\delta A\)，当 \(\|A^{-1}\|\,\|\delta A\|&lt;1\) 时，定义
+              <div class="eq-scroll">\[ \mathrm{cond}(A)=\|A\|\,\|A^{-1}\|, \tag{条件数} \]</div>
+              则由定理 2.8 的 (2)(3) 得
+              <div class="eq-scroll">\[
+              \frac{\|A^{-1}-(A+\delta A)^{-1}\|}{\|A^{-1}\|}
+              \le\frac{\mathrm{cond}(A)\,\dfrac{\|\delta A\|}{\|A\|}}{1-\mathrm{cond}(A)\,\dfrac{\|\delta A\|}{\|A\|}}.
+              \]</div>
+              <strong>条件数越大，同样大小的相对摄动 \(\|\delta A\|/\|A\|\) 引起的逆矩阵相对误差就越大</strong>。这是数值线性代数中"病态/良态矩阵"概念的源头：解线性方程组 \(Ax=b\) 时，条件数同时控制右端扰动和解的相对误差（\(\|\delta x\|/\|x\|\le\mathrm{cond}(A)\|\delta b\|/\|b\|\)）。</p>
+            <aside class="card note">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                <span class="card-label">注意</span>
+              </header>
+              <div class="card-body">
+                <p>条件数依赖所选范数（\(\mathrm{cond}_1,\mathrm{cond}_2,\mathrm{cond}_\infty\)），数值可能不同，但都刻画"放大倍数"。\(\mathrm{cond}_2(A)=\sigma_{\max}/\sigma_{\min}\)（最大奇异值与最小奇异值之比），对称正定矩阵时为特征值之比 \(\lambda_{\max}/\lambda_{\min}\)。</p>
+              </div>
+            </aside>
+          </section>
+
+          <!-- ================= 三、谱半径 ================= -->
+          <section class="section" id="sec-spectral-radius">
+            <h2 class="sec-title"><span class="cn">三</span>矩阵的谱半径及其性质</h2>
+            <p>谱半径在特征值估计、广义逆、数值分析及数值代数中占有极重要地位。</p>
+            <section class="card def" id="def-2-5">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <span class="card-label">定义 2.5</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\C^{n\times n}\) 的 \(n\) 个特征值为 \(\lambda_1,\ldots,\lambda_n\)，称
+                  <div class="eq-scroll">\[ \rho(A)=\max_i|\lambda_i| \tag{2.3.3} \]</div>
+                  为 \(A\) 的<strong>谱半径</strong>。</p>
+              </div>
+            </section>
+
+            <section class="card thm" id="thm-2-9">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 2.9（谱半径是任何矩阵范数的下界）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">对 \(\C^{n\times n}\) 上任何一种矩阵范数 \(\|\cdot\|\)，都有
+                  <div class="eq-scroll">\[ \rho(A)\le\|A\|. \tag{2.3.4} \]</div></p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>取属于特征值 \(\lambda\) 的特征向量 \(x\)，取与矩阵范数相容的向量范数（例 2.9 保证存在）。由 \(Ax=\lambda x\)：
+                      \[ |\lambda|\,\|x\|_V=\|\lambda x\|_V=\|Ax\|_V\le\|A\|\,\|x\|_V. \]
+                      因 \(x\ne\mathbf0\)，约去 \(\|x\|_V&gt;0\) 得 \(|\lambda|\le\|A\|\)；对所有特征值取最大即 (2.3.4)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <section class="card ex" id="exm-2-10">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3h6M10 3v5.5L5.2 18.2A2 2 0 0 0 7 21h10a2 2 0 0 0 1.8-2.8L14 8.5V3"/><line x1="7.5" y1="14" x2="16.5" y2="14"/></svg></span>
+                <span class="card-label">例 2.10</span><span class="card-tag">ρ 严格小于三种范数</span>
+              </header>
+              <div class="card-body">
+                <p>对 \(A=\begin{pmatrix}1-\mathrm j&3\\2&1+\mathrm j\end{pmatrix}\)（\(\mathrm j=\sqrt{-1}\)）：
+                  \[ \det(\lambda I-A)=(\lambda-1)^2-5,\ \lambda_{1,2}=1\pm\sqrt5,\ \rho(A)=1+\sqrt5\approx3.236, \]
+                  而 \(\|A\|_1=\|A\|_\infty=3+\sqrt2\approx4.414\)；又 \(A^{\mathrm H}A=\begin{pmatrix}6&5+5\mathrm j\\5-5\mathrm j&11\end{pmatrix}\) 的特征值为 16,1，故 \(\|A\|_2=4\)。于是
+                  \[ \rho(A)&lt;\|A\|_1,\quad \rho(A)&lt;\|A\|_2,\quad \rho(A)&lt;\|A\|_\infty. \]</p>
+              </div>
+            </section>
+
+            <div class="grid2">
+              <div class="mini-card"><div class="mc-title">例 2.11：幂的谱半径</div><p style="margin:0">\(\rho(A^k)=[\rho(A)]^k\)（\(k=1,2,\ldots\)）。因为若 \(A\) 的特征值为 \(\lambda_i\)，由定理 1.29，\(A^k\) 的特征值恰为 \(\lambda_i^k\)，取最大模即得。</p></div>
+              <div class="mini-card"><div class="mc-title">例 2.12：正规矩阵的谱范数</div><p style="margin:0">对任意非奇异矩阵 \(A\)：
+                \[ \|A\|_2=\rho^{1/2}(A^{\mathrm H}A)=\rho^{1/2}(AA^{\mathrm H}); \tag{2.3.5} \]
+                当 \(A\) 是 Hermite 矩阵（\(A^{\mathrm H}=A\)）时
+                \[ \|A\|_2=\rho(A). \tag{2.3.6} \]
+                （由 \(\|A\|_2^2=\rho(A^{\mathrm H}A)=\rho(A^2)=\rho^2(A)\) 开方。）</p></div>
+            </div>
+            <p>一般矩阵的谱范数 \(\|A\|_2\) 与谱半径 \(\rho(A)\) 可能相差很大（例 2.10），只有正规矩阵（含 Hermite、酉、对角矩阵）保证二者相等；反向不成立——非正规矩阵也可能 \(\|A\|_2=\rho(A)\)。</p>
+
+            <section class="card thm" id="thm-2-10">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 2.10（谱半径是范数族的下确界）</span><span class="card-tag">关键理论结果</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\in\C^{n\times n}\)，对任意 \(\varepsilon&gt;0\)，都存在某种矩阵范数 \(\|\cdot\|_M\)，使得
+                  <div class="eq-scroll">\[ \|A\|_M\le\rho(A)+\varepsilon. \tag{2.3.7} \]</div>
+                  结合定理 2.9 可知：\(\rho(A)\) 是 \(A\) 的<strong>所有矩阵范数的下确界</strong>——虽然常用范数可能比 \(\rho(A)\) 大不少，但总能换一种（依赖于 \(A\) 的 Jordan 形构造的）范数让它任意接近 \(\rho(A)\)。</p>
+                <details class="proof">
+                  <summary><span>证明梗概（Jordan 形 + 对角缩放，点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p>由定理 1.29 取可逆 \(P\) 使 \(P^{-1}AP=J=\Lambda+\widetilde I\)（\(\Lambda=\diag(\lambda_i)\)，\(\widetilde I\) 是超对角 0/1 矩阵）。令 \(D=\diag(1,\varepsilon,\varepsilon^2,\ldots)\)、\(S=PD\)，则
+                      \[ S^{-1}AS=D^{-1}JD=\Lambda+\varepsilon\widetilde I, \]
+                      它的列和范数不超过 \(\rho(A)+\varepsilon\)。而 \(\|B\|_M=\|S^{-1}BS\|_1\) 是 \(\C^{n\times n}\) 上的矩阵范数（由一个固定的相似变换诱导，三条件与相容性都保持），于是 \(\|A\|_M\le\rho(A)+\varepsilon\)。</p>
+                    <p class="muted">注意这个范数是为 \(A\) "量身定制"的，对别的矩阵 (2.3.7) 不一定成立。</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+
+            <h3 class="sub-title" id="power-conv">四、矩阵幂的收敛（§3.1 提前，最重要的应用）</h3>
+            <section class="card thm" id="thm-3-2">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 3.2：Aᵏ → O 的充要条件</span><span class="card-tag">迭代法收敛总开关</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">设 \(A\) 为方阵，则
+                  <div class="eq-scroll">\[ A^k\to O\ (k\to\infty)\quad\Longleftrightarrow\quad \rho(A)&lt;1. \]</div></p>
+                <details class="proof">
+                  <summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary>
+                  <div class="proof-body">
+                    <p><strong>充分性：</strong>已知 \(\rho(A)&lt;1\)，取 \(\varepsilon=\tfrac12[1-\rho(A)]&gt;0\)，定理 2.10 给出范数使 \(\|A\|_M\le\rho(A)+\varepsilon=\tfrac12[1+\rho(A)]&lt;1\)。于是
+                      \[ \|A^k\|_M\le\|A\|_M^k\to0, \]
+                      由矩阵范数等价（定理 3.1）得 \(A^k\to O\)。</p>
+                    <p><strong>必要性：</strong>若 \(A^k\to O\)，对任一特征值 \(\lambda\) 与特征向量 \(x\)：\(A^kx=\lambda^k x\to\mathbf0\)，故 \(\lambda^k\to0\)，即 \(|\lambda|&lt;1\)，所以 \(\rho(A)&lt;1\)。</p>
+                    <p class="qed">□ 证毕</p>
+                  </div>
+                </details>
+              </div>
+            </section>
+            <section class="card thm cor" id="thm-3-3">
+              <header class="card-head">
+                <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span>
+                <span class="card-label">定理 3.3（实用充分条件）</span>
+              </header>
+              <div class="card-body">
+                <p style="margin-bottom:0">只要存在<strong>某一种</strong>矩阵范数使 \(\|A\|&lt;1\)，就有 \(A^k\to O\)。</p>
+                <p style="margin-bottom:0">这是定理 2.9（\(\rho(A)\le\|A\|&lt;1\)）与定理 3.2 的直接推论。它好用但只是充分条件：\(\rho(A)&lt;1\) 时三种常用范数可能全都 ≥1（这时就要靠定理 2.10 理解为什么幂仍然收敛）。</p>
+              </div>
+            </section>
+            <p>这一结果是线性方程组迭代解法（Jacobi、Gauss–Seidel、SOR）与矩阵幂级数 \(\sum A^k=(I-A)^{-1}\) 收敛性的统一判据：<strong>迭代矩阵的谱半径小于 1</strong>。</p>
+
+            <h3 class="sub-title" id="power-lab-title">动手实验：谱半径与幂的衰减</h3>
+            <p>切换预设或手改 2×2 矩阵，对比 \(\rho(A)\) 与三种范数，观察 \(A^k\) 在 \(\rho&lt;1\)、\(\rho=1\)、\(\rho&gt;1\) 三种情形下的命运。</p>
+            <section class="card lab" data-power-lab></section>
+          </section>
+          <!-- ================= 习题 2.3 ================= -->
+          <section class="section" id="sec-exercises" data-fold-scope>
+            <h2 class="sec-title"><span class="cn">习</span>习题 2.3（共 2 题）</h2>
+            <div class="ex-toolbar">
+              <span data-fold-tools="details.solution">
+                <button type="button" data-fold="open">全部展开解答</button>
+                <button type="button" data-fold="close">全部收起</button>
+              </span>
+            </div>
+
+            <article class="card task" id="ex23-1">
+              <header class="card-head"><span class="card-label">第 1 题</span><span class="tag">摄动下保持可逆</span></header>
+              <div class="card-body">
+                <p>设 \(A\in\C^{n\times n}\) 可逆，\(B\in\C^{n\times n}\)，若对某种矩阵范数有 \(\|B\|&lt;\dfrac{1}{\|A^{-1}\|}\)，证明 \(A+B\) 可逆。</p>
+                <details class="solution"><summary><span>证明（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>把 \(A+B\) 写成
+                    \[ A+B=A(I+A^{-1}B). \]
+                    由相容性，
+                    \[ \|A^{-1}B\|\le\|A^{-1}\|\,\|B\|&lt;\|A^{-1}\|\cdot\frac1{\|A^{-1}\|}=1. \]
+                    根据定理 2.6（把其中的 \(A\) 换成 \(-A^{-1}B\)），\(I+A^{-1}B\) 非奇异；而可逆矩阵之积仍可逆，故 \(A+B\) 可逆。</p>
+                  <p class="muted">这给出了"可逆矩阵附近仍是可逆矩阵"的定量邻域半径：摄动 \(B\) 小到 \(\|B\|&lt;1/\|A^{-1}\|\) 时不改变可逆性。</p>
+                </div></details>
+              </div>
+            </article>
+
+            <article class="card task" id="ex23-2">
+              <header class="card-head"><span class="card-label">第 2 题</span><span class="tag tag-mid">条件数与相对误差估计</span></header>
+              <div class="card-body">
+                <p>已知 \(A=\begin{pmatrix}2&1\\1&3\end{pmatrix},\ \delta A=\begin{pmatrix}0&0.5\\0.2&0\end{pmatrix}\)，试估计
+                  \[ \frac{\|A^{-1}-(A+\delta A)^{-1}\|_\infty}{\|A^{-1}\|_\infty} \]
+                  的值（用行和范数）。</p>
+                <details class="solution"><summary><span>解答（点击展开）</span><svg class="chev" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></summary><div class="solution-body">
+                  <p>\(\det A=5\)，故
+                    \[ A^{-1}=\frac15\begin{pmatrix}3&-1\\-1&2\end{pmatrix}
+                       =\begin{pmatrix}0.6&-0.2\\-0.2&0.4\end{pmatrix}, \]
+                    \[ \|A\|_\infty=\max(3,4)=4,\qquad \|A^{-1}\|_\infty=\max(0.8,0.6)=0.8, \]
+                    \[ \mathrm{cond}_\infty(A)=\|A\|_\infty\|A^{-1}\|_\infty=4\times0.8=3.2, \]
+                    \[ \|\delta A\|_\infty=\max(0.5,0.2)=0.5,\qquad \frac{\|\delta A\|_\infty}{\|A\|_\infty}=\frac{0.5}{4}=0.125. \]</p>
+                  <p>先验证摄动定理条件：\(\|A^{-1}\delta A\|_\infty\le0.8\times0.5=0.4&lt;1\)，满足。代入逆矩阵相对误差公式
+                    \[ \frac{\|A^{-1}-(A+\delta A)^{-1}\|_\infty}{\|A^{-1}\|_\infty}
+                       \le\frac{\mathrm{cond}_\infty(A)\dfrac{\|\delta A\|_\infty}{\|A\|_\infty}}
+                                  {1-\mathrm{cond}_\infty(A)\dfrac{\|\delta A\|_\infty}{\|A\|_\infty}}
+                       =\frac{3.2\times0.125}{1-3.2\times0.125}
+                       =\frac{0.4}{0.6}\approx0.667. \]
+                    即逆矩阵的相对误差上界约为 <strong>66.7%</strong>。条件数 3.2 不大，但 12.5% 的相对摄动经放大后已相当可观，正体现分母 \(1-\mathrm{cond}\cdot\varepsilon\) 的放大效应。</p>
+                </div></details>
+              </div>
+            </article>
+          </section>
+
+          <!-- ================= 本节小结 ================= -->
+          <section class="section" id="sec-summary">
+            <h2 class="sec-title"><span class="cn">结</span>本节小结与自检</h2>
+            <div class="summary-block">
+              <p>范数的三类应用构成数值分析的"误差—稳定性—收敛"链条：</p>
+              <div class="table-wrap">
+                <table class="book">
+                  <tr><th>主题</th><th>核心结论</th></tr>
+                  <tr><td>非奇异性</td><td>\(\|A\|&lt;1\Rightarrow I-A\) 可逆，且 \(\|(I-A)^{-1}\|\le\dfrac{\|I\|}{1-\|A\|}\)；\(\|I-(I-A)^{-1}\|\le\dfrac{\|A\|}{1-\|A\|}\)</td></tr>
+                  <tr><td>逆矩阵摄动</td><td>\(\|A^{-1}B\|&lt;1\Rightarrow A+B\) 可逆；相对误差由 \(\mathrm{cond}(A)=\|A\|\|A^{-1}\|\) 控制</td></tr>
+                  <tr><td>谱半径</td><td>\(\rho(A)=\max|\lambda_i|\)；任意矩阵范数 \(\rho(A)\le\|A\|\)；存在范数使 \(\|A\|\le\rho(A)+\varepsilon\)</td></tr>
+                  <tr><td>特殊情形</td><td>\(\rho(A^k)=\rho(A)^k\)；Hermite（正规）矩阵 \(\|A\|_2=\rho(A)\)</td></tr>
+                  <tr><td>幂收敛</td><td>\(A^k\to O\Leftrightarrow\rho(A)&lt;1\)；某范数 \(\|A\|&lt;1\) 是充分条件</td></tr>
+                </table>
+              </div>
+              <div class="self-check">
+                <h3>三个自检问题</h3>
+                <ol style="margin-bottom:0">
+                  <li>为什么 \(\|A\|&lt;1\) 能在不计算行列式的情况下保证 \(I-A\) 可逆？反证时用到了哪条相容性不等式？</li>
+                  <li>条件数大意味着什么？相对摄动 \(\|\delta A\|/\|A\|\) 经过什么公式被放大成逆矩阵的相对误差？分母趋近 0 时会发生什么？</li>
+                  <li>\(\rho(A)&lt;1\) 但 \(\|A\|_1,\|A\|_2,\|A\|_\infty\) 全都 ≥1 时，\(A^k\) 还收敛吗？为什么需要定理 2.10 才能证明？</li>
+                </ol>
+              </div>
+            </div>
+            <nav class="lesson-nav" aria-label="课时翻页">
+              <a class="ln-prev" href="2.2-matrix-norms.html"><span class="ln-dir">上一节</span><span class="ln-ttl">§2.2 矩阵的范数</span></a>
+              <a class="ln-home" href="../../index.html" title="回课程主页" aria-label="回课程主页">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </a>
+              <a class="ln-next" href="../ch3/3.1-matrix-sequences.html"><span class="ln-dir">下一章</span><span class="ln-ttl">第 3 章 §3.1 矩阵序列</span></a>
+            </nav>
+          </section>
+            <p class="src-note">内容依据程云鹏等《矩阵论（第 3 版）》整理，仅供学习使用</p>
+        </article>
+      </div>
+    </main>
+
+    <nav id="toc-this-page" class="page-toc no-print" aria-label="本页目录"></nav>
+  </div>
+
+  <button id="to-top" class="no-print" aria-label="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script defer src="../../vendor/katex/katex.min.js"></script>
+  <script defer src="../../vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="../../assets/js/common.js"></script>
+  <script defer src="../../assets/js/interactives.js"></script>
+</body>
+</html>
